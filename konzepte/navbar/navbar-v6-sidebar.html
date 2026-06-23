@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  MAISON AURÉLIE — Premium-Juwelier, Düsseldorf
+  Design-Richtung: "Bordeaux & Gold"
+  Navbar-Konzept v6: "Vertikale Sidebar-Navigation"
+
+  KONZEPT
+  Auf Desktop (>=1000px) eine schmale, fixe vertikale Navigationsleiste am
+  linken Bildschirmrand. Oben sitzt die kompakte Wordmark, in der Mitte die
+  Links (Trauringe, Uhren, Schmuck, Manufaktur) untereinander mit feinem
+  Gold-Hover, unten ein "Termin"-Button. Der Hauptinhalt erhaelt links den
+  entsprechenden Platz (margin-left in Sidebar-Breite).
+
+  IDEE
+  Die vertikale Leiste wirkt wie eine ruhige, edle Spalte und gibt dem
+  Hauptinhalt eine grosse Buehne. Gold-Hairline trennt Sidebar und Inhalt,
+  die Typografie atmet. Bordeaux-Grund, Gold als Akzent.
+
+  VERHALTEN
+  Unter 1000px wird die Sidebar zu einer normalen oberen Leiste mit Wordmark
+  und Hamburger. Der Hamburger oeffnet ein zugaengliches Mobile-Menue (Dialog,
+  aria-modal) mit Fokus-Falle, ESC-Schliessen und Schliessen-Button.
+
+  Standalone, offline lauffaehig. Keine externen Skripte ausser Google Fonts.
+  PROD: next/font lokal statt Google-Fonts-<link>.
+
+  Zugaenglichkeit: Skip-Link, semantisches <header><nav aria-label>,
+  Mobile-Menue mit aria-expanded/aria-controls, ESC + Schliessen-Button,
+  Fokus-Falle, :focus-visible, Touch-Ziele >=44px, prefers-reduced-motion
+  respektiert, Kontrast >=4.5:1, kein horizontales Scrollen bei 320px.
+  ============================================================================
+-->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAISON AURÉLIE · Navbar v6 Vertikale Sidebar</title>
+
+  <!-- PROD: next/font lokal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #21090E;
+      --panel: #2E1118;
+      --text: #F4E7DD;
+      --text-2: #C49AA0;
+      --gold: #CBA15A;
+      --gold-light: #E6C783;
+      --gold-deep: #93702F;
+      --hairline: rgba(255, 210, 180, 0.14);
+
+      --font-display: "Bodoni Moda", Georgia, "Times New Roman", serif;
+      --font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+      /* Sidebar-Geometrie */
+      --sidebar-w: 232px;
+      --shadow-soft: 0 18px 50px -18px rgba(0, 0, 0, 0.7), 0 4px 14px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(120% 80% at 50% -10%, rgba(203, 161, 90, 0.10), transparent 60%),
+        radial-gradient(80% 60% at 90% 0%, rgba(147, 112, 47, 0.08), transparent 55%);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---------- Skip-Link ---------- */
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: 0;
+      transform: translateY(-120%);
+      z-index: 200;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--gold);
+      border-radius: 0 0 12px 12px;
+      padding: 12px 20px;
+      font-weight: 500;
+      transition: transform 0.18s ease;
+    }
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    /* ---------- Fokus sichtbar ---------- */
+    :focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* ============================================================
+       NAVBAR v6 — Vertikale Sidebar (Desktop-Basis)
+       ============================================================ */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      z-index: 100;
+      background: var(--panel);
+      background-image: linear-gradient(180deg, rgba(203, 161, 90, 0.06), transparent 40%);
+      border-right: 1px solid var(--hairline);
+      box-shadow: 8px 0 40px -24px rgba(0, 0, 0, 0.8);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 30px 22px 28px;
+    }
+
+    /* ---------- Wordmark (kompakt, oben) ---------- */
+    .wordmark {
+      display: inline-flex;
+      flex-direction: column;
+      line-height: 1;
+      flex: 0 0 auto;
+      padding: 4px;
+    }
+    .wordmark__name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.32rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+    .wordmark__sub {
+      font-family: var(--font-body);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 8px;
+    }
+
+    /* ---------- Vertikale Links (Mitte) ---------- */
+    .nav-links {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      gap: 4px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-links a {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 0 14px;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      color: var(--text-2);
+      transition: color 0.2s ease, background 0.2s ease, padding-left 0.2s ease;
+    }
+    /* feine Gold-Linie als Hover-Akzent */
+    .nav-links a::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transform: translateY(-50%);
+      transition: width 0.22s ease;
+    }
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--gold-light);
+      background: rgba(203, 161, 90, 0.10);
+      padding-left: 30px;
+    }
+    .nav-links a:hover::before,
+    .nav-links a:focus-visible::before {
+      width: 12px;
+    }
+
+    /* ---------- Termin-Button (unten) ---------- */
+    .sidebar__foot {
+      flex: 0 0 auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--hairline);
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #2A0F09;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      border: 1px solid var(--gold-deep);
+      box-shadow: 0 4px 14px -6px rgba(203, 161, 90, 0.6);
+      cursor: pointer;
+      transition: filter 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-cta:hover {
+      filter: brightness(1.06);
+    }
+    .nav-cta:active {
+      transform: translateY(1px);
+    }
+
+    /* ---------- Hamburger (nur mobil sichtbar) ---------- */
+    .nav-toggle {
+      display: none;
+      flex: 0 0 auto;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .nav-toggle:hover {
+      background: rgba(203, 161, 90, 0.10);
+      border-color: var(--gold);
+    }
+    .nav-toggle__bars,
+    .nav-toggle__bars::before,
+    .nav-toggle__bars::after {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+    .nav-toggle__bars {
+      position: relative;
+    }
+    .nav-toggle__bars::before {
+      position: absolute;
+      top: -6px;
+      left: 0;
+    }
+    .nav-toggle__bars::after {
+      position: absolute;
+      top: 6px;
+      left: 0;
+    }
+
+    /* ---------- Mobile-Menue Panel ---------- */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: none;
+      padding: 16px;
+    }
+    .mobile-menu[hidden] {
+      display: none;
+    }
+    .mobile-menu.is-open {
+      display: block;
+    }
+    .mobile-menu__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 5, 8, 0.6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .mobile-menu.is-open .mobile-menu__backdrop {
+      opacity: 1;
+    }
+    .mobile-menu__panel {
+      position: relative;
+      max-width: 460px;
+      margin: 8px auto 0;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+      transform: translateY(-12px);
+      opacity: 0;
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
+    }
+    .mobile-menu.is-open .mobile-menu__panel {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .mobile-menu__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .mobile-menu__title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+    .mobile-menu__close {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      border-radius: 999px;
+      color: var(--text);
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .mobile-menu__close:hover {
+      background: rgba(203, 161, 90, 0.10);
+      border-color: var(--gold);
+    }
+    .mobile-menu__list {
+      list-style: none;
+      margin: 0;
+      padding: 6px 0;
+    }
+    .mobile-menu__list a {
+      display: flex;
+      align-items: center;
+      min-height: 52px;
+      padding: 0 12px;
+      border-radius: 14px;
+      font-size: 1.02rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .mobile-menu__list a:hover {
+      background: rgba(203, 161, 90, 0.10);
+      color: var(--gold-light);
+    }
+    .mobile-menu__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 52px;
+      margin-top: 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #2A0F09;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      border: 1px solid var(--gold-deep);
+    }
+
+    /* ============================================================
+       SEITENINHALT — bekommt links Platz fuer die Sidebar
+       ============================================================ */
+    .page {
+      margin-left: var(--sidebar-w);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    main {
+      padding-top: 56px;
+    }
+
+    /* ---------- Hero-Stub ---------- */
+    .hero {
+      padding: 40px 0 96px;
+    }
+    .hero__eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 22px;
+    }
+    .hero__title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      line-height: 1.04;
+      letter-spacing: 0.01em;
+      margin: 0 0 24px;
+      color: var(--text);
+    }
+    .hero__title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero__lead {
+      max-width: 56ch;
+      color: var(--text-2);
+      font-size: 1.08rem;
+      margin: 0 0 36px;
+    }
+    .hero__media {
+      margin-top: 24px;
+      /* aspect-ratio-Platzhalter */
+      aspect-ratio: 16 / 7;
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid var(--hairline);
+      background:
+        repeating-linear-gradient(135deg, rgba(203, 161, 90, 0.06) 0 14px, transparent 14px 28px),
+        linear-gradient(160deg, var(--panel), #240A10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-2);
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 16px;
+    }
+
+    /* ---------- Fuell-Sektionen ---------- */
+    .section {
+      padding: 90px 0;
+      border-top: 1px solid var(--hairline);
+      min-height: 80vh;
+    }
+    .section__eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 16px;
+    }
+    .section__title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin: 0 0 20px;
+      color: var(--text);
+    }
+    .section__body {
+      max-width: 60ch;
+      color: var(--text-2);
+      margin: 0 0 28px;
+    }
+    .placeholder {
+      /* aspect-ratio-Platzhalter */
+      aspect-ratio: 4 / 3;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 16px;
+      border: 1px dashed var(--hairline);
+      background: linear-gradient(160deg, var(--panel), #240A10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-2);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .site-footer {
+      padding: 56px 0 80px;
+      border-top: 1px solid var(--hairline);
+      color: var(--text-2);
+      font-size: 0.84rem;
+    }
+
+    /* ============================================================
+       RESPONSIV: unter 1000px -> obere Leiste + Hamburger
+       ============================================================ */
+    @media (max-width: 999.98px) {
+      .site-header {
+        right: 0;
+        bottom: auto;
+        width: auto;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--hairline);
+        box-shadow: 0 8px 30px -18px rgba(0, 0, 0, 0.8);
+      }
+      .sidebar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        height: auto;
+        padding: 14px 18px;
+      }
+      .wordmark__sub {
+        margin-top: 5px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .sidebar__foot {
+        display: none;
+      }
+      .nav-toggle {
+        display: inline-flex;
+      }
+      .page {
+        margin-left: 0;
+      }
+      main {
+        /* Platz fuer die obere Leiste */
+        padding-top: 104px;
+      }
+    }
+
+    /* Sehr schmal (~320px): Wordmark schrumpft sauber */
+    @media (max-width: 360px) {
+      .sidebar {
+        padding: 12px 14px;
+      }
+      .wordmark__name {
+        font-size: 1.12rem;
+      }
+      .wordmark__sub {
+        letter-spacing: 0.26em;
+      }
+      .container {
+        padding: 0 18px;
+      }
+    }
+
+    /* ============================================================
+       REDUCED MOTION: Animationen / Smooth-Scroll aus
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <nav class="sidebar" aria-label="Hauptnavigation">
+      <a class="wordmark" href="#main" aria-label="MAISON AURÉLIE, Startseite">
+        <span class="wordmark__name">MAISON AURÉLIE</span>
+        <span class="wordmark__sub">Düsseldorf</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#trauringe">Trauringe</a></li>
+        <li><a href="#uhren">Uhren</a></li>
+        <li><a href="#schmuck">Schmuck</a></li>
+        <li><a href="#manufaktur">Manufaktur</a></li>
+      </ul>
+
+      <div class="sidebar__foot">
+        <a class="nav-cta" href="#termin">Termin</a>
+      </div>
+
+      <button
+        class="nav-toggle"
+        id="navToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+        aria-label="Menü öffnen">
+        <span class="nav-toggle__bars" aria-hidden="true"></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile-Menue -->
+  <div
+    class="mobile-menu"
+    id="mobileMenu"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigationsmenü"
+    hidden>
+    <div class="mobile-menu__backdrop" data-close></div>
+    <div class="mobile-menu__panel">
+      <div class="mobile-menu__head">
+        <span class="mobile-menu__title">Navigation</span>
+        <button
+          class="mobile-menu__close"
+          id="menuClose"
+          type="button"
+          aria-label="Menü schließen">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <ul class="mobile-menu__list">
+        <li><a href="#trauringe" data-close>Trauringe</a></li>
+        <li><a href="#uhren" data-close>Uhren</a></li>
+        <li><a href="#schmuck" data-close>Schmuck</a></li>
+        <li><a href="#manufaktur" data-close>Manufaktur</a></li>
+      </ul>
+      <a class="mobile-menu__cta" href="#termin" data-close>Termin vereinbaren</a>
+    </div>
+  </div>
+
+  <div class="page">
+    <main id="main">
+      <section class="hero">
+        <div class="container">
+          <p class="hero__eyebrow">Feine Juwelierkunst seit 1924</p>
+          <h1 class="hero__title">Schmuckstücke, die <em>Geschichten</em> tragen</h1>
+          <p class="hero__lead">
+            In unserem Atelier am Königsallee entstehen Einzelstücke aus
+            verantwortungsvoll gewonnenem Gold und sorgfältig ausgewählten
+            Steinen. Vereinbaren Sie einen Termin für eine persönliche Beratung.
+          </p>
+          <div class="hero__media" role="img" aria-label="Platzhalter für Atelier-Aufnahme">
+            aspect-ratio 16:7 Platzhalter
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="trauringe">
+        <div class="container">
+          <p class="section__eyebrow">Trauringe</p>
+          <h2 class="section__title">Ein Versprechen in Gold</h2>
+          <p class="section__body">
+            Vom klaren Klassiker bis zur fein gefassten Variante fertigen wir
+            Trauringe nach Mass. Diese Sektion dient als Fülltext mit
+            ausreichender Höhe, damit das Scroll-Verhalten neben der fixen
+            Sidebar sichtbar wird. Die Leiste bleibt links ruhig stehen,
+            während der Inhalt vorbeizieht.
+          </p>
+          <div class="placeholder" role="img" aria-label="Platzhalter für Trauring-Aufnahme">
+            aspect-ratio 4:3 Platzhalter
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="uhren">
+        <div class="container">
+          <p class="section__eyebrow">Uhren</p>
+          <h2 class="section__title">Zeitmesser von Rang</h2>
+          <p class="section__body">
+            Eine kuratierte Auswahl mechanischer Uhren, betreut von unseren
+            Uhrmachern. Diese zweite Fülltext-Sektion sorgt für genügend
+            Scrollhöhe, um das Zusammenspiel von fixer vertikaler Navigation
+            und scrollendem Inhalt zu prüfen. Bei reduzierter Bewegung bleiben
+            alle Übergänge bewusst ruhig.
+          </p>
+          <div class="placeholder" role="img" aria-label="Platzhalter für Uhren-Aufnahme">
+            aspect-ratio 4:3 Platzhalter
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer" id="manufaktur">
+        <div class="container">
+          MAISON AURÉLIE, Königsallee, 40212 Düsseldorf. Manufaktur und Termine
+          nach Vereinbarung.
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var toggle = document.getElementById("navToggle");
+      var menu = document.getElementById("mobileMenu");
+      var closeBtn = document.getElementById("menuClose");
+      var lastFocused = null;
+
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      function getFocusable() {
+        return menu.querySelectorAll('a[href], button:not([disabled])');
+      }
+
+      function openMenu() {
+        lastFocused = document.activeElement;
+        menu.hidden = false;
+        /* Reflow erzwingen, damit die Transition greift */
+        void menu.offsetWidth;
+        menu.classList.add("is-open");
+        toggle.setAttribute("aria-expanded", "true");
+        document.body.style.overflow = "hidden";
+        if (closeBtn) {
+          closeBtn.focus();
+        }
+        document.addEventListener("keydown", onKeydown);
+      }
+
+      function closeMenu() {
+        menu.classList.remove("is-open");
+        toggle.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+        document.removeEventListener("keydown", onKeydown);
+
+        var finish = function () {
+          menu.hidden = true;
+          menu.removeEventListener("transitionend", finish);
+        };
+        if (reduceMotion.matches) {
+          finish();
+        } else {
+          menu.addEventListener("transitionend", finish);
+          /* Fallback, falls transitionend ausbleibt */
+          window.setTimeout(finish, 400);
+        }
+
+        if (lastFocused && typeof lastFocused.focus === "function") {
+          lastFocused.focus();
+        }
+      }
+
+      function onKeydown(e) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeMenu();
+          return;
+        }
+        /* Fokus-Falle */
+        if (e.key === "Tab") {
+          var items = getFocusable();
+          if (!items.length) {
+            return;
+          }
+          var first = items[0];
+          var last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+
+      toggle.addEventListener("click", function () {
+        if (menu.classList.contains("is-open")) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      /* Klick auf Backdrop oder Link/CTA schliesst */
+      menu.addEventListener("click", function (e) {
+        var el = e.target.closest("[data-close]");
+        if (el) {
+          closeMenu();
+        }
+      });
+
+      /* Sicherheit: schliessen, wenn auf Desktop-Breite gewechselt wird */
+      var wide = window.matchMedia("(min-width: 1000px)");
+      wide.addEventListener("change", function (e) {
+        if (e.matches && menu.classList.contains("is-open")) {
+          closeMenu();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
