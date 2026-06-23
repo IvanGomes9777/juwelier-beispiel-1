@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAISON AURÉLIE · Kollektionen</title>
+<!--
+  VARIANTE: Sektion 3 / Kollektionen v4 - "ARIA-Tabs Crossfade"
+  IDEE:     Drei Reiter Uhren · Schmuck · Trauringe, deren Panels per Crossfade
+            wechseln. Pro Reiter ein eigenes kleines Grid.
+  TECHNIK:  WAI-ARIA Tabs-Pattern (roving tabindex, Pfeiltasten/Home/End);
+            Crossfade via opacity-Transition, Panel grid-stacked; aspect-ratio
+            gegen CLS; reduced-motion schaltet Fade aus.
+  PRODUKTIONSPFAD: Tabs/Panels als React-Komponente mit Headless-Tabs;
+            Produktlisten aus CMS; <Image> next/image; Fonts next/font lokal.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Link -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  font-size:clamp(0.95rem,0.9rem + 0.3vw,1.05rem);
+  overflow-x:hidden;
+}
+.wrap{
+  max-width:84rem;margin-inline:auto;
+  padding:clamp(3rem,6vw,7rem) clamp(1.25rem,4vw,3rem);
+}
+.head{max-width:40rem;margin-bottom:clamp(1.5rem,3vw,2.5rem)}
+.kicker{font-size:0.78rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0.9rem}
+h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(2.1rem,1.6rem + 2.6vw,3.6rem);line-height:1.05;letter-spacing:-0.01em}
+.lede{color:var(--muted);margin-top:0.9rem;max-width:46ch}
+
+.tabs{
+  display:flex;flex-wrap:wrap;gap:0.4rem;
+  border-bottom:1px solid var(--hairline);
+  margin-bottom:clamp(1.5rem,3vw,2.5rem);
+}
+.tab{
+  appearance:none;background:transparent;border:0;
+  color:var(--muted);font:inherit;
+  font-size:clamp(1rem,0.95rem + 0.4vw,1.2rem);
+  letter-spacing:0.02em;
+  padding:0.85rem 1.1rem;min-height:44px;
+  cursor:pointer;position:relative;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .25s,border-color .25s;
+}
+.tab:hover{color:var(--offwhite)}
+.tab[aria-selected="true"]{color:var(--offwhite);border-bottom-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+
+.panels{position:relative;display:grid}
+.panel{
+  grid-area:1 / 1;
+  opacity:0;visibility:hidden;
+  transition:opacity .45s ease;
+  pointer-events:none;
+}
+.panel[data-active="true"]{opacity:1;visibility:visible;pointer-events:auto;position:relative}
+.panel:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:4px}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));
+  gap:clamp(1.1rem,2.5vw,1.6rem);
+}
+.card{
+  border:1px solid var(--hairline);background:var(--ink);
+  border-radius:4px;overflow:hidden;transition:border-color .35s;
+}
+.card a{color:inherit;text-decoration:none;display:block}
+.card:hover,.card:focus-within{border-color:var(--gold-deep)}
+.card a:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.media{
+  position:relative;aspect-ratio:4/5;
+  /* PROD: <Image> next/image, Makro-Produktfoto */
+  background:
+    radial-gradient(120% 90% at 30% 18%, oklch(0.35 0.02 270) 0%, transparent 55%),
+    linear-gradient(155deg, oklch(0.27 0.012 270) 0%, oklch(0.18 0.008 270) 100%);
+}
+.media::after{
+  content:"PROD: Makrofoto";position:absolute;left:0.75rem;bottom:0.75rem;
+  font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--hairline);padding:0.25rem 0.5rem;border-radius:3px;
+  background:oklch(0.16 0.006 270 / 0.6);
+}
+.body{padding:1.05rem 1.1rem 1.25rem}
+.card h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.45rem;line-height:1.14}
+.spec{color:var(--muted);font-size:0.84rem;margin-top:0.3rem}
+.foot{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-top:0.85rem;padding-top:0.85rem;border-top:1px solid var(--hairline)}
+.price{font-variant-numeric:tabular-nums;color:var(--offwhite)}
+.more{font-size:0.78rem;color:var(--gold);letter-spacing:0.06em}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important}
+  .panel{transition:none}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section aria-labelledby="kol-titel">
+    <div class="head">
+      <p class="kicker">Kollektionen</p>
+      <h2 id="kol-titel">Nach Disziplin geordnet</h2>
+      <p class="lede">Wählen Sie eine Disziplin: Uhren, Schmuck oder Trauringe von MAISON AURÉLIE, Düsseldorf.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Kollektionen">
+      <button class="tab" id="tab-uhren" role="tab" aria-selected="true" aria-controls="panel-uhren" type="button">Uhren</button>
+      <button class="tab" id="tab-schmuck" role="tab" aria-selected="false" tabindex="-1" aria-controls="panel-schmuck" type="button">Schmuck</button>
+      <button class="tab" id="tab-trauringe" role="tab" aria-selected="false" tabindex="-1" aria-controls="panel-trauringe" type="button">Trauringe</button>
+    </div>
+
+    <div class="panels">
+      <div class="panel" id="panel-uhren" role="tabpanel" aria-labelledby="tab-uhren" tabindex="0" data-active="true">
+        <div class="grid">
+          <article class="card"><a href="#" aria-label="Aurélie 39 Chronograph ansehen"><div class="media"></div><div class="body"><h3>Aurélie 39 Chronograph</h3><p class="spec">Gehäuse 750 Gold, Automatik, 39 mm</p><div class="foot"><span class="price">18.900 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Lumière Petite ansehen"><div class="media"></div><div class="body"><h3>Lumière Petite</h3><p class="spec">Lünette 950 Platin, Perlmutt, 28 mm</p><div class="foot"><span class="price">12.400 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Maison Tourbillon ansehen"><div class="media"></div><div class="body"><h3>Maison Tourbillon</h3><p class="spec">Gehäuse 950 Platin, Handaufzug, 41 mm</p><div class="foot"><span class="price">64.000 €</span><span class="more">Ansehen</span></div></div></a></article>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-schmuck" role="tabpanel" aria-labelledby="tab-schmuck" tabindex="0" data-active="false" hidden>
+        <div class="grid">
+          <article class="card"><a href="#" aria-label="Solitaire Collier ansehen"><div class="media"></div><div class="body"><h3>Solitaire Collier</h3><p class="spec">750 Weißgold, Brillant 1,02 ct, F, VS1</p><div class="foot"><span class="price">9.750 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Goutte Ohrhänger ansehen"><div class="media"></div><div class="body"><h3>Goutte Ohrhänger</h3><p class="spec">750 Gelbgold, Saphir 2,4 ct, Brillantpavé</p><div class="foot"><span class="price">6.480 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Cordage Armreif ansehen"><div class="media"></div><div class="body"><h3>Cordage Armreif</h3><p class="spec">750 Roségold, gedreht, mattiert</p><div class="foot"><span class="price">3.290 €</span><span class="more">Ansehen</span></div></div></a></article>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-trauringe" role="tabpanel" aria-labelledby="tab-trauringe" tabindex="0" data-active="false" hidden>
+        <div class="grid">
+          <article class="card"><a href="#" aria-label="Serein Paar ansehen"><div class="media"></div><div class="body"><h3>Serein Paar</h3><p class="spec">750 Gelbgold, 4,0 mm, seidenmatt</p><div class="foot"><span class="price">1.980 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Constance Paar ansehen"><div class="media"></div><div class="body"><h3>Constance Paar</h3><p class="spec">950 Platin, 3,5 mm, Brillant 0,05 ct</p><div class="foot"><span class="price">2.640 €</span><span class="more">Ansehen</span></div></div></a></article>
+          <article class="card"><a href="#" aria-label="Aube Paar ansehen"><div class="media"></div><div class="body"><h3>Aube Paar</h3><p class="spec">750 Roségold und Weißgold, bicolor, 4,5 mm</p><div class="foot"><span class="price">2.310 €</span><span class="more">Ansehen</span></div></div></a></article>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var tablist = document.querySelector('[role="tablist"]');
+  var tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
+  var reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var fadeMs = reduce ? 0 : 220;
+
+  function panelFor(tab){ return document.getElementById(tab.getAttribute("aria-controls")); }
+
+  function select(tab, focus){
+    var current = tabs.filter(function(t){ return t.getAttribute("aria-selected")==="true"; })[0];
+    if(current === tab){ if(focus) tab.focus(); return; }
+
+    tabs.forEach(function(t){
+      var on = t === tab;
+      t.setAttribute("aria-selected", on ? "true":"false");
+      t.tabIndex = on ? 0 : -1;
+    });
+
+    var nextPanel = panelFor(tab);
+    var prevPanel = current ? panelFor(current) : null;
+
+    // Crossfade: neues Panel sichtbar einblenden, altes nach Fade ausblenden
+    nextPanel.hidden = false;
+    // reflow erzwingen, damit opacity-Transition greift
+    void nextPanel.offsetWidth;
+    nextPanel.setAttribute("data-active","true");
+
+    if(prevPanel){
+      prevPanel.setAttribute("data-active","false");
+      window.setTimeout(function(){
+        if(prevPanel.getAttribute("data-active")==="false") prevPanel.hidden = true;
+      }, fadeMs + 60);
+    }
+    if(focus) tab.focus();
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener("click", function(){ select(tab, false); });
+  });
+
+  tablist.addEventListener("keydown", function(e){
+    var i = tabs.indexOf(document.activeElement);
+    if(i < 0) return;
+    var n = tabs.length, target = null;
+    if(e.key === "ArrowRight"){ target = tabs[(i+1)%n]; }
+    else if(e.key === "ArrowLeft"){ target = tabs[(i-1+n)%n]; }
+    else if(e.key === "Home"){ target = tabs[0]; }
+    else if(e.key === "End"){ target = tabs[n-1]; }
+    if(target){ e.preventDefault(); select(target, true); }
+  });
+})();
+</script>
+</body>
+</html>

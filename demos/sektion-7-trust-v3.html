@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 7 — Bewertungen / Trust · v3 "Mosaik aus Bewertungen mit Sterne-Rating"
+  TRAGENDE IDEE: Ein ruhiges Masonry-Mosaik unterschiedlich langer Bewertungen, jede mit
+                 korrekt ausgezeichneter Sterne-Bewertung. Die Unregelmaessigkeit wirkt
+                 echt erhoben, nicht inszeniert. Kein autoplay, nichts blinkt.
+  TECHNIK: CSS columns fuer Masonry (kein JS noetig), Karten break-inside:avoid.
+           Sterne als CSS (Voll-/Halb-Stern via clip), Rating mit role=img + aria-label
+           ("4 von 5 Sternen"). Volle Tastatur-/Screenreader-Eignung. reduced-motion:
+           nur Hover-Transition entfaellt, Layout statisch.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Bewertungen mit Quelle/Datum aus CMS; Aggregat
+           nur ausweisen, wenn Einzelbewertungen verifizierbar sind. Schema.org Review/AggregateRating
+           serverseitig ergaenzen (kein Fake, nur reale Daten).
+-->
+<title>MAISON AURÉLIE · Bewertungen unserer Kundschaft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+  --star-off:    oklch(0.40 0.01 270);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem);max-width:100%}
+.shell{max-width:1400px;margin:0 auto}
+.intro{text-align:center;max-width:62ch;margin:0 auto clamp(2rem,5vw,3rem)}
+.kicker{font-size:clamp(0.72rem,1.6vw,0.82rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.08;color:var(--offwhite)}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+
+/* Aggregat-Zeile */
+.agg{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:0.75rem clamp(1rem,3vw,1.75rem);
+  margin:0 auto clamp(2.25rem,5vw,3rem);
+  padding-block:clamp(1rem,3vw,1.5rem);
+  border-block:1px solid var(--hairline);max-width:50rem;
+}
+.agg .score{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(2.2rem,6vw,3rem);color:var(--gold-bright);
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.agg .of{color:var(--muted);font-size:clamp(0.9rem,2vw,1rem)}
+
+/* Sterne */
+.stars{--rating:5;display:inline-flex;line-height:1}
+.stars .track{position:relative;display:inline-block}
+.stars .track::before{
+  content:"\2605\2605\2605\2605\2605";
+  color:var(--star-off);letter-spacing:0.12em;
+}
+.stars .track::after{
+  content:"\2605\2605\2605\2605\2605";
+  color:var(--gold-bright);letter-spacing:0.12em;
+  position:absolute;inset:0;overflow:hidden;
+  inline-size:calc(var(--rating) / 5 * 100%);
+  white-space:nowrap;
+}
+.stars.lg{font-size:clamp(1.1rem,3vw,1.4rem)}
+
+/* Mosaik */
+.mosaic{
+  columns:3 18rem;
+  column-gap:clamp(1rem,2.5vw,1.5rem);
+}
+.review{
+  break-inside:avoid;
+  margin-bottom:clamp(1rem,2.5vw,1.5rem);
+  background:var(--ink);
+  border:1px solid var(--hairline);
+  border-radius:4px;
+  padding:clamp(1.4rem,3vw,1.9rem);
+  transition:border-color .2s,transform .2s;
+}
+@media (hover:hover){
+  .review:hover{border-color:color-mix(in oklch,var(--gold-deep),transparent 40%);transform:translateY(-2px)}
+}
+.review .top{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.85rem}
+.review .rstars{font-size:0.95rem}
+.review .date{font-size:0.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.review blockquote{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(1.05rem,2.4vw,1.25rem);line-height:1.45;color:var(--offwhite);
+}
+.review .by{margin-top:1rem;display:flex;align-items:center;gap:0.65rem}
+.av{inline-size:2.2rem;block-size:2.2rem;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--gold-deep),var(--ink));border:1px solid var(--hairline);
+  font-family:"Cormorant Garamond",Georgia,serif;color:var(--offwhite);font-size:0.95rem}
+.nm{font-size:0.9rem;color:var(--platinum);font-weight:600}
+.ct{font-size:0.78rem;color:var(--muted)}
+.foot{margin-top:clamp(1.75rem,4vw,2.5rem);text-align:center;color:var(--muted);font-size:clamp(0.8rem,1.7vw,0.88rem)}
+a:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s7-title">
+  <div class="shell">
+    <div class="intro">
+      <p class="kicker">Bewertungen aus Düsseldorf</p>
+      <h2 id="s7-title">Was Kundinnen und Kunden uns hinterlassen</h2>
+      <p class="lede">Eine Auswahl aus eingegangenen Bewertungen, ungekürzt im Ton.</p>
+    </div>
+
+    <!-- COMPLIANCE: Aggregat nur mit verifizierbaren Einzelbewertungen ausweisen (Schema.org AggregateRating in PROD). -->
+    <div class="agg" role="img" aria-label="Durchschnittliche Bewertung 4,8 von 5 Sternen aus 312 Bewertungen">
+      <span class="score" aria-hidden="true">4,8</span>
+      <span class="stars lg" style="--rating:4.8" aria-hidden="true"><span class="track"></span></span>
+      <span class="of" aria-hidden="true">aus 312 Bewertungen</span>
+    </div>
+
+    <div class="mosaic">
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:5" role="img" aria-label="5 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">03/2025</span>
+        </div>
+        <blockquote>Die Goldschmiedin hat den alten Verlobungsring meiner Mutter behutsam aufgearbeitet. Er sieht wieder aus wie am ersten Tag.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">E</span><span><span class="nm">Elena&nbsp;V.</span><br><span class="ct">Aufarbeitung</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:5" role="img" aria-label="5 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">01/2025</span>
+        </div>
+        <blockquote>Ruhige Atmosphäre, keine Verkaufsmasche, ehrliche Auskunft zur Wertentwicklung. Wir kommen wieder.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">T</span><span><span class="nm">Thomas&nbsp;B.</span><br><span class="ct">Uhrenkauf</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:4" role="img" aria-label="4 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">12/2024</span>
+        </div>
+        <blockquote>Die Anfertigung hat etwas länger gedauert als geplant, das Ergebnis aber jeden Tag wert. Sehr feine Handarbeit.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">N</span><span><span class="nm">Nadja&nbsp;P.</span><br><span class="ct">Sonderanfertigung</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:5" role="img" aria-label="5 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">11/2024</span>
+        </div>
+        <blockquote>Man wird beim Namen begrüßt, auch nach Jahren. Diese Beständigkeit findet man heute selten.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">G</span><span><span class="nm">Familie&nbsp;Gärtner</span><br><span class="ct">Stammkundschaft</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:5" role="img" aria-label="5 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">10/2024</span>
+        </div>
+        <blockquote>Klare Preise, schriftlicher Kostenvoranschlag für die Revision, kein Cent darüber. So muss das sein.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">R</span><span><span class="nm">Rüdiger&nbsp;K.</span><br><span class="ct">Uhrenrevision</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:4" role="img" aria-label="4 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">09/2024</span>
+        </div>
+        <blockquote>Sehr kompetente Beratung zu den Trauringen. Etwas voll am Samstag, ein Termin lohnt sich.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">F</span><span><span class="nm">Felix&nbsp;&amp;&nbsp;Mara</span><br><span class="ct">Trauringe</span></span></div>
+      </article>
+
+      <article class="review">
+        <div class="top">
+          <span class="stars rstars" style="--rating:5" role="img" aria-label="5 von 5 Sternen"><span class="track"></span></span>
+          <span class="date">08/2024</span>
+        </div>
+        <blockquote>Eine Kette neu gefasst, fairer Preis, transparente Einschätzung des Altgolds nach Gewicht.</blockquote>
+        <div class="by"><span class="av" aria-hidden="true">H</span><span><span class="nm">Helena&nbsp;D.</span><br><span class="ct">Anfertigung</span></span></div>
+      </article>
+    </div>
+
+    <p class="foot">Bewertungen aus eigener Erhebung, Stand 2025. Namen auf Wunsch gekürzt.</p>
+  </div>
+</section>
+</main>
+</body>
+</html>

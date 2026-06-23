@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 2 — Marken-/Konzessionaer-Leiste · v4 "Vertikales Marken-Akkordeon"
+  TRAGENDE IDEE: Ruhige vertikale Markenliste; je Marke eine kurze Konzessionaer-Erklaerung,
+                 ausklappbar. Sachlich, leseorientiert, betont den Vertrauensaspekt je Marke.
+  TECHNIK: Natives <details>/<summary> (funktioniert ohne JS), Hairline-Trenner, Gold-Akzent
+           am offenen Element, grid-rows-Transition fuer weiches Aufklappen (mit reduced-motion-Guard).
+           Touch-Ziele >=44px, vollstaendig tastaturbedienbar via native Semantik.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Eintraege aus CMS. Erklaertexte juristisch gepruefte
+           Bausteine. Offizielle Konzessionaer-Nachweise/Module je Marke einbinden.
+-->
+<title>MAISON AURÉLIE · Offizieller Konzessionär</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem)}
+.shell{
+  max-width:820px;
+  margin:0 auto;
+}
+.kicker{
+  font-size:clamp(0.72rem,1.6vw,0.82rem);
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1rem;
+}
+h2{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.9rem,5vw,3.1rem);
+  line-height:1.1;
+  color:var(--offwhite);
+}
+.lede{
+  margin-top:1rem;
+  color:var(--muted);
+  max-width:60ch;
+  font-size:clamp(0.98rem,2.1vw,1.1rem);
+}
+.lede strong{color:var(--platinum);font-weight:600}
+
+.list{
+  margin-top:clamp(2rem,5vw,3rem);
+  border-top:1px solid var(--hairline);
+}
+.item{
+  border-bottom:1px solid var(--hairline);
+}
+.item summary{
+  list-style:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:clamp(1rem,3vw,1.5rem) 0.25rem;
+  min-height:44px;
+}
+.item summary::-webkit-details-marker{display:none}
+.name{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.35rem,3.6vw,2rem);
+  letter-spacing:0.03em;
+  color:var(--offwhite);
+  flex:1;
+  transition:color .3s ease;
+}
+.icon{
+  flex:0 0 auto;
+  width:28px;height:28px;
+  position:relative;
+  border:1px solid var(--hairline);
+  border-radius:50%;
+}
+.icon::before,.icon::after{
+  content:"";
+  position:absolute;
+  background:var(--gold-bright);
+  inset:0;
+  margin:auto;
+}
+.icon::before{width:11px;height:1.5px}
+.icon::after{width:1.5px;height:11px;transition:transform .3s ease}
+.item[open] .icon::after{transform:rotate(90deg)}
+.item[open] .name{color:var(--gold-bright)}
+.panel{
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:1fr;
+}
+.panel-inner{
+  min-height:0;
+  padding:0 0.25rem clamp(1.1rem,3vw,1.6rem);
+  color:var(--muted);
+  font-size:clamp(0.94rem,2vw,1.04rem);
+  max-width:64ch;
+}
+.panel-inner .badge{
+  display:inline-block;
+  margin-bottom:0.6rem;
+  font-size:0.72rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--gold);
+  border:1px solid color-mix(in oklch,var(--gold),transparent 60%);
+  border-radius:999px;
+  padding:0.3rem 0.7rem;
+}
+summary:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:4px}
+.foot{
+  margin-top:clamp(1.75rem,4vw,2.5rem);
+  color:var(--muted);
+  font-size:clamp(0.82rem,1.8vw,0.92rem);
+  max-width:62ch;
+}
+@media (prefers-reduced-motion: no-preference){
+  .name,.icon::after{transition-duration:.3s}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s2-title">
+  <div class="shell">
+    <p class="kicker">Offizieller Konzessionär in Düsseldorf</p>
+    <h2 id="s2-title">Marken, für die wir geradestehen</h2>
+    <p class="lede">
+      Für jede dieser Manufakturen sind wir <strong>offizieller Konzessionär</strong>.
+      Was das konkret bedeutet, lesen Sie je Marke nachstehend.
+    </p>
+
+    <!-- COMPLIANCE: Nur nominative Textnennung. Offizielle Konzessionär-Module in PROD einsetzen. -->
+    <div class="list" role="group" aria-label="Geführte Uhrenmarken mit Erläuterung">
+
+      <details class="item" open>
+        <summary><span class="name">Rolex</span><span class="icon" aria-hidden="true"></span></summary>
+        <div class="panel"><div class="panel-inner">
+          <span class="badge">Offizieller Konzessionär</span>
+          <p>Bezug ausschließlich über den autorisierten Vertrieb. Jede Uhr ist garantierte
+          Originalware mit voller Herstellergarantie und dokumentierter Herkunft.</p>
+        </div></div>
+      </details>
+
+      <details class="item">
+        <summary><span class="name">Patek Philippe</span><span class="icon" aria-hidden="true"></span></summary>
+        <div class="panel"><div class="panel-inner">
+          <span class="badge">Offizieller Konzessionär</span>
+          <p>Autorisierter Partner der Manufaktur. Beratung, Kauf und Service erfolgen
+          innerhalb des offiziellen Netzwerks, inklusive originaler Papiere.</p>
+        </div></div>
+      </details>
+
+      <details class="item">
+        <summary><span class="name">Audemars Piguet</span><span class="icon" aria-hidden="true"></span></summary>
+        <div class="panel"><div class="panel-inner">
+          <span class="badge">Offizieller Konzessionär</span>
+          <p>Direkter Bezug aus dem offiziellen Vertrieb sichert Echtheit, Garantieanspruch
+          und einen lückenlosen Nachweis der Lieferkette.</p>
+        </div></div>
+      </details>
+
+      <details class="item">
+        <summary><span class="name">Vacheron Constantin</span><span class="icon" aria-hidden="true"></span></summary>
+        <div class="panel"><div class="panel-inner">
+          <span class="badge">Offizieller Konzessionär</span>
+          <p>Als autorisierter Ansprechpartner begleiten wir Sie von der Auswahl bis zum
+          Service, durchgehend mit Herstellergarantie.</p>
+        </div></div>
+      </details>
+
+      <details class="item">
+        <summary><span class="name">A. Lange &amp; Söhne</span><span class="icon" aria-hidden="true"></span></summary>
+        <div class="panel"><div class="panel-inner">
+          <span class="badge">Offizieller Konzessionär</span>
+          <p>Sächsische Uhrmacherkunst aus offiziellem Bezug: Originalware, volle Garantie
+          und ein Service nach den Vorgaben der Manufaktur.</p>
+        </div></div>
+      </details>
+
+    </div>
+
+    <p class="foot">
+      Markennamen dienen ausschließlich der sachlichen Information über unser Sortiment.
+      Verfügbarkeit auf Anfrage.
+    </p>
+  </div>
+</section>
+</main>
+</body>
+</html>

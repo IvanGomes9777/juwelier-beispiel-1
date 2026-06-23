@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 2 — Marken-/Konzessionaer-Leiste · v3 "Zwei gegenlaeufige Reihen"
+  TRAGENDE IDEE: Zwei Wortmarken-Reihen laufen gegenlaeufig (oben links, unten rechts) und
+                 erzeugen ruhige, hochwertige Bewegung. Gold-Unterstreichung erscheint on hover.
+  TECHNIK: Zwei CSS-Marquees, eine mit reverse-Animation. Duplizierte Tracks fuer nahtlosen Loop,
+           mask-image-Fade, pause-on-hover/focus, Gold-Underline via animiertem ::after (scaleX).
+           prefers-reduced-motion: beide Reihen still, als zentrierte Listen.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Marken aus CMS. Hover-Underline rein dekorativ,
+           Fokus separat. Offizielle Konzessionaer-Module serverseitig.
+-->
+<title>MAISON AURÉLIE · Offizieller Konzessionär</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+.section{padding:clamp(3rem,8vw,7rem) 0}
+.intro{
+  text-align:center;
+  max-width:62ch;
+  margin:0 auto clamp(2.25rem,5vw,3.5rem);
+  padding-inline:clamp(1.25rem,5vw,4rem);
+}
+.kicker{
+  font-size:clamp(0.72rem,1.6vw,0.82rem);
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1rem;
+}
+h2{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.9rem,5vw,3.2rem);
+  line-height:1.1;
+  color:var(--offwhite);
+}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.1rem)}
+.lede strong{color:var(--platinum);font-weight:600}
+
+.rows{display:flex;flex-direction:column;gap:clamp(0.75rem,2vw,1.25rem)}
+.marquee{
+  position:relative;
+  overflow:hidden;
+  padding-block:clamp(0.75rem,2vw,1.25rem);
+  border-block:1px solid var(--hairline);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+}
+.marquee + .marquee{border-top:none}
+.track{display:flex;width:max-content;align-items:center;animation:scroll 42s linear infinite}
+.track.rev{animation-direction:reverse;animation-duration:48s}
+.marquee:hover .track,
+.marquee:focus-within .track{animation-play-state:paused}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.brand{
+  position:relative;
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.4rem,3.6vw,2.3rem);
+  letter-spacing:0.04em;
+  color:var(--offwhite);
+  white-space:nowrap;
+  padding-inline:clamp(1.5rem,4vw,3rem);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+}
+.brand::after{
+  content:"";
+  position:absolute;
+  left:clamp(1.5rem,4vw,3rem);
+  right:clamp(1.5rem,4vw,3rem);
+  bottom:0.15em;
+  height:2px;
+  background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright));
+  transform:scaleX(0);
+  transform-origin:left center;
+  transition:transform .4s cubic-bezier(.22,.61,.36,1);
+}
+@media (hover:hover){
+  .brand:hover{color:var(--gold-bright)}
+  .brand:hover::after{transform:scaleX(1)}
+}
+.brand:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:3px}
+.brand:focus-visible::after{transform:scaleX(1)}
+
+.foot{
+  margin:clamp(2rem,5vw,3rem) auto 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:clamp(0.84rem,1.8vw,0.95rem);
+  max-width:60ch;
+  padding-inline:clamp(1.25rem,5vw,4rem);
+}
+.foot strong{color:var(--platinum);font-weight:600}
+@media (prefers-reduced-motion: reduce){
+  .track{
+    animation:none;
+    flex-wrap:wrap;
+    justify-content:center;
+    width:100%;
+    row-gap:0.4rem;
+  }
+  .marquee{-webkit-mask-image:none;mask-image:none}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s2-title">
+  <div class="intro">
+    <p class="kicker">Offizieller Konzessionär in Düsseldorf</p>
+    <h2 id="s2-title">Unsere Manufakturen</h2>
+    <p class="lede">
+      Jede dieser Marken führen wir als <strong>offizieller Konzessionär</strong>:
+      garantierte Originalware und volle Herstellergarantie, direkt von der Manufaktur.
+    </p>
+  </div>
+
+  <!-- COMPLIANCE: Nur nominative Textnennung. Offizielle Konzessionär-Module in PROD einsetzen. -->
+  <div class="rows" role="group" aria-label="Geführte Uhrenmarken">
+    <div class="marquee">
+      <div class="track">
+        <a class="brand" href="#kontakt">Rolex</a>
+        <a class="brand" href="#kontakt">Patek Philippe</a>
+        <a class="brand" href="#kontakt">Audemars Piguet</a>
+        <a class="brand" href="#kontakt">Vacheron Constantin</a>
+        <a class="brand" href="#kontakt">A. Lange &amp; Söhne</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Rolex</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Patek Philippe</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Audemars Piguet</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Vacheron Constantin</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">A. Lange &amp; Söhne</a>
+      </div>
+    </div>
+    <div class="marquee">
+      <div class="track rev">
+        <a class="brand" href="#kontakt">A. Lange &amp; Söhne</a>
+        <a class="brand" href="#kontakt">Vacheron Constantin</a>
+        <a class="brand" href="#kontakt">Audemars Piguet</a>
+        <a class="brand" href="#kontakt">Patek Philippe</a>
+        <a class="brand" href="#kontakt">Rolex</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">A. Lange &amp; Söhne</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Vacheron Constantin</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Audemars Piguet</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Patek Philippe</a>
+        <a class="brand" href="#kontakt" aria-hidden="true" tabindex="-1">Rolex</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">
+    Markennamen dienen ausschließlich der Information. <strong>Verfügbarkeit auf Anfrage.</strong>
+  </p>
+</section>
+</main>
+</body>
+</html>

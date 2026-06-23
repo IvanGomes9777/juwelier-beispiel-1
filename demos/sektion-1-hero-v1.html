@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON AURÉLIE · Trauring-Beratung</title>
+<!--
+  ============================================================
+  VARIANTE: sektion-1-hero-v1
+  TRAGENDE IDEE: Prozeduraler 3D-Goldring mit facettiertem Diamant,
+                 langsame autoRotate, Cursor-Spotlight (radiale
+                 Aufhellung folgt der Maus) auf Obsidian-Bühne.
+                 Marken-Wortmarken-Leiste unter dem Fold.
+  TECHNIK: Three.js r170 (importmap CDN), MeshPhysicalMaterial
+           (Gold metalness 1 / roughness ~0.15, Diamant transmission
+           + ior 2.4), RoomEnvironment + PMREMGenerator,
+           ACESFilmicToneMapping, pixelRatio gecappt, rAF-Pause bei
+           visibilitychange, try/catch + CSS-Fallback ohne WebGL.
+  PRODUKTIONSPFAD: Next.js App Router + React Three Fiber (R3F);
+           Ring/Diamant als <mesh> mit drei/Environment preset,
+           next/font lokal, Bühne als <Canvas> Client-Component,
+           Cursor-Spotlight als CSS custom property via useMotionValue.
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+  --mx: 50%;
+  --my: 38%;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:'Inter',system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.hero{
+  position:relative;
+  min-height:100vh;
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  isolation:isolate;
+}
+/* Cursor-Spotlight: radiale Aufhellung folgt der Maus */
+.spotlight{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:radial-gradient(
+    42rem 42rem at var(--mx) var(--my),
+    oklch(0.30 0.02 270 / 0.55),
+    oklch(0.16 0.006 270 / 0) 60%);
+  transition:background-position .2s ease;
+}
+canvas#scene{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  width:100%;
+  height:100%;
+  display:block;
+  touch-action:pan-y;
+}
+/* CSS-Fallback ohne WebGL */
+.fallback{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:none;
+  place-items:center;
+  background:
+    radial-gradient(60% 50% at 50% 40%, oklch(0.30 0.04 85 / 0.4), transparent 70%),
+    var(--obsidian);
+}
+.fallback::after{
+  content:"";
+  width:min(46vw,18rem);
+  aspect-ratio:1;
+  border-radius:50%;
+  border:0.5rem solid transparent;
+  background:
+    linear-gradient(var(--ink),var(--ink)) padding-box,
+    conic-gradient(from 0deg,var(--gold-deep),var(--gold-bright),var(--gold),var(--gold-deep)) border-box;
+}
+.hero[data-fallback="true"] canvas#scene{display:none}
+.hero[data-fallback="true"] .fallback{display:grid}
+
+/* Top-Nav */
+.nav{
+  position:relative;
+  z-index:3;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:clamp(1rem,2.5vw,1.75rem) clamp(1.25rem,4vw,3rem);
+}
+.wordmark{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:600;
+  font-size:clamp(1.15rem,2.4vw,1.5rem);
+  letter-spacing:0.14em;
+  color:var(--offwhite);
+}
+.nav-links{
+  display:none;
+  gap:clamp(1.5rem,3vw,2.5rem);
+  list-style:none;
+  font-size:0.82rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.nav-links a{padding:0.5rem 0;display:inline-block}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--gold-bright)}
+.btn-termin{
+  border:1px solid var(--hairline);
+  color:var(--offwhite);
+  padding:0.65rem 1.25rem;
+  border-radius:999px;
+  font-size:0.8rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  transition:border-color .25s,color .25s;
+}
+.btn-termin:hover,.btn-termin:focus-visible{border-color:var(--gold);color:var(--gold-bright)}
+
+/* Hero-Content */
+.hero-body{
+  position:relative;
+  z-index:2;
+  flex:1;
+  display:grid;
+  align-items:center;
+  padding:clamp(1rem,4vw,2rem) clamp(1.25rem,5vw,4rem) clamp(2rem,5vw,3rem);
+  pointer-events:none; /* Overlay durchlässig, Buttons explizit auto */
+}
+.hero-copy{max-width:34rem}
+.kicker{
+  font-size:0.78rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1.25rem;
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:500;
+  font-size:clamp(2.6rem,7vw,5rem);
+  line-height:1.04;
+  letter-spacing:-0.01em;
+  margin-bottom:1.25rem;
+}
+h1 em{font-style:italic;color:var(--gold-bright)}
+.lede{
+  color:var(--muted);
+  font-size:clamp(1rem,1.4vw,1.15rem);
+  max-width:30rem;
+  margin-bottom:2rem;
+}
+.cta{
+  pointer-events:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:0.7rem;
+  background:var(--gold);
+  color:var(--obsidian);
+  font-weight:600;
+  font-size:0.95rem;
+  letter-spacing:0.02em;
+  padding:0.95rem 1.75rem;
+  border-radius:999px;
+  min-height:44px;
+  transition:transform .25s,background .25s;
+}
+.cta:hover,.cta:focus-visible{background:var(--gold-bright);transform:translateY(-2px)}
+.cta svg{width:1.1em;height:1.1em}
+
+/* Marken-Wortmarken-Leiste unter dem Fold */
+.brandbar{
+  position:relative;
+  z-index:2;
+  border-top:1px solid var(--hairline);
+  padding:clamp(1rem,2.5vw,1.4rem) clamp(1.25rem,5vw,4rem);
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:clamp(1.25rem,4vw,3rem);
+  background:oklch(0.16 0.006 270 / 0.55);
+}
+.brandbar .label{
+  font-size:0.7rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-right:auto;
+}
+.brandbar ul{
+  display:flex;
+  flex-wrap:wrap;
+  gap:clamp(1.25rem,4vw,2.75rem);
+  list-style:none;
+}
+/* COMPLIANCE: Nur nominative Textnennung. Offizielle Konzessionaer-Module in PROD einsetzen.
+   Keine echten Logos nachbauen, ausschliesslich Text-Wortmarken. */
+.brandbar li{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(0.95rem,1.6vw,1.15rem);
+  letter-spacing:0.06em;
+  color:var(--platinum);
+}
+
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:4px}
+
+@media (min-width:62rem){
+  .nav-links{display:flex}
+}
+@media (prefers-reduced-motion: reduce){
+  .spotlight{transition:none}
+  .cta{transition:none}
+}
+</style>
+</head>
+<body>
+<main class="hero" id="hero">
+  <div class="spotlight" aria-hidden="true"></div>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="fallback" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="wordmark" href="#" aria-label="MAISON AURÉLIE Startseite">MAISON AURÉLIE</a>
+    <nav aria-label="Hauptnavigation">
+      <ul class="nav-links">
+        <li><a href="#">Trauringe</a></li>
+        <li><a href="#">Uhren</a></li>
+        <li><a href="#">Atelier</a></li>
+        <li><a href="#">Düsseldorf</a></li>
+      </ul>
+    </nav>
+    <a class="btn-termin" href="#termin">Termin</a>
+  </header>
+
+  <div class="hero-body">
+    <div class="hero-copy">
+      <p class="kicker">Düsseldorf, seit 1924</p>
+      <h1>Zwei Ringe,<br>ein <em>Versprechen</em>.</h1>
+      <p class="lede">In persönlicher Beratung entstehen Trauringe, die zu Ihnen passen. Goldlegierungen, Fassung und Diamant wählen Sie gemeinsam mit unserem Atelier.</p>
+      <a class="cta" href="#termin">
+        Trauring-Beratung
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <section class="brandbar" aria-label="Geführte Marken">
+    <span class="label">Geführte Häuser</span>
+    <!-- COMPLIANCE: Nur nominative Textnennung der Marken, keine offiziellen Logos.
+         Konzessionär-/Markenmodule in PROD über offizielle Assets einbinden. -->
+    <ul>
+      <li>Rolex</li>
+      <li>Cartier</li>
+      <li>Patek Philippe</li>
+      <li>Niessing</li>
+    </ul>
+  </section>
+</main>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://unpkg.com/three@0.170.0/build/three.module.js",
+    "three/addons/":"https://unpkg.com/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+const hero = document.getElementById('hero');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarse = window.matchMedia('(pointer: coarse)').matches;
+
+/* Cursor-Spotlight (nur Feinzeiger, kein Drag auf Touch) */
+if(!coarse){
+  hero.addEventListener('pointermove',(e)=>{
+    const r = hero.getBoundingClientRect();
+    hero.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%');
+    hero.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%');
+  },{passive:true});
+}
+
+(async function initScene(){
+  try{
+    const THREE = await import('three');
+    const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+
+    const canvas = document.getElementById('scene');
+    const testCtx = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if(!testCtx) throw new Error('Kein WebGL');
+
+    const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35,1,0.1,100);
+    camera.position.set(0,0.2,6);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const env = pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+    scene.environment = env;
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    /* Goldring: Torus, MeshPhysicalMaterial metalness 1 / roughness ~0.15 */
+    const goldMat = new THREE.MeshPhysicalMaterial({
+      color:0xd9b15a, metalness:1, roughness:0.15, envMapIntensity:1.3
+    });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35,0.34,64,180),goldMat);
+    ring.rotation.x = Math.PI/2.4;
+    group.add(ring);
+
+    /* Facettierter Diamant: OctahedronGeometry, transmission + ior 2.4 */
+    const diaMat = new THREE.MeshPhysicalMaterial({
+      color:0xffffff, metalness:0, roughness:0.02,
+      transmission:1, ior:2.4, thickness:1.1,
+      clearcoat:1, clearcoatRoughness:0.05,
+      envMapIntensity:2, transparent:true
+    });
+    const dia = new THREE.Mesh(new THREE.OctahedronGeometry(0.62,0),diaMat);
+    dia.position.set(0,1.0,0);
+    dia.scale.set(1,1.4,1);
+    group.add(dia);
+
+    const key = new THREE.DirectionalLight(0xfff2d8,1.4);
+    key.position.set(3,4,5); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xbfd0ff,0.6);
+    rim.position.set(-4,-2,-3); scene.add(rim);
+
+    function resize(){
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if(canvas.width!==w*renderer.getPixelRatio()||canvas.height!==h*renderer.getPixelRatio()){
+        renderer.setSize(w,h,false);
+        camera.aspect = w/h; camera.updateProjectionMatrix();
+      }
+    }
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+
+    let running = true, raf = 0;
+    let targetX = 0, targetY = 0;
+    if(!coarse && !reduce){
+      hero.addEventListener('pointermove',(e)=>{
+        const r = hero.getBoundingClientRect();
+        targetX = ((e.clientX-r.left)/r.width-0.5)*0.5;
+        targetY = ((e.clientY-r.top)/r.height-0.5)*0.3;
+      },{passive:true});
+    }
+
+    function loop(){
+      if(!running) return;
+      raf = requestAnimationFrame(loop);
+      if(!reduce){
+        group.rotation.y += 0.0035;          /* langsame autoRotate */
+        dia.rotation.y -= 0.006;
+        camera.position.x += (targetX*1.2 - camera.position.x)*0.05;
+        camera.position.y += (0.2 - targetY*1.2 - camera.position.y)*0.05;
+        camera.lookAt(0,0.3,0);
+      }
+      renderer.render(scene,camera);
+    }
+    loop();
+
+    /* rAF bei visibilitychange pausieren */
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden){ running=false; cancelAnimationFrame(raf); }
+      else if(!running){ running=true; loop(); }
+    });
+
+    if(reduce){ renderer.render(scene,camera); } /* statisches Standbild */
+  }catch(err){
+    console.warn('3D-Fallback aktiv:',err.message);
+    hero.dataset.fallback = 'true';
+  }
+})();
+</script>
+</body>
+</html>

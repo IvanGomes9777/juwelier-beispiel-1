@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 9 — Footer · v5 "Hairline-Grid dunkel"
+  TRAGENDE IDEE: Praezises, dunkles Raster aus Hairlines als Schmuck-Vitrine. Zellen tragen
+                 Navigation, Kontakt, Social und Compliance; ein "Zurueck nach oben" schliesst
+                 die Vitrine. Ruhige Linienfuehrung statt Flaeche.
+  TECHNIK: CSS-Grid mit gap, Linien aus Hintergrund-Hairline (gap durchscheinend), Social-
+           Links als Text-Platzhalter (keine echten Logos), Smooth-Scroll-to-top respektiert
+           reduced-motion, Touch-Ziele >=44px, Fokus sichtbar, NAP konsistent.
+  PRODUKTIONSPFAD: PROD -> next/font lokal statt Google-Fonts-<link>. Rechtstext-Links nach
+           rechtstexte-website-compliance.md verdrahten. Social-Profile mit echten URLs +
+           rel="me noopener" hinterlegen.
+-->
+<title>MAISON AURÉLIE · Footer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+footer{
+  padding:clamp(2.5rem,7vw,5rem) clamp(1.25rem,5vw,4rem) clamp(1.5rem,4vw,2.5rem);
+}
+.shell{max-width:1600px;margin:0 auto}
+.topbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+  align-items:baseline;
+  justify-content:space-between;
+  padding-bottom:clamp(1.5rem,4vw,2.5rem);
+}
+.wordmark{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.5rem,3.4vw,2.2rem);
+  letter-spacing:0.08em;
+  color:var(--offwhite);
+}
+.wordmark span{color:var(--gold)}
+.toplink{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  min-height:44px;
+  color:var(--platinum);
+  text-decoration:none;
+  font-size:clamp(0.82rem,1.7vw,0.9rem);
+  letter-spacing:0.04em;
+}
+.toplink:hover{color:var(--gold-bright)}
+.toplink svg{width:1em;height:1em}
+/* Hairline-Grid: gap zeigt den Hintergrund (Hairline) durch */
+.grid{
+  display:grid;
+  gap:1px;
+  background:var(--hairline);
+  border:1px solid var(--hairline);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));
+}
+.cell{
+  background:var(--obsidian);
+  padding:clamp(1.5rem,3.5vw,2.25rem);
+}
+.cell h3{
+  font-size:clamp(0.72rem,1.6vw,0.8rem);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:600;
+  margin-bottom:1rem;
+}
+.cell ul{list-style:none}
+.cell a,address a{
+  color:var(--offwhite);
+  text-decoration:none;
+  font-size:clamp(0.92rem,2vw,1rem);
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+}
+.cell a:hover,address a:hover{color:var(--gold-bright)}
+address{font-style:normal;color:var(--muted)}
+address .line{font-size:clamp(0.92rem,2vw,1rem);color:var(--offwhite);line-height:1.5;padding:3px 0}
+.social a{gap:0.5rem}
+.social .label{color:var(--muted);font-size:0.85em;margin-left:0.3rem}
+.legal{
+  margin-top:clamp(1.5rem,4vw,2.25rem);
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.25rem 1.5rem;
+  align-items:center;
+  justify-content:space-between;
+}
+.legal nav ul{list-style:none;display:flex;flex-wrap:wrap;gap:0.25rem 1.25rem}
+.legal nav a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:clamp(0.82rem,1.7vw,0.9rem);
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+}
+.legal nav a:hover{color:var(--offwhite)}
+.copy{color:var(--muted);font-size:clamp(0.8rem,1.6vw,0.88rem)}
+a:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body id="top">
+<footer aria-labelledby="ft-heading">
+  <div class="shell">
+    <div class="topbar">
+      <h2 id="ft-heading" class="wordmark">MAISON <span>AURÉLIE</span></h2>
+      <a class="toplink" href="#top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M12 19V5M5 12l7-7 7 7"/>
+        </svg>
+        Zurück nach oben
+      </a>
+    </div>
+
+    <div class="grid">
+      <nav class="cell" aria-label="Navigation">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="#kollektionen">Kollektionen</a></li>
+          <li><a href="#uhren">Uhren</a></li>
+          <li><a href="#schmuck">Schmuck</a></li>
+          <li><a href="#maison">Die Maison</a></li>
+        </ul>
+      </nav>
+
+      <div class="cell">
+        <h3>Kontakt</h3>
+        <address>
+          <div class="line">MAISON AURÉLIE</div>
+          <div class="line">Königsallee 1, 40212 Düsseldorf</div>
+          <a href="tel:+492110000000">+49 211 000000</a><br>
+          <a href="mailto:kontakt@maison-aurelie.example">kontakt@maison-aurelie.example</a>
+        </address>
+      </div>
+
+      <nav class="cell social" aria-label="Soziale Profile">
+        <h3>Folgen</h3>
+        <ul>
+          <!-- PROD: echte Profil-URLs + rel="me noopener". Text-Platzhalter statt Logos. -->
+          <li><a href="#instagram" rel="noopener">Instagram<span class="label">@maisonaurelie</span></a></li>
+          <li><a href="#journal" rel="noopener">Journal</a></li>
+          <li><a href="#linkedin" rel="noopener">LinkedIn</a></li>
+        </ul>
+      </nav>
+
+      <!-- PROD: Rechtstexte nach rechtstexte-website-compliance.md -->
+      <nav class="cell" aria-label="Rechtliches">
+        <h3>Rechtliches</h3>
+        <ul>
+          <li><a href="#impressum">Impressum</a></li>
+          <li><a href="#datenschutz">Datenschutz</a></li>
+          <li><a href="#agb">AGB</a></li>
+          <li><a href="#widerruf">Widerruf</a></li>
+          <li><a href="#cookies">Cookie-Einstellungen</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="legal">
+      <!-- PROD: Rechtstexte nach rechtstexte-website-compliance.md -->
+      <nav aria-label="Rechtliche Hinweise">
+        <ul>
+          <li><a href="#impressum">Impressum</a></li>
+          <li><a href="#datenschutz">Datenschutz</a></li>
+          <li><a href="#agb">AGB</a></li>
+          <li><a href="#widerruf">Widerruf</a></li>
+          <li><a href="#cookies">Cookie-Einstellungen</a></li>
+        </ul>
+      </nav>
+      <p class="copy">© 2026 MAISON AURÉLIE, Düsseldorf</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

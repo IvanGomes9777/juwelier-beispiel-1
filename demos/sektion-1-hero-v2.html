@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON AURÉLIE · Manufaktur-Zeit</title>
+<!--
+  ============================================================
+  VARIANTE: sektion-1-hero-v2
+  TRAGENDE IDEE: Prozedurale 3D-Luxusuhr aus Primitiven (Gehäuse,
+                 Lünette, Zifferblatt, Zeiger, Indizes), dezente
+                 Reflexionen, scroll- und pointer-gesteuerte leichte
+                 Drehung. Ruhige, zentrierte Bühne.
+  TECHNIK: Three.js r170 (importmap CDN). Gehäuse/Lünette als
+           Cylinder mit MeshPhysicalMaterial (Stahl metalness 1 /
+           roughness 0.2, Gold-Lünette), Zeiger aus Box-Primitiven,
+           RoomEnvironment + PMREMGenerator, ACESFilmicToneMapping,
+           pixelRatio gecappt, rAF-Pause bei visibilitychange,
+           try/catch + CSS-Fallback.
+  PRODUKTIONSPFAD: Next.js + R3F; Uhr als Komponenten-Tree
+           (<Bezel/><Dial/><Hands/>), drei/Environment, Scroll-
+           Rotation via useScroll/useFrame, next/font lokal.
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:
+    radial-gradient(120% 90% at 50% 0%, oklch(0.21 0.008 270), var(--obsidian) 60%);
+  color:var(--offwhite);
+  font-family:'Inter',system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.hero{
+  position:relative;
+  min-height:100vh;
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+}
+.nav{
+  position:relative;z-index:3;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:clamp(1rem,2.5vw,1.75rem) clamp(1.25rem,4vw,3rem);
+}
+.wordmark{
+  font-family:'Cormorant Garamond',serif;font-weight:600;
+  font-size:clamp(1.15rem,2.4vw,1.5rem);letter-spacing:0.14em;
+}
+.nav-links{
+  display:none;gap:clamp(1.5rem,3vw,2.5rem);list-style:none;
+  font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);
+}
+.nav-links a{padding:0.5rem 0;display:inline-block}
+.nav-links a:hover,.nav-links a:focus-visible{color:var(--gold-bright)}
+.btn-termin{
+  border:1px solid var(--hairline);color:var(--offwhite);
+  padding:0.65rem 1.25rem;border-radius:999px;font-size:0.8rem;
+  letter-spacing:0.08em;text-transform:uppercase;min-height:44px;
+  display:inline-flex;align-items:center;transition:border-color .25s,color .25s;
+}
+.btn-termin:hover,.btn-termin:focus-visible{border-color:var(--gold);color:var(--gold-bright)}
+
+.stage{
+  position:relative;flex:1;display:grid;
+}
+canvas#scene{
+  position:absolute;inset:0;z-index:1;width:100%;height:100%;
+  display:block;touch-action:pan-y;
+}
+.fallback{
+  position:absolute;inset:0;z-index:1;display:none;place-items:center;
+}
+.fallback .watch{
+  width:min(56vw,20rem);aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 38%, oklch(0.30 0.01 270), oklch(0.18 0.006 270) 70%);
+  border:0.7rem solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 0 0 0.45rem var(--gold-deep), inset 0 0 3rem oklch(0 0 0 / 0.6);
+  position:relative;
+}
+.fallback .watch::before,.fallback .watch::after{
+  content:"";position:absolute;left:50%;top:50%;background:var(--platinum);
+  transform-origin:bottom center;border-radius:2px;
+}
+.fallback .watch::before{width:3px;height:34%;transform:translate(-50%,-100%) rotate(40deg)}
+.fallback .watch::after{width:3px;height:26%;transform:translate(-50%,-100%) rotate(-100deg)}
+.hero[data-fallback="true"] canvas#scene{display:none}
+.hero[data-fallback="true"] .fallback{display:grid}
+
+.overlay{
+  position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:clamp(1.5rem,5vw,4rem);
+  pointer-events:none;
+}
+.overlay-inner{max-width:36rem}
+.kicker{
+  font-size:0.78rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1rem;
+}
+h1{
+  font-family:'Cormorant Garamond',serif;font-weight:500;
+  font-size:clamp(2.4rem,6.5vw,4.6rem);line-height:1.05;
+  letter-spacing:-0.01em;margin-bottom:1.1rem;
+}
+h1 em{font-style:italic;color:var(--gold-bright)}
+.lede{color:var(--muted);font-size:clamp(1rem,1.4vw,1.12rem);max-width:30rem;margin-bottom:1.8rem}
+.cta{
+  pointer-events:auto;display:inline-flex;align-items:center;gap:0.7rem;
+  background:var(--gold);color:var(--obsidian);font-weight:600;font-size:0.95rem;
+  padding:0.95rem 1.75rem;border-radius:999px;min-height:44px;
+  transition:transform .25s,background .25s;
+}
+.cta:hover,.cta:focus-visible{background:var(--gold-bright);transform:translateY(-2px)}
+.cta svg{width:1.1em;height:1.1em}
+
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:4px}
+@media (min-width:62rem){.nav-links{display:flex}}
+@media (prefers-reduced-motion: reduce){.cta{transition:none}}
+</style>
+</head>
+<body>
+<main class="hero" id="hero">
+  <header class="nav">
+    <a class="wordmark" href="#" aria-label="MAISON AURÉLIE Startseite">MAISON AURÉLIE</a>
+    <nav aria-label="Hauptnavigation">
+      <ul class="nav-links">
+        <li><a href="#">Uhren</a></li>
+        <li><a href="#">Trauringe</a></li>
+        <li><a href="#">Service</a></li>
+        <li><a href="#">Düsseldorf</a></li>
+      </ul>
+    </nav>
+    <a class="btn-termin" href="#termin">Termin</a>
+  </header>
+
+  <div class="stage">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <div class="fallback" aria-hidden="true"><div class="watch"></div></div>
+
+    <div class="overlay">
+      <div class="overlay-inner">
+        <p class="kicker">Manufaktur-Zeit</p>
+        <h1>Präzision, die ein <em>Leben</em> begleitet.</h1>
+        <p class="lede">Von der ersten Beratung bis zum Service nach Jahren: Wir betreuen Ihre Uhr persönlich in Düsseldorf. Ebenso Ihre Trauringe.</p>
+        <a class="cta" href="#termin">
+          Trauring-Beratung
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://unpkg.com/three@0.170.0/build/three.module.js",
+    "three/addons/":"https://unpkg.com/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+const hero = document.getElementById('hero');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarse = window.matchMedia('(pointer: coarse)').matches;
+
+(async function init(){
+  try{
+    const THREE = await import('three');
+    const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+    const canvas = document.getElementById('scene');
+    if(!(canvas.getContext('webgl2')||canvas.getContext('webgl'))) throw new Error('Kein WebGL');
+
+    const renderer = new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32,1,0.1,100);
+    camera.position.set(0,0,7.2);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+
+    const watch = new THREE.Group();
+    scene.add(watch);
+
+    const steel = new THREE.MeshPhysicalMaterial({color:0xcfd3d8,metalness:1,roughness:0.22,envMapIntensity:1.3});
+    const goldM = new THREE.MeshPhysicalMaterial({color:0xd9b15a,metalness:1,roughness:0.18,envMapIntensity:1.4});
+    const dial  = new THREE.MeshPhysicalMaterial({color:0x14161c,metalness:0.4,roughness:0.5,envMapIntensity:0.6});
+    const glass = new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:0.02,transmission:1,ior:1.5,thickness:0.3,transparent:true,envMapIntensity:1});
+    const hand  = new THREE.MeshPhysicalMaterial({color:0xeef0f4,metalness:1,roughness:0.25,envMapIntensity:1.2});
+
+    /* Gehäuse */
+    const caseG = new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,0.55,96),steel);
+    caseG.rotation.x = Math.PI/2; watch.add(caseG);
+    /* Gold-Lünette */
+    const bezel = new THREE.Mesh(new THREE.TorusGeometry(1.92,0.18,32,96),goldM);
+    bezel.position.z = 0.26; watch.add(bezel);
+    /* Zifferblatt */
+    const face = new THREE.Mesh(new THREE.CircleGeometry(1.78,96),dial);
+    face.position.z = 0.281; watch.add(face);
+    /* Glas */
+    const crystal = new THREE.Mesh(new THREE.CircleGeometry(1.82,96),glass);
+    crystal.position.z = 0.40; watch.add(crystal);
+    /* Krone */
+    const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.4,24),goldM);
+    crown.rotation.z = Math.PI/2; crown.position.set(2.0,0,0.05); watch.add(crown);
+
+    /* Indizes */
+    for(let i=0;i<12;i++){
+      const a = i/12*Math.PI*2;
+      const idx = new THREE.Mesh(new THREE.BoxGeometry(0.06,0.22,0.04),goldM);
+      idx.position.set(Math.sin(a)*1.5,Math.cos(a)*1.5,0.30);
+      idx.rotation.z = -a; watch.add(idx);
+    }
+    /* Zeiger */
+    const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.09,0.9,0.04),hand);
+    hourHand.geometry.translate(0,0.45,0);
+    hourHand.position.z = 0.33; watch.add(hourHand);
+    const minHand = new THREE.Mesh(new THREE.BoxGeometry(0.06,1.3,0.04),hand);
+    minHand.geometry.translate(0,0.65,0);
+    minHand.position.z = 0.35; watch.add(minHand);
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.1,24),goldM);
+    pin.rotation.x = Math.PI/2; pin.position.z = 0.37; watch.add(pin);
+    hourHand.rotation.z = -1.7; minHand.rotation.z = 1.2;
+
+    const key = new THREE.DirectionalLight(0xfff2d8,1.6); key.position.set(4,5,6); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xbfd0ff,0.7); rim.position.set(-5,-2,2); scene.add(rim);
+
+    watch.rotation.x = -0.25;
+
+    function resize(){
+      const w=canvas.clientWidth,h=canvas.clientHeight;
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h;camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(canvas); resize();
+
+    let running=true,raf=0,px=0,py=0,scrollT=0;
+    if(!coarse && !reduce){
+      window.addEventListener('pointermove',(e)=>{
+        px=(e.clientX/window.innerWidth-0.5);
+        py=(e.clientY/window.innerHeight-0.5);
+      },{passive:true});
+    }
+    window.addEventListener('scroll',()=>{ scrollT = window.scrollY/window.innerHeight; },{passive:true});
+
+    function loop(){
+      if(!running) return;
+      raf=requestAnimationFrame(loop);
+      const ty = reduce?0:px*0.5 + scrollT*0.6;
+      const tx = reduce?-0.25:-0.25 - py*0.35;
+      watch.rotation.y += (ty - watch.rotation.y)*0.06;
+      watch.rotation.x += (tx - watch.rotation.x)*0.06;
+      if(!reduce) minHand.rotation.z -= 0.004;
+      renderer.render(scene,camera);
+    }
+    loop();
+
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden){running=false;cancelAnimationFrame(raf);}
+      else if(!running){running=true;loop();}
+    });
+    if(reduce) renderer.render(scene,camera);
+  }catch(err){
+    console.warn('3D-Fallback aktiv:',err.message);
+    hero.dataset.fallback='true';
+  }
+})();
+</script>
+</body>
+</html>
