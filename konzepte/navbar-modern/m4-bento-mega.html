@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  MAISON AURELIE  -  Duesseldorf
+  Konzept: "Bordeaux & Gold"  /  MODERNE Ausfuehrung 2025
+  Navbar-Konzept M4: "Bento Mega-Menue"
+  ----------------------------------------------------------------------------
+  Standalone, offline lauffaehige Demo-Datei (eine Datei, kein Build).
+  - Moderne Leiste; "Kollektionen" oeffnet ein grosses Glas-Panel im
+    Bento-Grid-Stil (unterschiedlich grosse Kacheln, Hover-Scale).
+  - Zugaengliches Disclosure: aria-expanded/controls, Hover UND Klick/Tastatur,
+    ESC schliesst, schliesst bei Klick ausserhalb/Fokusverlust, Hover-Delay
+    behindert die Tastaturbedienung nicht.
+  - Unter ~860px: Accordion-Mobile-Menue. Skip-Link, semantisches <header><nav>,
+    :focus-visible, Touch-Ziele >=44px, Kontrast >=4.5:1.
+  - prefers-reduced-motion: reduce schaltet Animationen ab.
+  - Kein horizontales Scrollen bei 320px. Keine Geviertstriche in sichtbarer Copy.
+
+  PROD-Hinweis: In Produktion Fonts via next/font lokal einbinden statt CDN.
+  PROD: next/font lokal (Space Grotesk, Inter, Fraunces) statt Google Fonts <link>.
+  ============================================================================
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON AURELIE  Bordeaux und Gold  Bento Mega-Menue</title>
+
+<!-- PROD: next/font lokal. Google-Fonts nur fuer diese Offline-Demo. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#1A0A0E;
+    --bg2:#240D13;
+    --panel:rgba(255,255,255,0.05);
+    --text:#F6ECE6;
+    --text-2:#C9A7AD;
+    --gold:#E6C07A;
+    --gold-2:#C99A4E;
+    --line:rgba(255,220,190,0.12);
+
+    --r-sm:14px;
+    --r-md:20px;
+    --r-lg:28px;
+    --r-2xl:34px;
+
+    --ease:cubic-bezier(0.22,1,0.36,1);
+    --t-fast:180ms;
+    --t-med:220ms;
+    --t-slow:260ms;
+
+    --shadow-soft:
+      0 1px 2px rgba(0,0,0,0.35),
+      0 8px 24px rgba(0,0,0,0.35),
+      0 28px 64px rgba(0,0,0,0.45);
+    --shadow-glass:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 18px 50px rgba(0,0,0,0.55),
+      0 40px 110px rgba(0,0,0,0.55);
+
+    --maxw:1200px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 600px at 78% -8%, rgba(230,192,122,0.10), transparent 60%),
+      radial-gradient(900px 520px at 8% 4%, rgba(140,30,55,0.30), transparent 60%),
+      linear-gradient(180deg, var(--bg2), var(--bg) 42%);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    line-height:1.6;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit;text-decoration:none}
+
+  img{max-width:100%;display:block}
+
+  /* ---------- Skip-Link ---------- */
+  .skip-link{
+    position:fixed;
+    top:-200px;
+    left:16px;
+    z-index:1000;
+    background:var(--gold);
+    color:#26100A;
+    padding:12px 18px;
+    border-radius:var(--r-sm);
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:600;
+    box-shadow:var(--shadow-soft);
+    transition:top var(--t-med) var(--ease);
+  }
+  .skip-link:focus{top:14px}
+
+  :focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:var(--maxw);
+    margin-inline:auto;
+    padding-inline:clamp(16px,4vw,32px);
+  }
+
+  /* ============================================================
+     HEADER / NAVBAR
+     ============================================================ */
+  .site-header{
+    position:sticky;
+    top:0;
+    z-index:200;
+    backdrop-filter:saturate(140%) blur(14px);
+    -webkit-backdrop-filter:saturate(140%) blur(14px);
+    background:linear-gradient(180deg, rgba(26,10,14,0.82), rgba(26,10,14,0.58));
+    border-bottom:1px solid var(--line);
+  }
+
+  .nav{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    height:74px;
+  }
+
+  .brand{
+    display:inline-flex;
+    align-items:center;
+    gap:11px;
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:700;
+    letter-spacing:0.14em;
+    font-size:0.98rem;
+    text-transform:uppercase;
+    white-space:nowrap;
+    padding:8px 6px;
+    border-radius:var(--r-sm);
+    transition:transform var(--t-fast) var(--ease);
+  }
+  .brand:hover{transform:translateY(-1px)}
+  .brand .mark{
+    width:30px;height:30px;flex:0 0 auto;
+    border-radius:9px;
+    display:grid;place-items:center;
+    background:linear-gradient(150deg, var(--gold), var(--gold-2));
+    color:#2A1108;
+    font-weight:700;
+    box-shadow:0 6px 16px rgba(230,192,122,0.30);
+  }
+  .brand .sub{color:var(--text-2);font-weight:500;letter-spacing:0.18em;font-size:0.62rem}
+
+  .nav-spacer{flex:1 1 auto}
+
+  .nav-list{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    list-style:none;
+    margin:0;padding:0;
+  }
+
+  .nav-link,
+  .nav-trigger{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:500;
+    font-size:0.95rem;
+    color:var(--text);
+    background:transparent;
+    border:0;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:44px;
+    padding:0 16px;
+    border-radius:var(--r-md);
+    transition:background var(--t-fast) var(--ease),
+               color var(--t-fast) var(--ease),
+               transform var(--t-fast) var(--ease);
+  }
+  .nav-link:hover,
+  .nav-trigger:hover{background:var(--panel);color:var(--gold)}
+  .nav-link::after{
+    content:"";
+    display:block;
+    height:2px;width:0;
+    margin-top:2px;
+    border-radius:2px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-2));
+    transition:width var(--t-med) var(--ease);
+  }
+  .nav-link:hover::after{width:18px}
+
+  .nav-trigger .chev{
+    width:14px;height:14px;
+    transition:transform var(--t-med) var(--ease);
+  }
+  .nav-trigger[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .nav-trigger[aria-expanded="true"]{background:var(--panel);color:var(--gold)}
+
+  /* CTA (magnetisch) */
+  .cta{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    color:#28110A;
+    background:linear-gradient(150deg, var(--gold), var(--gold-2));
+    border:0;
+    cursor:pointer;
+    min-height:44px;
+    padding:0 20px;
+    border-radius:999px;
+    box-shadow:0 8px 22px rgba(230,192,122,0.26);
+    transition:transform var(--t-med) var(--ease),
+               box-shadow var(--t-med) var(--ease),
+               filter var(--t-fast) var(--ease);
+    will-change:transform;
+  }
+  .cta:hover{filter:brightness(1.04);box-shadow:0 12px 30px rgba(230,192,122,0.36)}
+  .cta:active{transform:scale(0.98)}
+
+  /* ---------- Mega-Menue (Bento) ---------- */
+  .has-mega{position:static}
+
+  .mega{
+    position:absolute;
+    left:50%;
+    top:calc(74px + 8px);
+    transform:translateX(-50%) translateY(8px);
+    width:min(1120px, calc(100vw - 24px));
+    z-index:190;
+
+    background:linear-gradient(180deg, rgba(48,18,24,0.72), rgba(30,11,16,0.78));
+    backdrop-filter:saturate(160%) blur(22px);
+    -webkit-backdrop-filter:saturate(160%) blur(22px);
+    border:1px solid var(--line);
+    border-radius:var(--r-2xl);
+    box-shadow:var(--shadow-glass);
+    padding:18px;
+
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity var(--t-slow) var(--ease),
+               transform var(--t-slow) var(--ease),
+               visibility 0s linear var(--t-slow);
+  }
+  .mega.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:translateX(-50%) translateY(0);
+    transition:opacity var(--t-slow) var(--ease),
+               transform var(--t-slow) var(--ease),
+               visibility 0s;
+  }
+
+  .mega-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    padding:6px 8px 14px;
+  }
+  .mega-head h2{
+    margin:0;
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:600;
+    font-size:0.86rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .mega-head .hint{color:var(--text-2);font-size:0.8rem}
+
+  /* Bento Grid */
+  .bento{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    grid-auto-rows:128px;
+    gap:14px;
+  }
+
+  .tile{
+    position:relative;
+    overflow:hidden;
+    border-radius:var(--r-lg);
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    min-height:44px;
+    transition:transform var(--t-med) var(--ease),
+               border-color var(--t-med) var(--ease),
+               box-shadow var(--t-med) var(--ease);
+  }
+  .tile:hover{
+    transform:scale(1.02);
+    border-color:rgba(230,192,122,0.36);
+    box-shadow:0 14px 36px rgba(0,0,0,0.4);
+  }
+  .tile:focus-visible{transform:scale(1.02)}
+
+  /* abgerundeter Medien-Platzhalter (markiert) */
+  .tile .media{
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(120% 120% at 80% 0%, rgba(230,192,122,0.18), transparent 55%),
+      linear-gradient(160deg, rgba(140,30,55,0.42), rgba(26,10,14,0.20));
+    z-index:0;
+  }
+  .tile .media::after{
+    content:"PLATZHALTER";
+    position:absolute;
+    top:10px;left:12px;
+    font-family:"Space Grotesk",sans-serif;
+    font-size:0.56rem;
+    letter-spacing:0.18em;
+    color:var(--text-2);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px 8px;
+    background:rgba(0,0,0,0.25);
+  }
+  .tile .t-body{position:relative;z-index:1}
+  .tile .t-kicker{
+    font-size:0.66rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-family:"Space Grotesk",sans-serif;
+    margin-bottom:3px;
+  }
+  .tile .t-title{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:600;
+    font-size:1.04rem;
+    color:var(--text);
+  }
+  .tile .t-desc{color:var(--text-2);font-size:0.82rem;margin-top:2px}
+
+  /* Groessenvarianten der Kacheln */
+  .t-uhren   {grid-column:span 2; grid-row:span 2}
+  .t-schmuck {grid-column:span 1; grid-row:span 2}
+  .t-trau    {grid-column:span 1; grid-row:span 1}
+  .t-service {grid-column:span 1; grid-row:span 1}
+  /* Feature-Kacheln */
+  .t-feature {
+    grid-column:span 2; grid-row:span 1;
+    background:linear-gradient(150deg, rgba(230,192,122,0.16), rgba(140,30,55,0.22));
+    border-color:rgba(230,192,122,0.30);
+  }
+  .t-feature .media{display:none}
+  .t-feature2{grid-column:span 2; grid-row:span 1}
+
+  .arrow{
+    align-self:flex-start;
+    margin-top:8px;
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--gold);
+    font-family:"Space Grotesk",sans-serif;
+    font-size:0.78rem;
+    transition:gap var(--t-fast) var(--ease);
+  }
+  .tile:hover .arrow{gap:11px}
+
+  /* ---------- Hamburger ---------- */
+  .menu-toggle{
+    display:none;
+    width:46px;height:46px;
+    align-items:center;justify-content:center;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--r-md);
+    cursor:pointer;
+    color:var(--text);
+    transition:background var(--t-fast) var(--ease);
+  }
+  .menu-toggle:hover{background:rgba(255,255,255,0.08)}
+  .menu-toggle .bars{position:relative;width:20px;height:14px}
+  .menu-toggle .bars span{
+    position:absolute;left:0;height:2px;width:100%;
+    background:var(--text);border-radius:2px;
+    transition:transform var(--t-med) var(--ease),opacity var(--t-fast) var(--ease);
+  }
+  .menu-toggle .bars span:nth-child(1){top:0}
+  .menu-toggle .bars span:nth-child(2){top:6px}
+  .menu-toggle .bars span:nth-child(3){top:12px}
+  .menu-toggle[aria-expanded="true"] .bars span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .menu-toggle[aria-expanded="true"] .bars span:nth-child(2){opacity:0}
+  .menu-toggle[aria-expanded="true"] .bars span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+  /* ============================================================
+     MOBILE
+     ============================================================ */
+  .mobile-panel{display:none}
+
+  @media (max-width:860px){
+    .nav-list,.nav .cta.desktop-cta{display:none}
+    .menu-toggle{display:inline-flex}
+
+    .mobile-panel{
+      display:block;
+      overflow:hidden;
+      max-height:0;
+      opacity:0;
+      transition:max-height var(--t-slow) var(--ease),
+                 opacity var(--t-med) var(--ease);
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(36,13,19,0.96), rgba(26,10,14,0.96));
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .mobile-panel.open{max-height:90vh;opacity:1;overflow-y:auto}
+
+    .m-inner{padding:14px clamp(16px,4vw,32px) 26px}
+
+    .m-item{
+      display:block;
+      width:100%;
+      text-align:left;
+      font-family:"Space Grotesk",sans-serif;
+      font-size:1.04rem;
+      color:var(--text);
+      background:transparent;border:0;
+      border-bottom:1px solid var(--line);
+      padding:16px 6px;
+      min-height:44px;
+      cursor:pointer;
+    }
+    .m-acc-trigger{
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .m-acc-trigger .chev{width:16px;height:16px;transition:transform var(--t-med) var(--ease)}
+    .m-acc-trigger[aria-expanded="true"] .chev{transform:rotate(180deg)}
+
+    .m-acc-content{
+      overflow:hidden;
+      max-height:0;
+      transition:max-height var(--t-slow) var(--ease);
+    }
+    .m-acc-content.open{max-height:760px}
+    .m-sub{
+      display:block;
+      color:var(--text-2);
+      padding:13px 10px;
+      min-height:44px;
+      border-bottom:1px solid var(--line);
+      font-size:0.96rem;
+    }
+    .m-sub .lead{color:var(--gold);font-family:"Space Grotesk",sans-serif;font-weight:600}
+    .m-sub:last-child{border-bottom:0}
+
+    .m-cta{
+      display:block;text-align:center;
+      margin-top:18px;
+      font-family:"Space Grotesk",sans-serif;font-weight:600;
+      color:#28110A;
+      background:linear-gradient(150deg,var(--gold),var(--gold-2));
+      border-radius:999px;
+      padding:15px;min-height:44px;
+    }
+
+    /* Desktop-Mega nie auf Mobile zeigen */
+    .mega{display:none !important}
+  }
+
+  /* ============================================================
+     HERO + CONTENT
+     ============================================================ */
+  main{display:block}
+
+  .hero{position:relative;padding:clamp(56px,9vw,120px) 0 clamp(40px,6vw,80px);overflow:hidden}
+  .hero .glow{
+    position:absolute;
+    inset:auto;
+    width:680px;height:680px;
+    right:-160px;top:-180px;
+    background:radial-gradient(closest-side, rgba(230,192,122,0.20), transparent 70%);
+    filter:blur(8px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .hero .glow.two{
+    left:-200px;top:120px;
+    width:560px;height:560px;
+    background:radial-gradient(closest-side, rgba(140,30,55,0.40), transparent 70%);
+  }
+  .hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr 0.9fr;gap:clamp(28px,5vw,60px);align-items:center}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:"Space Grotesk",sans-serif;
+    font-size:0.74rem;letter-spacing:0.2em;text-transform:uppercase;
+    color:var(--gold);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    background:var(--panel);
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+
+  .hero h1{
+    font-family:"Fraunces", Georgia, serif;
+    font-weight:500;
+    font-size:clamp(2.6rem,6.4vw,4.6rem);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  .hero h1 .em{
+    font-style:italic;
+    background:linear-gradient(120deg,var(--gold),#F4DDA9 60%,var(--gold-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.lead{color:var(--text-2);font-size:clamp(1rem,1.6vw,1.18rem);max-width:46ch;margin:0 0 30px}
+
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+  .btn-ghost{
+    font-family:"Space Grotesk",sans-serif;font-weight:500;
+    color:var(--text);background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:999px;
+    min-height:44px;padding:0 22px;
+    display:inline-flex;align-items:center;
+    transition:background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,0.09);transform:translateY(-1px)}
+
+  .hero-media{
+    position:relative;
+    aspect-ratio:4/5;
+    border-radius:var(--r-2xl);
+    border:1px solid var(--line);
+    background:
+      radial-gradient(120% 90% at 78% 6%, rgba(230,192,122,0.20), transparent 55%),
+      linear-gradient(160deg, rgba(140,30,55,0.45), rgba(26,10,14,0.30));
+    box-shadow:var(--shadow-glass);
+    overflow:hidden;
+  }
+  .hero-media .tag{
+    position:absolute;top:14px;left:14px;
+    font-family:"Space Grotesk",sans-serif;font-size:0.6rem;letter-spacing:0.18em;
+    color:var(--text-2);
+    border:1px solid var(--line);border-radius:999px;
+    padding:5px 11px;background:rgba(0,0,0,0.3);
+  }
+  .hero-media .center{
+    position:absolute;inset:0;display:grid;place-items:center;
+    color:var(--text-2);font-family:"Space Grotesk",sans-serif;letter-spacing:0.16em;font-size:0.8rem;
+  }
+
+  /* Bento Cards Sektion */
+  .section{padding:clamp(48px,7vw,96px) 0}
+  .section-head{margin-bottom:30px;max-width:60ch}
+  .section-head .kick{
+    font-family:"Space Grotesk",sans-serif;color:var(--gold);
+    font-size:0.74rem;letter-spacing:0.2em;text-transform:uppercase;
+  }
+  .section-head h2{
+    font-family:"Fraunces",Georgia,serif;font-weight:500;
+    font-size:clamp(1.8rem,4vw,2.8rem);margin:10px 0 0;line-height:1.1;
+  }
+
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    grid-auto-rows:200px;
+    gap:18px;
+  }
+  .card{
+    position:relative;overflow:hidden;
+    border-radius:var(--r-lg);
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:22px;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    box-shadow:var(--shadow-soft);
+    transition:transform var(--t-med) var(--ease),border-color var(--t-med) var(--ease);
+  }
+  .card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(230,192,122,0.34)}
+  .card .media{
+    position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(120% 120% at 80% 0%, rgba(230,192,122,0.16), transparent 55%),
+      linear-gradient(160deg, rgba(140,30,55,0.40), rgba(26,10,14,0.18));
+  }
+  .card .media::after{
+    content:"PLATZHALTER";
+    position:absolute;top:12px;left:14px;
+    font-family:"Space Grotesk",sans-serif;font-size:0.58rem;letter-spacing:0.18em;
+    color:var(--text-2);border:1px solid var(--line);border-radius:999px;
+    padding:4px 9px;background:rgba(0,0,0,0.25);
+  }
+  .card .c-body{position:relative;z-index:1}
+  .card h3{font-family:"Space Grotesk",sans-serif;font-weight:600;margin:0 0 4px;font-size:1.18rem}
+  .card p{color:var(--text-2);margin:0;font-size:0.86rem}
+  .c-wide{grid-column:span 2}
+  .c-tall{grid-row:span 2}
+
+  /* Footer */
+  .site-footer{
+    border-top:1px solid var(--line);
+    padding:40px 0;
+    color:var(--text-2);
+    font-size:0.86rem;
+  }
+  .foot-inner{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+
+  @media (max-width:860px){
+    .hero-inner{grid-template-columns:1fr}
+    .hero-media{max-width:420px}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .c-wide{grid-column:span 2}
+  }
+  @media (max-width:520px){
+    .cards{grid-template-columns:1fr;grid-auto-rows:170px}
+    .c-wide,.c-tall{grid-column:auto;grid-row:auto}
+  }
+
+  /* ---------- Reduced Motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:0.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;
+      scroll-behavior:auto !important;
+    }
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a class="brand" href="#" aria-label="Maison Aurelie, Startseite">
+        <span class="mark" aria-hidden="true">A</span>
+        <span>Maison Aurelie<br><span class="sub">Duesseldorf</span></span>
+      </a>
+
+      <span class="nav-spacer"></span>
+
+      <ul class="nav-list">
+        <li class="has-mega">
+          <button class="nav-trigger" id="mega-trigger"
+                  aria-expanded="false" aria-controls="mega-kollektionen" aria-haspopup="true">
+            Kollektionen
+            <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <!-- Bento Mega-Menue -->
+          <div class="mega" id="mega-kollektionen" role="region" aria-label="Kollektionen">
+            <div class="mega-head">
+              <h2>Kollektionen</h2>
+              <span class="hint">Handgefertigt in Duesseldorf</span>
+            </div>
+
+            <div class="bento">
+              <a class="tile t-uhren" href="#">
+                <span class="media" aria-hidden="true"></span>
+                <span class="t-body">
+                  <span class="t-kicker">Zeitmesser</span>
+                  <span class="t-title">Uhren</span>
+                  <span class="t-desc">Mechanik und Eleganz, kuratiert fuer den Tag und den Abend.</span>
+                  <span class="arrow">Entdecken
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </span>
+              </a>
+
+              <a class="tile t-schmuck" href="#">
+                <span class="media" aria-hidden="true"></span>
+                <span class="t-body">
+                  <span class="t-kicker">Stuecke</span>
+                  <span class="t-title">Schmuck</span>
+                  <span class="t-desc">Colliers, Ringe, Ohrschmuck.</span>
+                </span>
+              </a>
+
+              <a class="tile t-trau" href="#">
+                <span class="media" aria-hidden="true"></span>
+                <span class="t-body">
+                  <span class="t-kicker">Fuer immer</span>
+                  <span class="t-title">Trauringe</span>
+                </span>
+              </a>
+
+              <a class="tile t-service" href="#">
+                <span class="media" aria-hidden="true"></span>
+                <span class="t-body">
+                  <span class="t-kicker">Atelier</span>
+                  <span class="t-title">Service</span>
+                </span>
+              </a>
+
+              <a class="tile t-feature" href="#">
+                <span class="t-body">
+                  <span class="t-kicker">Neu 2025</span>
+                  <span class="t-title">Edition Bordeaux</span>
+                  <span class="t-desc">Limitierte Serie in tiefem Rot und warmem Gold.</span>
+                  <span class="arrow">Zur Edition
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </span>
+              </a>
+
+              <a class="tile t-feature2" href="#">
+                <span class="media" aria-hidden="true"></span>
+                <span class="t-body">
+                  <span class="t-kicker">Termin</span>
+                  <span class="t-title">Private Beratung</span>
+                  <span class="t-desc">Persoenliche Auswahl im Salon, nach Vereinbarung.</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </li>
+
+        <li><a class="nav-link" href="#kollektion">Atelier</a></li>
+        <li><a class="nav-link" href="#kollektion">Service</a></li>
+        <li><a class="nav-link" href="#kollektion">Boutique</a></li>
+      </ul>
+
+      <button class="cta desktop-cta" id="cta-magnet" type="button">Termin anfragen</button>
+
+      <button class="menu-toggle" id="menu-toggle" aria-expanded="false"
+              aria-controls="mobile-panel" aria-label="Menue oeffnen">
+        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile Accordion -->
+  <div class="mobile-panel" id="mobile-panel">
+    <div class="m-inner">
+      <button class="m-item m-acc-trigger" id="m-acc-trigger"
+              aria-expanded="false" aria-controls="m-acc-content">
+        Kollektionen
+        <svg class="chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="m-acc-content" id="m-acc-content">
+        <a class="m-sub" href="#"><span class="lead">Uhren</span>  Mechanik und Eleganz</a>
+        <a class="m-sub" href="#"><span class="lead">Schmuck</span>  Colliers, Ringe, Ohrschmuck</a>
+        <a class="m-sub" href="#"><span class="lead">Trauringe</span>  Fuer immer</a>
+        <a class="m-sub" href="#"><span class="lead">Edition Bordeaux</span>  Neu 2025</a>
+        <a class="m-sub" href="#"><span class="lead">Private Beratung</span>  Nach Vereinbarung</a>
+      </div>
+
+      <a class="m-item" href="#kollektion">Atelier</a>
+      <a class="m-item" href="#kollektion">Service</a>
+      <a class="m-item" href="#kollektion">Boutique</a>
+
+      <a class="m-cta" href="#">Termin anfragen</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero">
+    <span class="glow" aria-hidden="true"></span>
+    <span class="glow two" aria-hidden="true"></span>
+    <div class="wrap">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Bordeaux und Gold  Edition 2025</span>
+          <h1>Zeitlose Stuecke,<br><span class="em">in warmem Gold</span> gefasst.</h1>
+          <p class="lead">Maison Aurelie verbindet Duesseldorfer Handwerk mit moderner Formensprache. Uhren, Schmuck und Trauringe, kuratiert mit Sorgfalt.</p>
+          <div class="hero-actions">
+            <button class="cta" type="button">Kollektion ansehen</button>
+            <a class="btn-ghost" href="#kollektion">Mehr erfahren</a>
+          </div>
+        </div>
+        <div class="hero-media" aria-label="Bildplatzhalter Hero">
+          <span class="tag">PLATZHALTER  MEDIEN</span>
+          <span class="center">4 zu 5  Hero-Visual</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENTO CARDS -->
+  <section class="section" id="kollektion">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kick">Kuratiert</span>
+        <h2>Eine Auswahl aus dem Atelier</h2>
+      </div>
+
+      <div class="cards">
+        <article class="card c-wide c-tall">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body">
+            <h3>Uhren</h3>
+            <p>Mechanik, die bleibt. Praezise gefertigt und sorgfaeltig kuratiert.</p>
+          </div>
+        </article>
+        <article class="card c-tall">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body"><h3>Schmuck</h3><p>Colliers und Ringe in Gold.</p></div>
+        </article>
+        <article class="card">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body"><h3>Trauringe</h3><p>Fuer immer.</p></div>
+        </article>
+        <article class="card">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body"><h3>Service</h3><p>Pflege und Reparatur.</p></div>
+        </article>
+        <article class="card c-wide">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body"><h3>Edition Bordeaux</h3><p>Limitierte Serie 2025.</p></div>
+        </article>
+        <article class="card c-wide">
+          <span class="media" aria-hidden="true"></span>
+          <div class="c-body"><h3>Private Beratung</h3><p>Persoenliche Auswahl im Salon, nach Vereinbarung.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kick">Besuch</span>
+        <h2>Salon in Duesseldorf</h2>
+      </div>
+      <p style="color:var(--text-2);max-width:60ch">Vereinbaren Sie einen Termin fuer eine persoenliche Beratung. Wir nehmen uns Zeit fuer Ihre Auswahl, in ruhiger Atmosphaere und mit fachkundiger Begleitung.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap foot-inner">
+    <span>Maison Aurelie  Koenigsallee, Duesseldorf</span>
+    <span>Bordeaux und Gold  Ausfuehrung 2025</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var mqDesktop = window.matchMedia("(min-width: 861px)");
+
+  /* ===================== Desktop Mega-Menue (Disclosure) ===================== */
+  var trigger = document.getElementById("mega-trigger");
+  var mega    = document.getElementById("mega-kollektionen");
+  var host    = trigger.closest(".has-mega");
+  var openTimer = null, closeTimer = null;
+  var HOVER_OPEN = 90, HOVER_CLOSE = 160;
+
+  function isOpen(){ return trigger.getAttribute("aria-expanded") === "true"; }
+
+  function openMega(){
+    if(!mqDesktop.matches) return;
+    clearTimeout(closeTimer);
+    trigger.setAttribute("aria-expanded","true");
+    mega.classList.add("open");
+  }
+  function closeMega(){
+    clearTimeout(openTimer);
+    trigger.setAttribute("aria-expanded","false");
+    mega.classList.remove("open");
+  }
+  function toggleMega(){ isOpen() ? closeMega() : openMega(); }
+
+  /* Klick / Tastatur (Enter, Space) auf den Trigger */
+  trigger.addEventListener("click", function(e){
+    e.preventDefault();
+    clearTimeout(openTimer); clearTimeout(closeTimer);
+    toggleMega();
+  });
+
+  /* Hover (mit Delay, blockiert die Tastatur nicht) */
+  host.addEventListener("mouseenter", function(){
+    if(!mqDesktop.matches) return;
+    clearTimeout(closeTimer);
+    openTimer = setTimeout(openMega, HOVER_OPEN);
+  });
+  host.addEventListener("mouseleave", function(){
+    if(!mqDesktop.matches) return;
+    clearTimeout(openTimer);
+    closeTimer = setTimeout(closeMega, HOVER_CLOSE);
+  });
+
+  /* ESC schliesst und gibt Fokus zurueck */
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && isOpen()){
+      closeMega();
+      trigger.focus();
+    }
+  });
+
+  /* Klick ausserhalb schliesst */
+  document.addEventListener("click", function(e){
+    if(isOpen() && !host.contains(e.target)){ closeMega(); }
+  });
+
+  /* Fokusverlust (Tab aus dem Menue heraus) schliesst */
+  host.addEventListener("focusout", function(e){
+    if(!host.contains(e.relatedTarget)){ closeMega(); }
+  });
+
+  /* ===================== Mobile Menue ===================== */
+  var mToggle = document.getElementById("menu-toggle");
+  var mPanel  = document.getElementById("mobile-panel");
+
+  mToggle.addEventListener("click", function(){
+    var open = mToggle.getAttribute("aria-expanded") === "true";
+    mToggle.setAttribute("aria-expanded", String(!open));
+    mToggle.setAttribute("aria-label", open ? "Menue oeffnen" : "Menue schliessen");
+    mPanel.classList.toggle("open", !open);
+  });
+
+  /* Mobile Accordion */
+  var mAcc = document.getElementById("m-acc-trigger");
+  var mAccC = document.getElementById("m-acc-content");
+  mAcc.addEventListener("click", function(){
+    var open = mAcc.getAttribute("aria-expanded") === "true";
+    mAcc.setAttribute("aria-expanded", String(!open));
+    mAccC.classList.toggle("open", !open);
+  });
+
+  /* ESC schliesst Mobile-Panel */
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && mToggle.getAttribute("aria-expanded") === "true"){
+      mToggle.setAttribute("aria-expanded","false");
+      mToggle.setAttribute("aria-label","Menue oeffnen");
+      mPanel.classList.remove("open");
+      mToggle.focus();
+    }
+  });
+
+  /* Aufraeumen beim Wechsel Desktop <-> Mobile */
+  mqDesktop.addEventListener("change", function(){
+    closeMega();
+    mToggle.setAttribute("aria-expanded","false");
+    mPanel.classList.remove("open");
+  });
+
+  /* ===================== Magnetischer CTA (<=6px) ===================== */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var magnets = document.querySelectorAll(".cta");
+  var MAX = 6;
+
+  magnets.forEach(function(btn){
+    btn.addEventListener("pointermove", function(e){
+      if(reduce.matches || e.pointerType === "touch") return;
+      var r = btn.getBoundingClientRect();
+      var dx = e.clientX - (r.left + r.width/2);
+      var dy = e.clientY - (r.top + r.height/2);
+      var mx = Math.max(-MAX, Math.min(MAX, dx * 0.3));
+      var my = Math.max(-MAX, Math.min(MAX, dy * 0.3));
+      btn.style.transform = "translate(" + mx + "px," + my + "px)";
+    });
+    btn.addEventListener("pointerleave", function(){
+      btn.style.transform = "";
+    });
+  });
+})();
+</script>
+</body>
+</html>
