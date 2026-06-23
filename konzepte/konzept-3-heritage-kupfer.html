@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="de">
+<!--
+  ============================================================================
+  KONZEPT 3 — "Heritage & Kupfer"
+  ----------------------------------------------------------------------------
+  Richtungsname: Heritage & Kupfer
+  Stimmung/Idee: Warme Manufaktur, Familienbetrieb seit 1968. Werkstatt- und
+                 Meisteratelier-Anmutung, handwerklich, traditionsbewusst,
+                 erdig-edel. Erzaehlerisches Layout mit Anfertigungs-Story.
+  Farbwahl:      Warmes Anthrazit (#1C1A17) als Grund, Panel-Braun (#262219),
+                 warmes Creme als Text (#EDE6D8). Akzent Kupfer (#C07A45),
+                 Kupfer tief (#8A4F2B), Messing-Highlight (#D9A066).
+  Fontwahl:      Display = "Marcellus" (klassische roemische Versalien),
+                 Body/UI = "Inter".
+  Wann passt diese Richtung: Wenn die Marke ihre Geschichte, das Handwerk und
+                 den Familienbetrieb in den Vordergrund stellen will. Fuer
+                 Kundschaft, die Werte wie Bestaendigkeit, Reparatur und
+                 echte Manufaktur-Arbeit schaetzt.
+  ============================================================================
+-->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MAISON AURÉLIE · Heritage und Kupfer · Manufaktur seit 1968</title>
+  <meta name="description" content="MAISON AURÉLIE, Manufaktur fuer Trauringe, Uhren und Schmuck in Duesseldorf. Familienbetrieb seit 1968." />
+
+  <!-- PROD: next/font lokal. In der Demo Google-Fonts per <link>. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Farbpalette Heritage & Kupfer */
+      --bg:            #1C1A17; /* warmes Anthrazit */
+      --panel:         #262219; /* Panel */
+      --text:          #EDE6D8; /* warmes Creme */
+      --text-soft:     #B3A892; /* sekundaerer Text */
+      --copper:        #C07A45; /* Akzent Kupfer */
+      --copper-deep:   #8A4F2B; /* Kupfer tief */
+      --brass:         #D9A066; /* Messing-Highlight */
+      --hairline:      rgba(255, 235, 200, 0.12); /* Hairline */
+
+      --font-display: "Marcellus", Georgia, "Times New Roman", serif;
+      --font-body:    "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+      --maxw: 1240px;
+      --gap: clamp(1rem, 2.5vw, 2rem);
+      --radius: 10px;
+      --pad-x: clamp(1.1rem, 4vw, 3rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+      line-height: 1.65;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+      /* dezente warme Textur, kein Slop */
+      background-image:
+        radial-gradient(120% 90% at 85% -10%, rgba(192, 122, 69, 0.10), transparent 60%),
+        radial-gradient(90% 70% at -10% 110%, rgba(138, 79, 43, 0.10), transparent 55%);
+      background-attachment: fixed;
+    }
+
+    img, svg { display: block; max-width: 100%; }
+
+    a { color: inherit; }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+      margin: 0;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: var(--maxw);
+      margin-inline: auto;
+      padding-inline: var(--pad-x);
+    }
+
+    .eyebrow {
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--brass);
+      margin: 0 0 1rem;
+    }
+
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    /* ---------- Focus ---------- */
+    :focus-visible {
+      outline: 2px solid var(--brass);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* ---------- Buttons / Links ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.98rem;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background-color .25s ease, color .25s ease, border-color .25s ease, transform .25s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--copper);
+      color: #211208;
+      border-color: var(--copper);
+    }
+    .btn-primary:hover { background-color: var(--brass); border-color: var(--brass); }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--text);
+      border-color: var(--hairline);
+      min-height: 44px;
+      padding: 0.7rem 1.25rem;
+    }
+    .btn-ghost:hover { border-color: var(--brass); color: var(--brass); }
+
+    .ghost-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 44px;
+      padding: 0.5rem 0.25rem;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+    }
+    .ghost-link .arrow { color: var(--copper); transition: transform .25s ease; }
+    .ghost-link:hover { color: var(--brass); }
+    .ghost-link:hover .arrow { transform: translateX(4px); }
+
+    /* ---------- Nav ---------- */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(28, 26, 23, 0.86);
+      border-bottom: 1px solid var(--hairline);
+      backdrop-filter: saturate(120%) blur(6px);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 68px;
+    }
+    .wordmark {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .wordmark span { color: var(--copper); }
+
+    .nav-links {
+      display: none;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: clamp(1rem, 2vw, 2rem);
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      transition: color .2s ease;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta { display: inline-flex; }
+
+    @media (min-width: 880px) {
+      .nav-links { display: flex; }
+    }
+
+    /* ---------- Hero ---------- */
+    .hero { padding: clamp(3rem, 7vw, 6rem) 0 clamp(2.5rem, 5vw, 4rem); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(2rem, 5vw, 3.5rem);
+      align-items: center;
+    }
+    @media (min-width: 980px) {
+      .hero-grid { grid-template-columns: 1.05fr 0.95fr; }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.6rem, 1.6rem + 4.6vw, 5rem);
+      margin: 0 0 1.25rem;
+      max-width: 14ch;
+    }
+    .hero .since {
+      color: var(--copper);
+      font-style: normal;
+    }
+    .lede {
+      color: var(--text-soft);
+      font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+      max-width: 46ch;
+      margin: 0 0 2rem;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.25rem;
+      align-items: center;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      margin-top: clamp(2rem, 4vw, 2.75rem);
+      padding-top: clamp(1.5rem, 3vw, 2rem);
+      border-top: 1px solid var(--hairline);
+    }
+    .hero-meta .num {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
+      color: var(--brass);
+      display: block;
+      line-height: 1;
+    }
+    .hero-meta .lbl {
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      margin-top: 0.4rem;
+      display: block;
+    }
+
+    /* Visual-Flaeche: CSS-Motiv Werkstatt/Anfertigung, klar Platzhalter */
+    .hero-visual {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      border-radius: var(--radius);
+      border: 1px solid var(--hairline);
+      overflow: hidden;
+      background-color: var(--panel);
+      background-image:
+        radial-gradient(80% 60% at 70% 25%, rgba(217, 160, 102, 0.22), transparent 60%),
+        radial-gradient(70% 70% at 25% 80%, rgba(138, 79, 43, 0.30), transparent 60%),
+        repeating-linear-gradient(115deg, rgba(255,235,200,0.045) 0 2px, transparent 2px 26px);
+    }
+    .hero-visual::after {
+      /* angedeutete gedrehte Ring-Form / Werkstueck */
+      content: "";
+      position: absolute;
+      width: 46%;
+      aspect-ratio: 1;
+      top: 38%;
+      left: 50%;
+      transform: translate(-50%, -38%);
+      border-radius: 50%;
+      border: 3px solid var(--copper);
+      box-shadow:
+        0 0 0 10px rgba(192,122,69,0.10),
+        inset 0 0 28px rgba(217,160,102,0.30);
+      background:
+        conic-gradient(from 210deg, var(--brass), var(--copper-deep), var(--copper), var(--brass));
+      opacity: 0.92;
+    }
+    .placeholder-tag {
+      position: absolute;
+      left: 0.85rem;
+      bottom: 0.85rem;
+      z-index: 2;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      background-color: rgba(28,26,23,0.78);
+      border: 1px solid var(--hairline);
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    /* ---------- Section base ---------- */
+    section { padding-block: clamp(3rem, 6vw, 5.5rem); }
+    .section-head { max-width: 56ch; margin-bottom: clamp(2rem, 4vw, 3rem); }
+    .section-head h2 {
+      font-size: clamp(2rem, 1.4rem + 2.4vw, 3.1rem);
+      margin-bottom: 0.85rem;
+    }
+    .section-head p { color: var(--text-soft); margin: 0; }
+
+    /* ---------- Designsystem-Kachel ---------- */
+    .ds {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: clamp(1.5rem, 4vw, 2.75rem);
+    }
+    .ds-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(2rem, 4vw, 3rem);
+    }
+    @media (min-width: 860px) {
+      .ds-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .ds h3 {
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.1rem;
+    }
+    .ds .kicker {
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    @media (min-width: 520px) { .swatches { grid-template-columns: repeat(3, 1fr); } }
+
+    .swatch {
+      border: 1px solid var(--hairline);
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+    .swatch .chip { height: 56px; }
+    .swatch .meta { padding: 0.5rem 0.6rem 0.65rem; }
+    .swatch .nm { font-size: 0.82rem; font-weight: 500; display: block; }
+    .swatch .hx {
+      font-size: 0.74rem;
+      color: var(--text-soft);
+      letter-spacing: 0.03em;
+      display: block;
+      margin-top: 0.15rem;
+    }
+
+    .specimen .display-sample {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4rem);
+      line-height: 1.02;
+      margin: 0 0 0.75rem;
+    }
+    .specimen .body-sample { color: var(--text-soft); margin: 0 0 1.5rem; max-width: 42ch; }
+
+    .scale { display: grid; gap: 0.4rem; border-top: 1px solid var(--hairline); padding-top: 1.1rem; }
+    .scale-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      font-family: var(--font-display);
+      color: var(--text);
+    }
+    .scale-row .sz { color: var(--text-soft); font-family: var(--font-body); font-size: 0.78rem; }
+    .scale-row.s1 { font-size: 2.4rem; }
+    .scale-row.s2 { font-size: 1.8rem; }
+    .scale-row.s3 { font-size: 1.35rem; }
+    .scale-row.s4 { font-size: 1.05rem; }
+
+    .ds-note {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--hairline);
+      padding-top: 1.25rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      max-width: 70ch;
+    }
+    .ds-note strong { color: var(--text); font-weight: 600; }
+
+    /* ---------- Story / Manufaktur ---------- */
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(2rem, 5vw, 3.5rem);
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .story-grid { grid-template-columns: 0.95fr 1.05fr; }
+    }
+    .story-visual {
+      aspect-ratio: 5 / 4;
+      border-radius: var(--radius);
+      border: 1px solid var(--hairline);
+      position: relative;
+      overflow: hidden;
+      background-color: var(--panel);
+      background-image:
+        radial-gradient(70% 80% at 30% 30%, rgba(217,160,102,0.18), transparent 60%),
+        repeating-linear-gradient(45deg, rgba(255,235,200,0.05) 0 2px, transparent 2px 22px);
+    }
+    .story-visual::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border: 2px solid var(--copper);
+      border-radius: 6px;
+      transform: rotate(-6deg);
+      background: linear-gradient(135deg, rgba(217,160,102,0.25), rgba(138,79,43,0.25));
+    }
+    .story-text h2 {
+      font-size: clamp(1.9rem, 1.4rem + 2vw, 2.8rem);
+      margin-bottom: 1.1rem;
+    }
+    .story-text p { color: var(--text-soft); margin: 0 0 1.1rem; }
+    .story-text p.lead-line { color: var(--text); }
+
+    /* ---------- Service-Karten ---------- */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+    }
+    @media (min-width: 720px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+    .card {
+      background-color: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: clamp(1.4rem, 3vw, 2rem);
+      display: flex;
+      flex-direction: column;
+      transition: transform .3s ease, border-color .3s ease;
+    }
+    .card:hover { transform: translateY(-4px); border-color: rgba(217,160,102,0.4); }
+
+    .card .mark {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      border: 1px solid var(--copper);
+      color: var(--brass);
+      margin-bottom: 1.1rem;
+      flex: none;
+    }
+    .card .mark svg { width: 22px; height: 22px; }
+    .card h3 { font-size: 1.4rem; margin-bottom: 0.55rem; }
+    .card p { color: var(--text-soft); margin: 0 0 1.25rem; font-size: 0.97rem; }
+    .card .card-foot { margin-top: auto; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      border-top: 1px solid var(--hairline);
+      padding-block: clamp(2rem, 4vw, 3rem);
+      color: var(--text-soft);
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer .nap { font-size: 0.92rem; }
+    .footer .nap .brand {
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .footer-links a {
+      text-decoration: none;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .footer-links a:hover { color: var(--brass); }
+
+    /* ---------- Reveal ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .7s ease, transform .7s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .card, .ghost-link .arrow, .btn { transition: none !important; }
+      body { background-attachment: scroll; }
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 0.5rem;
+      background-color: var(--copper);
+      color: #211208;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      z-index: 100;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .skip-link:focus { left: 0.75rem; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="wordmark" href="#" aria-label="MAISON AURÉLIE, Startseite">MAISON <span>AURÉLIE</span></a>
+      <nav aria-label="Hauptnavigation">
+        <ul class="nav-links">
+          <li><a href="#story">Trauringe</a></li>
+          <li><a href="#service">Uhren</a></li>
+          <li><a href="#service">Schmuck</a></li>
+          <li><a href="#story">Manufaktur</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-primary nav-cta" href="#service">Termin</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">Manufaktur in Düsseldorf</p>
+          <h1 id="hero-title" class="reveal">
+            Am Werktisch entsteht, <span class="since">seit 1968</span>, was ein Leben lang getragen wird.
+          </h1>
+          <p class="lede reveal">
+            In dritter Generation feilen, fassen und gravieren wir in eigener Werkstatt.
+            Jedes Stück beginnt als Gespräch und endet als Erbstück.
+          </p>
+          <div class="hero-actions reveal">
+            <a class="btn btn-primary" href="#service">Trauring-Beratung</a>
+            <a class="ghost-link" href="#story">
+              Die Werkstatt kennenlernen <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <dl class="hero-meta reveal">
+            <div>
+              <dd class="num tnum">1968</dd>
+              <dt class="lbl">Gegründet als Familienbetrieb</dt>
+            </div>
+            <div>
+              <dd class="num tnum">3</dd>
+              <dt class="lbl">Generationen am Werktisch</dt>
+            </div>
+            <div>
+              <dd class="num tnum">100&nbsp;%</dd>
+              <dt class="lbl">Anfertigung im eigenen Haus</dt>
+            </div>
+          </dl>
+        </div>
+
+        <div class="hero-visual reveal" role="img" aria-label="Platzhalter, Makrofoto eines Werkstücks aus der Werkstatt">
+          <span class="placeholder-tag">Platzhalter · PROD: Makrofoto Werkstatt</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DESIGNSYSTEM-KACHEL ============ -->
+    <section aria-labelledby="ds-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Auf einen Blick</p>
+          <h2 id="ds-title">Farbe, Schrift und Akzent</h2>
+          <p>Das Designsystem dieser Richtung. Warme Erdtöne, ein Kupfer-Akzent und eine klassische Versalien-Schrift für die Manufaktur-Anmutung.</p>
+        </div>
+
+        <div class="ds reveal">
+          <div class="ds-grid">
+            <!-- Farben -->
+            <div>
+              <h3 class="kicker">Farbpalette</h3>
+              <div class="swatches">
+                <div class="swatch">
+                  <div class="chip" style="background-color:#1C1A17"></div>
+                  <div class="meta"><span class="nm">Anthrazit warm</span><span class="hx tnum">#1C1A17</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#262219"></div>
+                  <div class="meta"><span class="nm">Panel</span><span class="hx tnum">#262219</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#EDE6D8"></div>
+                  <div class="meta"><span class="nm">Creme</span><span class="hx tnum">#EDE6D8</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#B3A892"></div>
+                  <div class="meta"><span class="nm">Text sekundär</span><span class="hx tnum">#B3A892</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#C07A45"></div>
+                  <div class="meta"><span class="nm">Kupfer</span><span class="hx tnum">#C07A45</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#8A4F2B"></div>
+                  <div class="meta"><span class="nm">Kupfer tief</span><span class="hx tnum">#8A4F2B</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#D9A066"></div>
+                  <div class="meta"><span class="nm">Messing-Highlight</span><span class="hx tnum">#D9A066</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="chip" style="background-color:#1C1A17; background-image:repeating-linear-gradient(45deg, rgba(255,235,200,0.12) 0 2px, transparent 2px 8px)"></div>
+                  <div class="meta"><span class="nm">Hairline</span><span class="hx">rgba(255,235,200,.12)</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typo -->
+            <div class="specimen">
+              <h3 class="kicker">Typografie</h3>
+              <p class="display-sample">Handwerk &amp; Heritage</p>
+              <p class="body-sample">
+                Body in Inter. Ruhig, gut lesbar, für Fließtext und Bedienelemente.
+                Display in Marcellus für Headlines mit klassischer Versalien-Anmutung.
+              </p>
+              <div class="scale" aria-hidden="false">
+                <div class="scale-row s1"><span>Display</span><span class="sz tnum">clamp · bis 5rem</span></div>
+                <div class="scale-row s2"><span>Headline</span><span class="sz tnum">≈ 1.8rem</span></div>
+                <div class="scale-row s3"><span>Subhead</span><span class="sz tnum">≈ 1.35rem</span></div>
+                <div class="scale-row s4"><span>Body</span><span class="sz tnum">≈ 1.05rem</span></div>
+              </div>
+            </div>
+
+            <p class="ds-note">
+              <strong>Akzent-Nutzung:</strong> Kupfer trägt genau einen Schwerpunkt pro Sektion, meist den primären CTA oder ein einzelnes Wort.
+              Messing-Highlight dient sparsam für Hover und Zahlen. Flächen bleiben warmes Anthrazit, damit das Kupfer Gewicht behält und nichts überladen wirkt.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BEISPIEL-SEKTION 1: Manufaktur-Story ============ -->
+    <section id="story" aria-labelledby="story-title">
+      <div class="wrap">
+        <div class="story-grid">
+          <div class="story-visual reveal" role="img" aria-label="Platzhalter, Werkstatt-Aufnahme am Werktisch">
+            <span class="placeholder-tag">Platzhalter · PROD: Werkstatt-Foto</span>
+          </div>
+          <div class="story-text reveal">
+            <p class="eyebrow">Unsere Werkstatt</p>
+            <h2 id="story-title">Vom Rohgold zum Ring, alles unter einem Dach.</h2>
+            <p class="lead-line">
+              1968 hat unser Großvater an der Königsallee die erste Werkbank aufgestellt.
+              Die Werkzeuge von damals liegen heute noch im Atelier.
+            </p>
+            <p>
+              Wir schmelzen, walzen und löten selbst. So bestimmen wir jede Legierung, jede Fassung
+              und jede Gravur. Wer bei uns einen Trauring abholt, hat zugesehen, wie er entstanden ist.
+            </p>
+            <p>
+              Reparatur und Umarbeitung gehören dazu. Ein Schmuckstück darf altern, getragen werden
+              und nach Jahren zurückkommen, um weiterzuleben.
+            </p>
+            <a class="ghost-link" href="#service">
+              Anfertigung anfragen <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BEISPIEL-SEKTION 2: 3 Service-Karten ============ -->
+    <section id="service" aria-labelledby="service-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Unsere Arbeit</p>
+          <h2 id="service-title">Drei Wege zu Ihrem Stück</h2>
+          <p>Ob neu gefertigt, behutsam instand gesetzt oder als Trauring-Paar: Jeder Auftrag durchläuft die eigene Werkstatt.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card reveal">
+            <span class="mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l2.5 4.5L19 9l-3.5 3 1 5L12 14.5 7.5 17l1-5L5 9l4.5-1.5L12 3z"/>
+              </svg>
+            </span>
+            <h3>Anfertigung</h3>
+            <p>Einzelstücke nach Ihrem Entwurf. Wir wählen Legierung und Stein gemeinsam und fertigen von Hand.</p>
+            <div class="card-foot">
+              <a class="ghost-link" href="#">Termin vereinbaren <span class="arrow" aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 5.5a4 4 0 1 1-5 5L4 16v4h4l5.5-5.5"/>
+                <path d="M14.5 9.5l4-4"/>
+              </svg>
+            </span>
+            <h3>Reparatur</h3>
+            <p>Gefasste Steine, gerissene Glieder, alte Verschlüsse. Wir bringen Getragenes zurück in Form.</p>
+            <div class="card-foot">
+              <a class="ghost-link" href="#">Stück einschicken <span class="arrow" aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <article class="card reveal">
+            <span class="mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="14" r="4"/>
+                <circle cx="16" cy="14" r="4"/>
+              </svg>
+            </span>
+            <h3>Trauringe</h3>
+            <p>Ein Nachmittag am Werktisch, zwei Ringe fürs Leben. Mit Probegrößen, Gravur und Beratung in Ruhe.</p>
+            <div class="card-foot">
+              <a class="ghost-link" href="#">Beratung buchen <span class="arrow" aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p class="nap">
+        <span class="brand">MAISON AURÉLIE</span> · Königsallee 1 · 40212 Düsseldorf
+      </p>
+      <ul class="footer-links">
+        <li><a href="#">Impressum</a></li>
+        <li><a href="#">Datenschutz</a></li>
+        <li><a href="#">AGB</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Dezenter Reveal, respektiert prefers-reduced-motion.
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+      var items = document.querySelectorAll('.reveal');
+      if (reduce.matches || !('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>
