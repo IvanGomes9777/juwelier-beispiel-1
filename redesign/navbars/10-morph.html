@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 10 "Morph"
+  Startet als volle, transparente Bar ueber dem Hero. Beim Scrollen morpht sie in eine
+  zentrierte, solide Glas-Pill (Breite schrumpft, Radius + Hintergrund erscheinen).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON VEYRA — Navbar 10 · Morph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#100C0A;--fg:#F4ECE1;--muted:#A89E8E;--gold:#C9A45B;--line:rgba(244,236,225,.18);
+    --ease:cubic-bezier(.22,1,.36,1);--t:420ms}
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--fg);line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--fg);color:var(--bg);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  .navwrap{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;
+    padding:0;transition:padding var(--t) var(--ease)}
+  .navwrap.morph{padding:14px}
+  .nav{width:100%;max-width:100%;display:flex;align-items:center;gap:18px;color:#fff;
+    padding:20px clamp(18px,4vw,44px);border-radius:0;border:1px solid transparent;background:transparent;
+    transition:max-width var(--t) var(--ease),padding var(--t) var(--ease),border-radius var(--t) var(--ease),
+      background var(--t) var(--ease),border-color var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+  .navwrap.morph .nav{max-width:760px;padding:10px 12px 10px 22px;border-radius:999px;
+    background:rgba(20,16,13,.7);border-color:var(--line);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);
+    box-shadow:0 22px 60px -26px rgba(0,0,0,.8)}
+  .nav .logo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.4rem;letter-spacing:.26em;
+    padding-left:.26em;white-space:nowrap;transition:font-size var(--t) var(--ease)}
+  .navwrap.morph .nav .logo{font-size:1.15rem}
+  .nav .links{display:flex;gap:clamp(10px,1.6vw,22px);margin:0 auto}
+  .nav .links a{position:relative;font-size:.86rem;letter-spacing:.08em;color:rgba(255,255,255,.85);padding:6px 2px}
+  .nav .links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);
+    transform:scaleX(0);transform-origin:left;transition:transform var(--t) var(--ease)}
+  .nav .links a:hover{color:#fff} .nav .links a:hover::after{transform:scaleX(1)}
+  .nav .cta{flex:0 0 auto;background:linear-gradient(150deg,var(--gold),#a87f37);color:#1c1407;font-weight:600;
+    font-size:.82rem;letter-spacing:.06em;padding:11px 20px;border-radius:999px;white-space:nowrap}
+  .nav .burger{display:none;background:none;border:none;color:inherit;cursor:pointer;padding:6px}
+  .nav .burger svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6}
+  @media (max-width:820px){
+    .nav .links{display:none} .nav .cta{display:none} .nav .burger{display:inline-flex;margin-left:auto}
+    .navwrap.morph .nav{max-width:none}
+  }
+  .sheet{position:fixed;inset:0;z-index:120;background:var(--bg);transform:translateY(-100%);
+    transition:transform var(--t) var(--ease);padding:24px;display:flex;flex-direction:column}
+  .sheet.open{transform:none}
+  .sheet .x{align-self:flex-end;background:none;border:none;color:var(--fg);font-size:2rem;cursor:pointer}
+  .sheet a{font-family:"Cormorant Garamond",serif;font-size:1.9rem;padding:14px 0;border-bottom:1px solid var(--line)}
+
+  .hero{position:relative;height:100vh;min-height:600px;display:grid;place-items:center;text-align:center;color:#fff}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.55))}
+  .hero .in{position:relative;z-index:2;padding:0 24px;max-width:28ch}
+  .hero .eb{font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 18px}
+  .hero h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2.6rem,7vw,5.2rem);line-height:1.03;margin:0}
+  .filler{height:120vh;background:linear-gradient(180deg,#100C0A,#1a1410);display:grid;place-items:center;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms !important;scroll-behavior:auto !important}}
+</style>
+</head>
+<body>
+<span class="badge">Option 10 · Morph</span>
+
+<div class="navwrap" id="navwrap">
+  <nav class="nav" aria-label="Hauptnavigation">
+    <a class="logo" href="#">VEYRA</a>
+    <div class="links">
+      <a href="#">Schmuck</a><a href="#">Trauringe</a><a href="#">Uhren</a><a href="#">Atelier</a>
+    </div>
+    <a class="cta" href="#">Termin</a>
+    <button class="burger" id="burger" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </nav>
+</div>
+
+<div class="sheet" id="sheet" aria-hidden="true">
+  <button class="x" id="sx" aria-label="Schließen">&times;</button>
+  <a href="#">Schmuck</a><a href="#">Trauringe</a><a href="#">Uhren</a><a href="#">Atelier</a>
+</div>
+
+<section class="hero">
+  <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=2000&q=80&auto=format&fit=crop" alt="Uhr in Szene" />
+  <div class="in">
+    <p class="eb">Maison Veyra</p>
+    <h1>Scrollen Sie. Die Navigation folgt.</h1>
+  </div>
+</section>
+<div class="filler">Beim Scrollen schrumpft die Bar zur zentrierten Pill.</div>
+
+<script>
+(function(){
+  var w=document.getElementById("navwrap");
+  window.addEventListener("scroll",function(){w.classList.toggle("morph",window.scrollY>50);},{passive:true});
+  var sheet=document.getElementById("sheet");
+  document.getElementById("burger").addEventListener("click",function(){sheet.classList.add("open");sheet.setAttribute("aria-hidden","false");});
+  document.getElementById("sx").addEventListener("click",function(){sheet.classList.remove("open");sheet.setAttribute("aria-hidden","true");});
+})();
+</script>
+</body>
+</html>
