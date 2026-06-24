@@ -232,6 +232,91 @@
   .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:center}
   footer .copy{color:var(--text-2);font-size:.86rem}
 
+  /* Anker unter Sticky-Navbar nicht verdecken */
+  section[id]{scroll-margin-top:96px}
+  /* Teaser-Karten als Links */
+  a.card{color:inherit}
+  a.card .go{position:absolute;top:22px;right:22px;color:var(--gold);opacity:0;transform:translateX(-4px);
+    transition:opacity var(--t) var(--ease),transform var(--t) var(--ease)}
+  a.card:hover .go,a.card:focus-visible .go{opacity:1;transform:none}
+
+  /* ============ TRAURINGE ============ */
+  .split{display:grid;grid-template-columns:1fr;gap:clamp(32px,5vw,56px);align-items:center}
+  @media (min-width:920px){ .split{grid-template-columns:1.05fr .95fr} }
+  .split.reverse .split-media{order:-1}
+  @media (min-width:920px){ .split.reverse .split-media{order:0} }
+
+  .feature-list{list-style:none;margin:26px 0 30px;padding:0;display:grid;gap:14px}
+  .feature-list li{display:flex;gap:14px;align-items:flex-start}
+  .feature-list .tick{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+    margin-top:2px;background:rgba(230,192,122,.12);border:1px solid var(--line);color:var(--gold)}
+  .feature-list .tick svg{width:16px;height:16px}
+  .feature-list .ft{font-weight:500;color:var(--text)}
+  .feature-list .fd{color:var(--text-2);font-size:.92rem}
+
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .swatch{display:inline-flex;align-items:center;gap:9px;padding:8px 14px;border-radius:var(--pill);
+    border:1px solid var(--line);background:var(--panel);font-size:.86rem;color:var(--text-2)}
+  .swatch .chip{width:15px;height:15px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  .chip.gelb{background:linear-gradient(150deg,#F4D58B,#C99A4E)}
+  .chip.weiss{background:linear-gradient(150deg,#EDEFF3,#B9C0CC)}
+  .chip.rose{background:linear-gradient(150deg,#E9C3B0,#C98E76)}
+  .chip.platin{background:linear-gradient(150deg,#E7E9ED,#9AA1AC)}
+
+  /* Prozess-Karte rechts */
+  .process{border-radius:var(--r-2xl);border:1px solid var(--line);background:var(--panel);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:clamp(22px,3vw,32px);box-shadow:var(--shadow-soft)}
+  .process .ph{font-family:"Space Grotesk",sans-serif;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--gold);margin:0 0 18px}
+  .step{display:flex;gap:18px;padding:18px 0;border-top:1px solid var(--line)}
+  .step:first-of-type{border-top:none;padding-top:4px}
+  .step .num{flex:0 0 auto;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+    font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2a0f14;
+    background:linear-gradient(150deg,var(--gold),var(--gold-2));box-shadow:0 8px 22px -10px rgba(230,192,122,.6)}
+  .step h4{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.06rem;margin:6px 0 4px}
+  .step p{margin:0;color:var(--text-2);font-size:.92rem}
+
+  /* ============ BERATUNGSTERMIN ============ */
+  .booking{display:grid;grid-template-columns:1fr;gap:clamp(28px,4vw,44px)}
+  @media (min-width:920px){ .booking{grid-template-columns:1.1fr .9fr} }
+  .form-card{border-radius:var(--r-2xl);border:1px solid var(--line);background:var(--panel);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:clamp(22px,3.4vw,34px);box-shadow:var(--shadow-soft)}
+  .field-grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media (min-width:560px){ .field-grid.two{grid-template-columns:1fr 1fr} }
+  .field{display:flex;flex-direction:column;gap:7px}
+  .field label{font-family:"Space Grotesk",sans-serif;font-size:.82rem;letter-spacing:.04em;color:var(--text)}
+  .field label .req{color:var(--gold)}
+  .field input,.field select,.field textarea{font-family:"Inter",sans-serif;font-size:.96rem;color:var(--text);
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--r-xl);padding:13px 15px;
+    min-height:48px;transition:border-color var(--t) var(--ease),background var(--t) var(--ease)}
+  .field textarea{min-height:104px;resize:vertical}
+  .field input::placeholder,.field textarea::placeholder{color:var(--text-2)}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:rgba(230,192,122,.55);
+    background:rgba(255,255,255,.06)}
+  .field select{appearance:none;-webkit-appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9A7AD' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;background-size:18px;padding-right:42px}
+  .form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:22px}
+  .form-foot .cta{min-height:50px;padding:0 26px}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--text-2);max-width:42ch}
+  .consent input{margin-top:3px;accent-color:var(--gold);width:17px;height:17px;flex:0 0 auto}
+  .form-note{margin:18px 0 0;font-size:.8rem;color:var(--text-2)}
+  .form-status{margin:16px 0 0;padding:13px 16px;border-radius:var(--r-xl);border:1px solid rgba(230,192,122,.4);
+    background:rgba(230,192,122,.1);color:var(--text);font-size:.92rem;display:none}
+  .form-status.show{display:block}
+
+  .contact-aside{display:flex;flex-direction:column;gap:22px}
+  .contact-block{display:flex;gap:14px;align-items:flex-start}
+  .contact-block .ic{flex:0 0 auto;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(230,192,122,.12);border:1px solid var(--line);color:var(--gold)}
+  .contact-block .ic svg{width:20px;height:20px}
+  .contact-block h4{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1rem;margin:4px 0 5px}
+  .contact-block p{margin:0;color:var(--text-2);font-size:.93rem;line-height:1.55}
+  .contact-block a:hover{color:var(--gold)}
+  .hours{list-style:none;margin:6px 0 0;padding:0;font-size:.9rem;color:var(--text-2)}
+  .hours li{display:flex;justify-content:space-between;gap:18px;padding:3px 0;max-width:260px}
+  .hours li span:last-child{color:var(--text)}
+
   /* ============ COMMAND PALETTE ============ */
   .cmd-overlay{position:fixed;inset:0;z-index:150;display:none;padding:14vh 20px 20px;
     background:rgba(10,4,6,0.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
@@ -387,11 +472,12 @@
         <p>Von der Verlobung bis zur Vitrine. Die Bereiche von Maison Aurélie auf einen Blick.</p>
       </div>
       <div class="bento">
-        <article class="card col-3" id="trauringe">
+        <a class="card col-3" href="#trauringe">
           <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="6"></circle><path d="M9 6 12 2l3 4"></path></svg></span>
           <h3>Trauringe nach Maß</h3>
           <p>Gemeinsam entworfen, von Hand gefertigt in unserer Werkstatt am Rhein.</p>
-        </article>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </a>
         <article class="card col-3" id="uhren">
           <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
           <h3>Feine Uhren</h3>
@@ -407,11 +493,180 @@
           <h3>Diamanten</h3>
           <p>Zertifiziert und verantwortungsvoll bezogen.</p>
         </article>
-        <article class="card col-2" id="termin">
+        <a class="card col-2" href="#termin">
           <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg></span>
           <h3>Privater Termin</h3>
           <p>Persönliche Beratung bei einem Glas Champagner.</p>
-        </article>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRAURINGE ============ -->
+  <section class="section" id="trauringe" aria-labelledby="trauringe-title">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <div class="section-head" style="margin-bottom:18px">
+            <span class="eyebrow" style="margin-bottom:18px"><span class="dot" aria-hidden="true"></span> Meisteratelier · Düsseldorf</span>
+            <h2 id="trauringe-title">Trauringe, die <em>zueinander</em> finden.</h2>
+            <p>Kein Katalogprodukt, sondern ein Paar Ringe nach Ihrem Maß. Wir entwerfen sie mit Ihnen
+              und fertigen sie von Hand in unserer Werkstatt am Rhein.</p>
+          </div>
+
+          <ul class="feature-list">
+            <li>
+              <span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"></path></svg></span>
+              <span><span class="ft">Profil &amp; Breite individuell</span><br><span class="fd">Gerade, bombiert oder angeschrägt, von 2 bis 8 Millimeter.</span></span>
+            </li>
+            <li>
+              <span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"></path></svg></span>
+              <span><span class="ft">Brillanten nach Wunsch</span><br><span class="fd">Zertifiziert und verantwortungsvoll bezogen, fasstechnisch sauber gesetzt.</span></span>
+            </li>
+            <li>
+              <span class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"></path></svg></span>
+              <span><span class="ft">Gravur inklusive</span><br><span class="fd">Datum, Initialen oder Handschrift, innen oder außen.</span></span>
+            </li>
+          </ul>
+
+          <div class="swatches" role="list" aria-label="Verfügbare Materialien">
+            <span class="swatch" role="listitem"><span class="chip gelb" aria-hidden="true"></span> Gelbgold 750</span>
+            <span class="swatch" role="listitem"><span class="chip weiss" aria-hidden="true"></span> Weißgold 750</span>
+            <span class="swatch" role="listitem"><span class="chip rose" aria-hidden="true"></span> Roségold 750</span>
+            <span class="swatch" role="listitem"><span class="chip platin" aria-hidden="true"></span> Platin 950</span>
+          </div>
+
+          <div class="hero-actions" style="margin-top:30px">
+            <a class="cta" href="#termin">Beratung vereinbaren</a>
+          </div>
+        </div>
+
+        <div class="split-media">
+          <div class="process" aria-label="So entsteht Ihr Ring">
+            <p class="ph">In drei Schritten zum Ring</p>
+            <div class="step">
+              <span class="num" aria-hidden="true">1</span>
+              <div><h4>Entwurf zu zweit</h4><p>Wir sprechen über Stil, Budget und Material und skizzieren Ihre Ringe gemeinsam.</p></div>
+            </div>
+            <div class="step">
+              <span class="num" aria-hidden="true">2</span>
+              <div><h4>Anprobe &amp; Maß</h4><p>An Musterringen finden wir Profil, Breite und exakte Größe, in Ruhe vor Ort.</p></div>
+            </div>
+            <div class="step">
+              <span class="num" aria-hidden="true">3</span>
+              <div><h4>Anfertigung von Hand</h4><p>Unsere Goldschmiede fertigen Ihre Ringe in vier bis sechs Wochen.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BERATUNGSTERMIN ============ -->
+  <section class="section" id="termin" aria-labelledby="termin-title">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow" style="margin-bottom:18px"><span class="dot" aria-hidden="true"></span> Privater Termin</span>
+        <h2 id="termin-title">Wir nehmen uns <em>Zeit</em> für Sie.</h2>
+        <p>Vereinbaren Sie eine persönliche Beratung. Sie sitzen mit uns am Tisch, in Ruhe und ohne Eile.
+          Wir melden uns innerhalb eines Werktags zur Bestätigung.</p>
+      </div>
+
+      <div class="booking">
+        <form class="form-card" id="bookingForm" novalidate>
+          <div class="field-grid two">
+            <div class="field">
+              <label for="bf-name">Name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="bf-name" name="name" autocomplete="name" placeholder="Vor- und Nachname" required />
+            </div>
+            <div class="field">
+              <label for="bf-phone">Telefon</label>
+              <input type="tel" id="bf-phone" name="phone" autocomplete="tel" placeholder="Für die Rückbestätigung" />
+            </div>
+          </div>
+
+          <div class="field-grid two" style="margin-top:16px">
+            <div class="field">
+              <label for="bf-email">E-Mail <span class="req" aria-hidden="true">*</span></label>
+              <input type="email" id="bf-email" name="email" autocomplete="email" placeholder="name@beispiel.de" required />
+            </div>
+            <div class="field">
+              <label for="bf-topic">Anliegen</label>
+              <select id="bf-topic" name="topic">
+                <option value="trauringe">Trauringe nach Maß</option>
+                <option value="verlobung">Verlobungsring</option>
+                <option value="uhren">Feine Uhren</option>
+                <option value="schmuck">Schmuck &amp; Kollektionen</option>
+                <option value="atelier">Atelier &amp; Reparatur</option>
+                <option value="sonstiges">Etwas anderes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-grid two" style="margin-top:16px">
+            <div class="field">
+              <label for="bf-date">Wunschtermin</label>
+              <input type="date" id="bf-date" name="date" />
+            </div>
+            <div class="field">
+              <label for="bf-time">Tageszeit</label>
+              <select id="bf-time" name="time">
+                <option value="vormittag">Vormittag</option>
+                <option value="nachmittag">Nachmittag</option>
+                <option value="egal">Ist mir gleich</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:16px">
+            <label for="bf-msg">Nachricht</label>
+            <textarea id="bf-msg" name="message" placeholder="Worum geht es? Je mehr wir wissen, desto besser bereiten wir uns vor."></textarea>
+          </div>
+
+          <label class="consent" style="margin-top:18px">
+            <input type="checkbox" id="bf-consent" name="consent" required />
+            <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert
+              werden. <span class="req" aria-hidden="true">*</span></span>
+          </label>
+
+          <div class="form-foot">
+            <button class="cta" type="submit">Termin anfragen</button>
+            <span class="form-note" style="margin:0">Pflichtfelder sind mit <span style="color:var(--gold)">*</span> markiert.</span>
+          </div>
+
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+          <p class="form-note">Demo-Formular: Diese Anfrage wird nicht versendet. In Produktion: serverseitiger Versand + DSGVO-konforme Verarbeitung.</p>
+        </form>
+
+        <aside class="contact-aside" aria-label="Kontakt und Öffnungszeiten">
+          <div class="contact-block">
+            <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span>
+            <div>
+              <h4>Maison Aurélie</h4>
+              <p>Königsallee 1<br>40212 Düsseldorf</p>
+            </div>
+          </div>
+          <div class="contact-block">
+            <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"></path></svg></span>
+            <div>
+              <h4>Direkt erreichbar</h4>
+              <p><a href="tel:+492110000000">+49 211 000000</a><br><a href="mailto:atelier@maison-aurelie.de">atelier@maison-aurelie.de</a></p>
+            </div>
+          </div>
+          <div class="contact-block">
+            <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+            <div>
+              <h4>Öffnungszeiten</h4>
+              <ul class="hours">
+                <li><span>Mo – Fr</span><span>10 – 19 Uhr</span></li>
+                <li><span>Samstag</span><span>10 – 18 Uhr</span></li>
+                <li><span>Sonntag</span><span>geschlossen</span></li>
+              </ul>
+              <p style="margin-top:8px">Beratung bevorzugt nach Termin.</p>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   </section>
@@ -554,6 +809,42 @@
     document.addEventListener("visibilitychange",function(){if(document.hidden){run=false;cancelAnimationFrame(rf);rf=0;}else{run=true;if(!rf)rf=requestAnimationFrame(frame);}});
     window.addEventListener("resize",rs);
     rs();io.observe(stage);rf=requestAnimationFrame(frame);
+  }
+
+  /* ---------- Beratungsformular (Demo, kein Versand) ---------- */
+  var bookingForm = document.getElementById("bookingForm");
+  if (bookingForm){
+    var dateInput = document.getElementById("bf-date");
+    if (dateInput){
+      var d = new Date();
+      var iso = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+      dateInput.min = iso;
+    }
+    var status = document.getElementById("formStatus");
+    bookingForm.addEventListener("submit", function(e){
+      e.preventDefault();
+      if (!bookingForm.checkValidity()){
+        var firstInvalid = bookingForm.querySelector(":invalid");
+        if (firstInvalid) firstInvalid.focus();
+        if (status){
+          status.textContent = "Bitte ergänzen Sie die markierten Pflichtfelder.";
+          status.style.borderColor = "rgba(200,70,80,.5)";
+          status.style.background = "rgba(200,70,80,.12)";
+          status.classList.add("show");
+        }
+        return;
+      }
+      var name = (document.getElementById("bf-name").value || "").trim();
+      if (status){
+        status.style.borderColor = "";
+        status.style.background = "";
+        status.textContent = "Vielen Dank" + (name ? ", " + name.split(" ")[0] : "") +
+          ". Ihre Anfrage ist angekommen, wir bestätigen den Termin innerhalb eines Werktags.";
+        status.classList.add("show");
+      }
+      bookingForm.reset();
+      if (status && status.scrollIntoView) status.scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "center"});
+    });
   }
 })();
 </script>
