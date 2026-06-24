@@ -168,6 +168,38 @@
   footer.site .fi{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:center}
   footer.site .wm{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;letter-spacing:.22em}
   footer.site .cp{color:var(--muted);font-size:.86rem}
+  /* ===== Termin-Buchung (Dialog) ===== */
+  .bkscrim{position:fixed;inset:0;background:var(--scrim);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:120;opacity:0;transition:opacity var(--t) var(--ease)}
+  .bkscrim.show{opacity:1}
+  .bk{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:20px;opacity:0;transition:opacity var(--t) var(--ease)}
+  .bk.show{opacity:1}
+  .bk[hidden],.bkscrim[hidden]{display:none}
+  .bk-panel{position:relative;width:100%;max-width:540px;max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:clamp(22px,4vw,38px);box-shadow:0 40px 90px -30px rgba(27,33,40,.45);transform:translateY(12px) scale(.99);transition:transform var(--t) var(--ease)}
+  .bk.show .bk-panel{transform:none}
+  .bk-x{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font-size:1.3rem;line-height:1;transition:background var(--t),border-color var(--t)}
+  .bk-x:hover{background:var(--panel-2)}
+  .bk-eb{font-family:"JetBrains Mono",monospace;font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  .bk h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(1.7rem,4vw,2.2rem);margin:0 0 8px;color:var(--fg);line-height:1.05}
+  .bk-sub{color:var(--muted);margin:0 0 22px;font-size:.95rem}
+  .bk-form{display:flex;flex-direction:column;gap:14px}
+  .bk-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:480px){.bk-grid2{grid-template-columns:1fr}}
+  .bk-row{display:flex;flex-direction:column;gap:7px}
+  .bk-row>label{font-family:"JetBrains Mono",monospace;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .bk-form input,.bk-form select,.bk-form textarea{width:100%;min-height:48px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--fg);font-family:"Inter",sans-serif;font-size:.98rem;transition:border-color var(--t),box-shadow var(--t)}
+  .bk-form textarea{min-height:84px;resize:vertical}
+  .bk-form input:focus,.bk-form select:focus,.bk-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(51,65,77,.14)}
+  .bk-check{display:flex;gap:11px;align-items:flex-start;font-family:"Inter",sans-serif;font-size:.85rem;color:var(--muted);line-height:1.45;cursor:pointer;margin-top:2px}
+  .bk-check input{width:20px;height:20px;min-height:0;flex:0 0 auto;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+  .bk-error{color:#A8321F;font-size:.86rem;margin:0;font-weight:500}
+  .bk-submit{min-height:54px;border:none;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:"Inter",sans-serif;font-weight:600;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--t),transform .12s var(--ease)}
+  .bk-submit:hover{background:var(--accent2)} .bk-submit:active{transform:scale(.98)}
+  .bk-note{font-size:.72rem;color:var(--muted);margin:0;text-align:center}
+  .bk-done{text-align:center;padding:10px 0 6px}
+  .bk-done .ic{width:62px;height:62px;border-radius:999px;display:grid;place-items:center;margin:0 auto 16px;background:var(--accent);color:var(--on-accent);font-size:1.7rem}
+  .bk-done h3{font-family:"Fraunces",serif;font-weight:600;font-size:1.6rem;margin:0 0 8px;color:var(--fg)}
+  .bk-done p{color:var(--muted);margin:0 0 22px}
+  @media (prefers-reduced-motion:reduce){.bk,.bkscrim,.bk-panel,.bk-submit{transition:none} .bk-panel{transform:none}}
 </style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div>
 <aside class="sidebar" id="sidebar">
   <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
@@ -178,7 +210,7 @@
     <a class="navitem" href="#">Atelier</a>
     <a class="navitem" href="#">Maison</a>
   </nav>
-  <a class="cta" href="#">Termin buchen</a>
+  <a class="cta" href="#termin" id="bookOpen" role="button">Termin buchen</a>
   <div class="foot"><div class="soc"><a href="#">Instagram</a><a href="#">Pinterest</a></div><span>Königsallee · Düsseldorf</span></div>
 </aside>
 <div class="scrim" id="scrim"></div>
@@ -235,7 +267,55 @@
   <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
 </div>
-<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div><script>
+<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
+<div class="bkscrim" id="bkScrim" hidden></div>
+<div class="bk" id="bkModal" role="dialog" aria-modal="true" aria-labelledby="bkTitle" aria-describedby="bkSub" hidden>
+  <div class="bk-panel">
+    <button class="bk-x" id="bkClose" type="button" aria-label="Schließen">&times;</button>
+    <p class="bk-eb">Maison Veyra · Atelier</p>
+    <h2 id="bkTitle">Termin buchen</h2>
+    <p id="bkSub" class="bk-sub">Persönliche Beratung in unserem Atelier an der Königsallee. Wir melden uns zur Bestätigung.</p>
+    <form class="bk-form" id="bkForm" novalidate>
+      <div class="bk-row">
+        <label for="bkConcern">Anliegen</label>
+        <select id="bkConcern" name="concern" required>
+          <option>Trauring-Beratung</option>
+          <option>Verlobungsring</option>
+          <option>Uhren</option>
+          <option>Schmuck</option>
+          <option>Service und Reparatur</option>
+        </select>
+      </div>
+      <div class="bk-grid2">
+        <div class="bk-row"><label for="bkDate">Wunschdatum</label><input type="date" id="bkDate" name="date" required></div>
+        <div class="bk-row"><label for="bkTime">Uhrzeit</label>
+          <select id="bkTime" name="time" required>
+            <option value="" disabled selected>Bitte wählen</option>
+            <option>10:00</option><option>11:00</option><option>12:00</option>
+            <option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option>
+          </select>
+        </div>
+      </div>
+      <div class="bk-row"><label for="bkName">Name</label><input type="text" id="bkName" name="name" autocomplete="name" required></div>
+      <div class="bk-grid2">
+        <div class="bk-row"><label for="bkMail">E-Mail</label><input type="email" id="bkMail" name="email" autocomplete="email" required></div>
+        <div class="bk-row"><label for="bkPhone">Telefon (optional)</label><input type="tel" id="bkPhone" name="phone" autocomplete="tel"></div>
+      </div>
+      <div class="bk-row"><label for="bkMsg">Nachricht (optional)</label><textarea id="bkMsg" name="message" rows="3"></textarea></div>
+      <label class="bk-check"><input type="checkbox" id="bkPriv" required> <span>Ich habe die Datenschutzhinweise gelesen und bin mit der Kontaktaufnahme einverstanden.</span></label>
+      <p class="bk-error" id="bkError" role="alert" hidden></p>
+      <button type="submit" class="bk-submit">Termin anfragen</button>
+      <p class="bk-note">Demo: Es werden keine Daten gesendet. In Produktion geht die Anfrage an das Atelier.</p>
+    </form>
+    <div class="bk-done" id="bkDone" hidden>
+      <div class="ic" aria-hidden="true">&#10003;</div>
+      <h3>Vielen Dank.</h3>
+      <p id="bkDoneMsg"></p>
+      <button type="button" class="bk-submit" id="bkDoneClose">Schließen</button>
+    </div>
+  </div>
+</div>
+<script>
 (function(){
   var sidebar=document.getElementById("sidebar"),scrim=document.getElementById("scrim"),flyout=document.getElementById("flyout"),
       panelTitle=document.getElementById("panelTitle"),previewImg=document.getElementById("previewImg"),
@@ -354,4 +434,62 @@ try{
   function loop(){raf=requestAnimationFrame(loop);if(!run){raf=0;return;}controls.update();renderer.render(scene,camera);}
   loop();
 }catch(e){ if(loadnote)loadnote.classList.add('hide'); console.error(e); }
+</script><script>
+(function(){
+  var modal=document.getElementById('bkModal'); if(!modal) return;
+  var scrim=document.getElementById('bkScrim'),
+      form=document.getElementById('bkForm'), done=document.getElementById('bkDone'),
+      doneMsg=document.getElementById('bkDoneMsg'), err=document.getElementById('bkError'),
+      opener=document.getElementById('bookOpen'),
+      closeBtns=[document.getElementById('bkClose'),document.getElementById('bkDoneClose')].filter(Boolean);
+  var lastFocus=null;
+  // Wunschdatum: kein Datum in der Vergangenheit
+  var dEl=document.getElementById('bkDate');
+  if(dEl){var t=new Date();dEl.min=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
+  function focusables(){return Array.prototype.filter.call(
+    modal.querySelectorAll('button, input, select, textarea, [href], [tabindex]:not([tabindex="-1"])'),
+    function(el){return !el.disabled && el.offsetParent!==null;});}
+  function onKey(e){
+    if(e.key==='Escape'){e.preventDefault();close();return;}
+    if(e.key==='Tab'){var f=focusables();if(!f.length)return;var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}
+  function open(){
+    lastFocus=document.activeElement; modal.hidden=false; scrim.hidden=false;
+    form.hidden=false; done.hidden=true; if(err){err.hidden=true;}
+    requestAnimationFrame(function(){scrim.classList.add('show');modal.classList.add('show');});
+    document.body.style.overflow='hidden';
+    document.addEventListener('keydown',onKey,true);
+    var first=document.getElementById('bkConcern'); if(first)setTimeout(function(){first.focus();},40);
+  }
+  function close(){
+    scrim.classList.remove('show'); modal.classList.remove('show');
+    document.removeEventListener('keydown',onKey,true); document.body.style.overflow='';
+    setTimeout(function(){modal.hidden=true;scrim.hidden=true;},340);
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  if(opener)opener.addEventListener('click',function(e){e.preventDefault();open();});
+  closeBtns.forEach(function(b){b.addEventListener('click',close);});
+  scrim.addEventListener('click',close);
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('bkName'), mail=document.getElementById('bkMail'),
+        date=document.getElementById('bkDate'), time=document.getElementById('bkTime'),
+        priv=document.getElementById('bkPriv');
+    var firstBad=null, miss=[];
+    if(!name.value.trim()){miss.push('Name'); firstBad=firstBad||name;}
+    if(!/.+@.+\..+/.test(mail.value)){miss.push('gültige E-Mail'); firstBad=firstBad||mail;}
+    if(!date.value){miss.push('Datum'); firstBad=firstBad||date;}
+    if(!time.value){miss.push('Uhrzeit'); firstBad=firstBad||time;}
+    if(!priv.checked){miss.push('Datenschutz-Einwilligung'); firstBad=firstBad||priv;}
+    if(miss.length){err.hidden=false; err.textContent='Bitte ergänzen: '+miss.join(', ')+'.'; if(firstBad)firstBad.focus(); return;}
+    err.hidden=true;
+    var concern=document.getElementById('bkConcern').value;
+    var ds=date.value; var dt=new Date(date.value+'T00:00:00');
+    if(!isNaN(dt)) ds=dt.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    doneMsg.textContent=name.value.trim().split(' ')[0]+', wir haben Ihre Anfrage fuer '+concern+' am '+ds+' um '+time.value+' Uhr erhalten. Sie erhalten in Kuerze eine Bestaetigung per E-Mail.';
+    form.hidden=true; done.hidden=false;
+    var dc=document.getElementById('bkDoneClose'); if(dc)dc.focus();
+  });
+})();
 </script></body></html>
