@@ -1,0 +1,343 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="Maison Veyra Düsseldorf — Haute Joaillerie, Trauringe nach Maß, feine Uhren und Schmuck." /><title>MAISON VEYRA · Düsseldorf — Haute Joaillerie</title><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" /><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script><style>:root{--bg:#EEF0F2;--panel:#FAFBFC;--panel-2:#E6E9ED;--fg:#1B2128;--muted:#6B7681;--accent:#33414D;--accent2:#586773;--line:rgba(27,33,40,.13);--scrim:rgba(27,33,40,.35);--on-accent:#FAFBFC;--sw:252px;--ease:cubic-bezier(.22,1,.36,1);--t:340ms}
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Inter",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--fg);color:var(--bg);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.9}
+
+  /* ===== Sidebar (gewaehlte Navbar: 6+5+8) ===== */
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sw);z-index:95;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:30px 24px}
+  .sidebar .brand{font-family:"Cormorant Garamond",serif;font-size:1.7rem;font-weight:600;letter-spacing:.24em;color:var(--fg)}
+  .sidebar .brand small{display:block;font-family:"Inter",sans-serif;font-size:.58rem;letter-spacing:.36em;color:var(--muted);margin-top:8px}
+  .sidebar nav{margin-top:42px;display:flex;flex-direction:column;gap:2px}
+  .navitem{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:none;cursor:pointer;color:var(--muted);font-family:inherit;font-size:.98rem;text-align:left;padding:11px 0 11px 18px;transition:color var(--t),padding var(--t) var(--ease)}
+  .navitem::before{content:"";position:absolute;left:0;top:50%;width:7px;height:1.5px;background:var(--accent);transform:translateY(-50%) scaleX(0);transform-origin:left;transition:transform var(--t) var(--ease)}
+  .navitem .car{opacity:0;transition:opacity var(--t);font-family:"JetBrains Mono",monospace;color:var(--accent)}
+  .navitem:hover,.navitem.active{color:var(--fg);padding-left:24px}
+  .navitem:hover::before,.navitem.active::before{transform:translateY(-50%) scaleX(1)}
+  .navitem[data-panel]:hover .car,.navitem.active .car{opacity:1}
+  .sidebar .cta{margin-top:22px;display:inline-flex;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:12px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);transition:background var(--t),color var(--t),border-color var(--t)}
+  .sidebar .cta:hover{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .sidebar .foot{margin-top:auto;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:10px}
+  .sidebar .foot .soc{display:flex;gap:14px}
+  .sidebar .foot a:hover{color:var(--accent)}
+
+  .scrim{position:fixed;inset:0 0 0 var(--sw);z-index:90;background:var(--scrim);opacity:0;visibility:hidden;transition:opacity var(--t),visibility var(--t)}
+  .scrim.open{opacity:1;visibility:visible}
+  .flyout{position:fixed;top:0;bottom:0;left:var(--sw);z-index:96;width:min(70vw,640px);background:var(--panel-2);border-right:1px solid var(--line);box-shadow:40px 0 80px -40px rgba(0,0,0,.4);transform:translateX(-18px);opacity:0;visibility:hidden;transition:transform var(--t) var(--ease),opacity var(--t),visibility var(--t);display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+  .flyout.open{transform:none;opacity:1;visibility:visible}
+  .flyout .lcol{padding:32px 28px;overflow:auto}
+  .flyout .phead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .flyout .phead h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.6rem;margin:0;color:var(--fg)}
+  .flyout .phead .close{background:none;border:none;color:var(--muted);cursor:pointer;font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase}
+  .flyout .phead .close:hover{color:var(--fg)}
+  .panel{display:none}
+  .panel.show{display:block;animation:fade .4s var(--ease)}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .panel h4{font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:18px 0 9px}
+  .panel h4:first-child{margin-top:0}
+  .panel ul{list-style:none;margin:0;padding:0}
+  .panel a.sub{display:flex;align-items:baseline;gap:10px;padding:8px 0;font-size:1.0rem;color:var(--fg);transition:color var(--t),padding var(--t) var(--ease)}
+  .panel a.sub .ix{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--accent);opacity:.7}
+  .panel a.sub:hover{color:var(--accent);padding-left:8px}
+  .flyout .rcol{position:relative;background:var(--bg);overflow:hidden}
+  .flyout .preview{position:absolute;inset:0}
+  .flyout .preview img{width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity .35s var(--ease)}
+  .flyout .rcol::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.55))}
+  .flyout .pcap{position:absolute;left:20px;bottom:18px;z-index:2;color:#fff}
+  .flyout .pcap em{font-style:normal;font-family:"JetBrains Mono",monospace;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:#fff;opacity:.85}
+  .flyout .pcap b{display:block;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin-top:3px}
+  @media (max-width:760px){ .flyout{display:none} }
+
+  .topbar{display:none;position:fixed;top:0;left:0;right:0;z-index:95;align-items:center;justify-content:space-between;padding:14px 18px;background:color-mix(in srgb, var(--panel) 88%, transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .topbar .brand{font-family:"Cormorant Garamond",serif;font-size:1.3rem;font-weight:600;letter-spacing:.22em;color:var(--fg)}
+  .topbar button{background:none;border:none;color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-family:"JetBrains Mono",monospace;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase}
+  .topbar .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .ovl{position:fixed;inset:0;z-index:120;background:var(--bg);padding:22px;overflow:auto;transform:translateY(-100%);transition:transform var(--t) var(--ease)}
+  .ovl.open{transform:none}
+  .ovl .x{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .ovl .x button{background:none;border:none;color:var(--fg);font-size:2rem;cursor:pointer}
+  .ovl .grp{border-top:1px solid var(--line);padding:8px 0}
+  .ovl .glabel{font-family:"Cormorant Garamond",serif;font-size:1.6rem;padding:12px 0;color:var(--fg)}
+  .ovl .links{display:flex;flex-wrap:wrap;gap:8px 16px;padding:0 0 14px}
+  .ovl .links a{color:var(--muted);font-size:.95rem}
+  .ovl .links a:hover{color:var(--accent)}
+
+  .main{margin-left:var(--sw)}
+  @media (max-width:900px){
+    .sidebar{display:none} .topbar{display:flex} .main{margin-left:0} .scrim{left:0} .flyout{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}}
+
+  .reveal{position:fixed;inset:0;z-index:500;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}
+  .reveal .col{background:var(--panel);transform-origin:top;animation:revcol .85s var(--ease) forwards;animation-delay:calc(.55s + var(--i)*.07s)}
+  @keyframes revcol{from{transform:scaleY(1)}to{transform:scaleY(0)}}
+  .reveal .mark{position:absolute;inset:0;display:grid;place-items:center;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2rem,7vw,4.2rem);letter-spacing:.42em;color:var(--fg);padding-left:.42em;animation:revmark 1.15s var(--ease) forwards}
+  @keyframes revmark{0%{opacity:0;letter-spacing:.6em}28%{opacity:1;letter-spacing:.42em}72%{opacity:1}100%{opacity:0}}
+  .rise{opacity:0;animation:rise .9s var(--ease) forwards;animation-delay:1.15s}
+  .rise.d1{animation-delay:1.25s}.rise.d2{animation-delay:1.35s}.rise.d3{animation-delay:1.45s}
+  @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.reveal{display:none}.rise{opacity:1;animation:none}}
+
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,4vw,60px);
+    padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:hidden}
+  @media(max-width:900px){.hero{grid-template-columns:1fr}}
+  .kin .eb{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin:0 0 22px;transition:color var(--t)}
+  .kin h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(2.6rem,6.4vw,5.4rem);line-height:.98;margin:0;letter-spacing:-.01em}
+  .kin h1 .scr{font-family:"JetBrains Mono",monospace;font-style:normal;color:var(--accent);font-size:.66em;transition:color var(--t)}
+  .kin .lead{color:var(--muted);max-width:40ch;margin:22px 0 28px;font-size:1.05rem}
+  .picker{display:flex;flex-direction:column;gap:12px}
+  .picker .pt{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .sw{display:flex;gap:12px;flex-wrap:wrap}
+  .sw button{width:48px;height:48px;border-radius:50%;border:2px solid transparent;cursor:pointer;position:relative;transition:transform .2s var(--ease),border-color var(--t);box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+  .sw button:hover{transform:translateY(-3px)} .sw button[aria-pressed="true"]{border-color:var(--fg)}
+  .sw button .nm{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;letter-spacing:.04em;color:var(--muted)}
+  .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;background:var(--accent);color:var(--on-accent);margin-top:34px;transition:background var(--t)}
+
+  .stage{position:relative;justify-self:center;width:min(82vw,480px);aspect-ratio:1/1}
+  .card{position:relative;width:100%;height:100%;border-radius:24px;overflow:hidden;
+    background:radial-gradient(120% 100% at 50% 30%,color-mix(in srgb,var(--accent) 14%,var(--panel-2)),var(--panel-2));
+    box-shadow:0 60px 120px -50px rgba(0,0,0,.85);border:1px solid var(--line)}
+  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:none;cursor:grab}
+  #ringcanvas:active{cursor:grabbing}
+  .card .fallback{position:absolute;inset:0;z-index:2}
+  .card .fallback img{width:100%;height:100%;object-fit:cover}
+  .card .ring-frame{position:absolute;inset:0;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);pointer-events:none;z-index:3}
+  .card .floor{position:absolute;left:50%;bottom:9%;width:58%;height:9%;transform:translateX(-50%);z-index:0;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(20,24,30,.28),transparent 75%);filter:blur(4px)}
+  .card .cap{position:absolute;left:18px;bottom:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.12em;color:var(--fg)}
+  .card .badge2{position:absolute;right:16px;top:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);background:rgba(255,255,255,.72);border:1px solid var(--line);padding:6px 10px;border-radius:999px}
+  .card .loadnote{position:absolute;inset:0;z-index:4;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);transition:opacity .5s}
+  .card .loadnote.hide{opacity:0;pointer-events:none}
+
+  /* ===== Hero-Hintergrund-Varianten (umschaltbar) ===== */
+  .hero{position:relative;transition:background .45s ease}
+  .hero>*{position:relative;z-index:1}
+  .hero.bg-verlauf{background:radial-gradient(58vmin 58vmin at 70% 38%,color-mix(in srgb,var(--accent) 12%,#ffffff),transparent 60%),linear-gradient(160deg,#F8F9FB,#E6E9ED)}
+  .hero.bg-spot{background:radial-gradient(48vmin 48vmin at 68% 42%,#ffffff,#E4E7EB 55%,#D3D7DD 100%)}
+  .hero.bg-spot::after{content:"";position:absolute;inset:0;z-index:0;box-shadow:inset 0 0 22vmin rgba(20,24,30,.2);pointer-events:none}
+  .hero.bg-elfenbein{background:linear-gradient(160deg,#F6EFE1,#ECE2CE)}
+  .hero.bg-dunkel{background:radial-gradient(58vmin 58vmin at 68% 40%,#1c2433,#0E1016 70%)}
+  .hero.bg-dunkel .kin h1{color:#F5F3FB}
+  .hero.bg-dunkel .kin .lead{color:#AEB6C4}
+  .hero.bg-dunkel .picker .pt,.hero.bg-dunkel .sw button .nm{color:#AEB6C4}
+  .hero.bg-dunkel .cta{color:#0E1016}
+
+  .bgctl{position:fixed;left:calc(50% + var(--sw)/2);bottom:18px;transform:translateX(-50%);z-index:400;display:flex;align-items:center;gap:4px;
+    background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:0 18px 40px -20px rgba(0,0,0,.4)}
+  @media(max-width:900px){.bgctl{left:50%}}
+  .bgctl .lbl{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 10px}
+  .bgctl button{font-family:"Inter",sans-serif;font-size:.74rem;letter-spacing:.04em;border:none;background:transparent;color:#1B2128;padding:9px 14px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s}
+  .bgctl button[aria-pressed="true"]{background:#1B2128;color:#fff}
+
+  .coll{padding:clamp(64px,9vh,120px) clamp(24px,5vw,70px)}
+  .coll .head{max-width:62ch;margin:0 0 clamp(28px,4vw,48px)}
+  .coll .eb{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent2);margin:0 0 14px}
+  .coll h2{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.04;margin:0 0 12px}
+  .coll h2 em{font-style:italic;color:var(--accent2)}
+  .coll .intro{color:var(--muted);font-size:1.05rem;margin:0}
+  .coll .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(14px,1.6vw,22px)}
+  .coll .item{position:relative;display:block;border-radius:18px;overflow:hidden;background:var(--panel-2);aspect-ratio:4/5;
+    opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease),box-shadow .4s var(--ease)}
+  .coll .item.in{opacity:1;transform:none}
+  .coll .item:hover{box-shadow:0 40px 80px -40px rgba(20,24,30,.5)}
+  .coll .item img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+  .coll .item:hover img{transform:scale(1.07)}
+  .coll .item .veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(15,18,22,.62));z-index:1}
+  .coll .item .meta{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;color:#fff}
+  .coll .item .meta h3{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.35rem;margin:0 0 8px}
+  .coll .item .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .coll .item .chip{font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:5px 9px;border-radius:999px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .coll .item .go{position:absolute;top:14px;right:14px;z-index:2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(255,255,255,.9);color:#16140f;opacity:0;transform:translateY(-6px);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+  .coll .item:hover .go{opacity:1;transform:none}
+  .coll .more{margin-top:clamp(26px,3vw,40px)}
+  .coll .more a{display:inline-flex;align-items:center;gap:10px;min-height:50px;padding:0 28px;border-radius:999px;border:1px solid var(--line);
+    font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg);transition:background .3s,color .3s}
+  .coll .more a:hover{background:var(--fg);color:var(--bg)}
+
+  footer.site{border-top:1px solid var(--line);padding:clamp(40px,6vw,70px) clamp(24px,5vw,70px) clamp(48px,7vw,80px)}
+  footer.site .fi{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:center}
+  footer.site .wm{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;letter-spacing:.22em}
+  footer.site .cp{color:var(--muted);font-size:.86rem}
+</style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div>
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
+  <nav aria-label="Hauptnavigation">
+    <button class="navitem" data-panel="schmuck" aria-haspopup="true" aria-expanded="false">Schmuck <span class="car" aria-hidden="true">&#8594;</span></button>
+    <button class="navitem" data-panel="trauringe" aria-haspopup="true" aria-expanded="false">Trauringe <span class="car" aria-hidden="true">&#8594;</span></button>
+    <button class="navitem" data-panel="uhren" aria-haspopup="true" aria-expanded="false">Uhren <span class="car" aria-hidden="true">&#8594;</span></button>
+    <a class="navitem" href="#">Atelier</a>
+    <a class="navitem" href="#">Maison</a>
+  </nav>
+  <a class="cta" href="#">Termin buchen</a>
+  <div class="foot"><div class="soc"><a href="#">Instagram</a><a href="#">Pinterest</a></div><span>Königsallee · Düsseldorf</span></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+<div class="flyout" id="flyout" aria-label="Untermenü">
+  <div class="lcol">
+    <div class="phead"><h3 id="panelTitle">Schmuck</h3><button class="close" id="panelClose">Schließen &times;</button></div>
+    <div class="panel" data-key="schmuck" data-default="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" data-cap="Kollektion|Lumière">
+      <h4>Kategorien</h4>
+      <ul>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" data-cap="Kategorie|Ringe"><span class="ix">01</span> Ringe</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" data-cap="Kategorie|Halsketten"><span class="ix">02</span> Halsketten</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" data-cap="Kategorie|Ohrringe"><span class="ix">03</span> Ohrringe</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1620656798579-1984d9e87df7?w=1100&q=80&auto=format&fit=crop" data-cap="Kategorie|Armbänder"><span class="ix">04</span> Armbänder</a></li>
+      </ul>
+      <h4>Kollektionen</h4>
+      <ul>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" data-cap="Kollektion|Rivière"><span class="ix">05</span> Rivière</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1100&q=80&auto=format&fit=crop" data-cap="Kollektion|Héritage"><span class="ix">06</span> Héritage</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" data-cap="Kollektion|Solitaire"><span class="ix">07</span> Solitaire</a></li>
+      </ul>
+    </div>
+    <div class="panel" data-key="trauringe" data-default="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" data-cap="Atelier|Nach Maß">
+      <h4>Nach Maß</h4>
+      <ul>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" data-cap="Trauringe|Konfigurator"><span class="ix">01</span> Konfigurator</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1620656798579-1984d9e87df7?w=1100&q=80&auto=format&fit=crop" data-cap="Trauringe|Materialien"><span class="ix">02</span> Materialien</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=1100&q=80&auto=format&fit=crop" data-cap="Trauringe|Gravur"><span class="ix">03</span> Gravur</a></li>
+      </ul>
+      <h4>Verlobung</h4>
+      <ul>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" data-cap="Verlobung|Solitäre"><span class="ix">04</span> Solitäre</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" data-cap="Verlobung|Diamanten"><span class="ix">05</span> Diamanten</a></li>
+      </ul>
+    </div>
+    <div class="panel" data-key="uhren" data-default="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" data-cap="Horlogerie|Manufaktur">
+      <h4>Manufakturen</h4>
+      <ul>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1100&q=80&auto=format&fit=crop" data-cap="Uhren|Damenuhren"><span class="ix">01</span> Damenuhren</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" data-cap="Uhren|Herrenuhren"><span class="ix">02</span> Herrenuhren</a></li>
+        <li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1100&q=80&auto=format&fit=crop" data-cap="Uhren|Automatik"><span class="ix">03</span> Automatik</a></li>
+      </ul>
+      <h4>Service</h4>
+      <ul><li><a class="sub" href="#" data-img="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" data-cap="Service|Revision"><span class="ix">04</span> Revision &amp; Ankauf</a></li></ul>
+    </div>
+  </div>
+  <div class="rcol"><div class="preview"><img id="previewImg" src="" alt="Vorschau" /></div><div class="pcap"><em id="capKicker"></em><b id="capTitle"></b></div></div>
+</div>
+<header class="topbar"><a class="brand" href="#">VEYRA</a><button id="ovlOpen" aria-expanded="false" aria-controls="ovl"><span class="dot"></span> Menü</button></header>
+<div class="ovl" id="ovl" aria-hidden="true">
+  <div class="x"><span class="brand" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;letter-spacing:.2em;color:var(--fg)">VEYRA</span><button id="ovlClose" aria-label="Schließen">&times;</button></div>
+  <div class="grp"><div class="glabel"><a href="#">Schmuck</a></div><div class="links"><a href="#">Ringe</a><a href="#">Halsketten</a><a href="#">Ohrringe</a><a href="#">Armbänder</a></div></div>
+  <div class="grp"><div class="glabel"><a href="#">Trauringe</a></div><div class="links"><a href="#">Konfigurator</a><a href="#">Materialien</a><a href="#">Solitäre</a></div></div>
+  <div class="grp"><div class="glabel"><a href="#">Uhren</a></div><div class="links"><a href="#">Damenuhren</a><a href="#">Herrenuhren</a><a href="#">Service</a></div></div>
+  <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
+  <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
+</div>
+<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div><script>
+(function(){
+  var sidebar=document.getElementById("sidebar"),scrim=document.getElementById("scrim"),flyout=document.getElementById("flyout"),
+      panelTitle=document.getElementById("panelTitle"),previewImg=document.getElementById("previewImg"),
+      capKicker=document.getElementById("capKicker"),capTitle=document.getElementById("capTitle");
+  var items=document.querySelectorAll(".navitem[data-panel]"),panels=document.querySelectorAll(".panel"),closeTimer=null,current=null;
+  function setPreview(url,cap){if(url&&previewImg.getAttribute("src")!==url){previewImg.style.opacity=0;var p=new Image();p.onload=function(){previewImg.src=url;previewImg.style.opacity=1;};p.src=url;}
+    if(cap){var s=cap.split("|");capKicker.textContent=s[0]||"";capTitle.textContent=s[1]||"";}}
+  function openPanel(key,btn){current=key;panels.forEach(function(p){p.classList.toggle("show",p.getAttribute("data-key")===key);});
+    items.forEach(function(b){b.classList.toggle("active",b===btn);b.setAttribute("aria-expanded",b===btn?"true":"false");});
+    var a=document.querySelector('.panel[data-key="'+key+'"]');panelTitle.textContent=btn?btn.textContent.replace("\u2192","").trim():key;
+    setPreview(a.getAttribute("data-default"),a.getAttribute("data-cap"));flyout.classList.add("open");scrim.classList.add("open");}
+  function closePanel(){flyout.classList.remove("open");scrim.classList.remove("open");current=null;
+    items.forEach(function(b){b.classList.remove("active");b.setAttribute("aria-expanded","false");});}
+  items.forEach(function(btn){var key=btn.getAttribute("data-panel");
+    btn.addEventListener("mouseenter",function(){clearTimeout(closeTimer);openPanel(key,btn);});
+    btn.addEventListener("click",function(){current===key?closePanel():openPanel(key,btn);});
+    btn.addEventListener("focus",function(){openPanel(key,btn);});});
+  document.querySelectorAll(".panel a.sub").forEach(function(a){a.addEventListener("mouseenter",function(){setPreview(a.getAttribute("data-img"),a.getAttribute("data-cap"));});});
+  function leave(){closeTimer=setTimeout(closePanel,160);}
+  sidebar.addEventListener("mouseleave",leave);flyout.addEventListener("mouseleave",leave);
+  sidebar.addEventListener("mouseenter",function(){clearTimeout(closeTimer);});flyout.addEventListener("mouseenter",function(){clearTimeout(closeTimer);});
+  scrim.addEventListener("click",closePanel);document.getElementById("panelClose").addEventListener("click",closePanel);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closePanel();});
+  var ovl=document.getElementById("ovl");
+  document.getElementById("ovlOpen").addEventListener("click",function(){ovl.classList.add("open");ovl.setAttribute("aria-hidden","false");this.setAttribute("aria-expanded","true");});
+  document.getElementById("ovlClose").addEventListener("click",function(){ovl.classList.remove("open");ovl.setAttribute("aria-hidden","true");});
+})();
+</script><script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scr=document.getElementById('scr');
+  if(scr){var words=['bleibt','funkelt','verbindet','verspricht'],chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ',wi=0;
+    function scramble(target,cb){if(reduce){scr.textContent=target;if(cb)setTimeout(cb,2000);return;}var fr=0;var iv=setInterval(function(){fr++;var out='';for(var i=0;i<target.length;i++){out+= i<fr/2?target[i]:chars[Math.floor(Math.random()*chars.length)];}scr.textContent=out;if(fr/2>=target.length){clearInterval(iv);scr.textContent=target;if(cb)setTimeout(cb,1700);}},45);}
+    function cycle(){scramble(words[wi],function(){wi=(wi+1)%words.length;cycle();});}
+    setTimeout(cycle,1300);}
+})();
+</script><script>
+(function(){
+  var items=document.querySelectorAll('.coll .item'); if(!items.length)return;
+  if(!('IntersectionObserver' in window)){items.forEach(function(el){el.classList.add('in');});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.18});
+  items.forEach(function(el,i){el.style.transitionDelay=(Math.min(i,6)*60)+'ms';io.observe(el);});
+})();
+</script><script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas=document.getElementById('ringcanvas');
+const fallback=document.getElementById('fallback');
+const loadnote=document.getElementById('loadnote');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const URL='assets/jewelery_ring_diamonds.glb';
+let metals=[];
+
+try{
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0.3,4);
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+  const key=new THREE.PointLight(0xffffff,18,40,2); key.position.set(3,5,4); scene.add(key);
+  const fill=new THREE.PointLight(0xbfe6ff,10,40,2); fill.position.set(-4,-1,3); scene.add(fill);
+
+  const controls=new OrbitControls(camera,canvas);
+  controls.enablePan=false; controls.enableZoom=true; controls.minDistance=2.4; controls.maxDistance=6;
+  controls.enableDamping=true; controls.dampingFactor=0.08;
+  controls.autoRotate=!reduce; controls.autoRotateSpeed=1.4;
+  controls.target.set(0,0,0);
+
+  function fit(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',fit); fit(); setTimeout(fit,150);
+
+  const loader=new GLTFLoader();
+  loader.load(URL,(gltf)=>{
+    const root=gltf.scene;
+    const box=new THREE.Box3().setFromObject(root);
+    const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
+    const maxDim=Math.max(size.x,size.y,size.z)||1;
+    const pivot=new THREE.Group();
+    root.position.sub(center);
+    pivot.add(root);
+    pivot.scale.setScalar(2.2/maxDim);
+    scene.add(pivot);
+    root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
+      ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
+    // Standard-Metall (Weißgold) direkt anwenden
+    const pressed=document.querySelector('#sw button[aria-pressed="true"]');
+    if(pressed){ const tint=new THREE.Color(pressed.dataset.tint); metals.forEach(m=>{ if(m.color)m.color.copy(tint); }); }
+    if(loadnote)loadnote.classList.add('hide');
+    if(fallback)fallback.style.display='none';
+  },(xhr)=>{ if(loadnote && xhr.total){ loadnote.textContent='Ring wird geladen … '+Math.round(xhr.loaded/xhr.total*100)+'%'; } },
+  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); /* Foto-Fallback bleibt */ });
+
+  // Metall-Umschaltung
+  document.querySelectorAll('#sw button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#sw button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    const tint=new THREE.Color(b.dataset.tint);
+    metals.forEach(m=>{ if(m.color)m.color.copy(tint); });
+  }));
+
+  let run=true,raf;
+  document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run&&!raf)loop();});
+  function loop(){raf=requestAnimationFrame(loop);if(!run){raf=0;return;}controls.update();renderer.render(scene,camera);}
+  loop();
+}catch(e){ if(loadnote)loadnote.classList.add('hide'); console.error(e); }
+</script></body></html>
