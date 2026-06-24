@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>VEYRA — Mix 8+6+2</title><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" /><style>:root{--bg:#120D1C;--panel:#1A1228;--panel-2:#241834;--fg:#F1ECF7;--muted:#A697B6;--accent:#B79BE6;--accent2:#8F73C2;--line:rgba(241,236,247,.13);--scrim:rgba(8,5,14,.6);--on-accent:#160F22;--sw:252px;--ease:cubic-bezier(.22,1,.36,1);--t:340ms}
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>VEYRA — Hero mit echtem 3D-Ring</title><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" /><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script><style>:root{--bg:#EEF0F2;--panel:#FAFBFC;--panel-2:#E6E9ED;--fg:#1B2128;--muted:#6B7681;--accent:#33414D;--accent2:#586773;--line:rgba(27,33,40,.13);--scrim:rgba(27,33,40,.35);--on-accent:#FAFBFC;--sw:252px;--ease:cubic-bezier(.22,1,.36,1);--t:340ms}
   *,*::before,*::after{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--fg);font-family:"Inter",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -81,7 +81,7 @@
   @media (prefers-reduced-motion:reduce){.reveal{display:none}.rise{opacity:1;animation:none}}
 
   .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,4vw,60px);
-    padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;perspective:1300px;overflow:hidden}
+    padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:hidden}
   @media(max-width:900px){.hero{grid-template-columns:1fr}}
   .kin .eb{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin:0 0 22px;transition:color var(--t)}
   .kin h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(2.6rem,6.4vw,5.4rem);line-height:.98;margin:0;letter-spacing:-.01em}
@@ -95,16 +95,20 @@
   .sw button .nm{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;letter-spacing:.04em;color:var(--muted)}
   .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;background:var(--accent);color:var(--on-accent);margin-top:34px;transition:background var(--t)}
 
-  .stage{position:relative;justify-self:center;width:min(82vw,460px);aspect-ratio:4/5;transform-style:preserve-3d}
-  .card{position:relative;width:100%;height:100%;border-radius:22px;overflow:hidden;transform-style:preserve-3d;
-    transition:transform .15s var(--ease);box-shadow:0 60px 120px -50px rgba(0,0,0,.85);border:1px solid var(--line)}
-  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity .4s var(--ease)}
-  .card .sheen{position:absolute;inset:0;mix-blend-mode:screen;pointer-events:none;
-    background:radial-gradient(26rem 26rem at var(--mx,50%) var(--my,38%),color-mix(in srgb,var(--accent) 70%,#ffffff),transparent 60%);transition:background .1s}
-  .card .ring-frame{position:absolute;inset:0;border-radius:22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);pointer-events:none}
-  .card .cap{position:absolute;left:18px;bottom:16px;z-index:2;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.12em;color:#fff}
-  .badge2{position:absolute;right:16px;top:16px;z-index:2;font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.25);padding:6px 10px;border-radius:999px}
-</style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div><span class="badge">Mix · 8 + 6 + 2</span>
+  .stage{position:relative;justify-self:center;width:min(82vw,480px);aspect-ratio:1/1}
+  .card{position:relative;width:100%;height:100%;border-radius:24px;overflow:hidden;
+    background:radial-gradient(120% 100% at 50% 30%,color-mix(in srgb,var(--accent) 14%,var(--panel-2)),var(--panel-2));
+    box-shadow:0 60px 120px -50px rgba(0,0,0,.85);border:1px solid var(--line)}
+  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:none;cursor:grab}
+  #ringcanvas:active{cursor:grabbing}
+  .card .fallback{position:absolute;inset:0;z-index:2}
+  .card .fallback img{width:100%;height:100%;object-fit:cover}
+  .card .ring-frame{position:absolute;inset:0;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);pointer-events:none;z-index:3}
+  .card .cap{position:absolute;left:18px;bottom:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.12em;color:var(--fg)}
+  .card .badge2{position:absolute;right:16px;top:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);background:rgba(255,255,255,.72);border:1px solid var(--line);padding:6px 10px;border-radius:999px}
+  .card .loadnote{position:absolute;inset:0;z-index:4;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);transition:opacity .5s}
+  .card .loadnote.hide{opacity:0;pointer-events:none}
+</style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div><span class="badge">Mix · 8 + 6 + 2 · echter 3D-Ring</span>
 <aside class="sidebar" id="sidebar">
   <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
   <nav aria-label="Hauptnavigation">
@@ -171,7 +175,7 @@
   <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
 </div>
-<div class="main"><section class="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Material wählen, sofort sehen. Bewegen Sie das Bild mit dem Cursor.</p><div class="picker rise d2"><span class="pt">Material</span><div class="sw" id="sw" role="group" aria-label="Material"><button data-img="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" data-accent="#E6C079" data-cap="Trauringe · Gelbgold 750" aria-pressed="true" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-img="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1200&q=80&auto=format&fit=crop" data-accent="#CFD8E2" data-cap="Solitaire · Weißgold 750" aria-pressed="false" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-img="https://images.unsplash.com/photo-1620656798579-1984d9e87df7?w=1200&q=80&auto=format&fit=crop" data-accent="#E7B79F" data-cap="Ring · Roségold 750" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-img="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1200&q=80&auto=format&fit=crop" data-accent="#CFE5EE" data-cap="Brillant · lupenrein" aria-pressed="false" aria-label="Diamant" style="background:radial-gradient(circle at 35% 30%,#ffffff,#cdd6df)"><span class="nm">Diamant</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card" id="card"><img id="cimg" src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Schmuckstück" /><div class="sheen" id="sheen"></div><div class="ring-frame"></div><span class="badge2">3D-Tilt</span><span class="cap" id="cap">Trauringe · Gelbgold 750</span></div></div></section></div><script>
+<div class="main"><section class="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-accent="#E6C079" aria-pressed="true" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-accent="#CFD8E2" aria-pressed="false" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-accent="#E7B79F" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-accent="#CFE5EE" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><script>
 (function(){
   var sidebar=document.getElementById("sidebar"),scrim=document.getElementById("scrim"),flyout=document.getElementById("flyout"),
       panelTitle=document.getElementById("panelTitle"),previewImg=document.getElementById("previewImg"),
@@ -202,29 +206,75 @@
 </script><script>
 (function(){
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // 8 — kinetische Typo
   var scr=document.getElementById('scr');
   if(scr){var words=['bleibt','funkelt','verbindet','verspricht'],chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ',wi=0;
     function scramble(target,cb){if(reduce){scr.textContent=target;if(cb)setTimeout(cb,2000);return;}var fr=0;var iv=setInterval(function(){fr++;var out='';for(var i=0;i<target.length;i++){out+= i<fr/2?target[i]:chars[Math.floor(Math.random()*chars.length)];}scr.textContent=out;if(fr/2>=target.length){clearInterval(iv);scr.textContent=target;if(cb)setTimeout(cb,1700);}},45);}
     function cycle(){scramble(words[wi],function(){wi=(wi+1)%words.length;cycle();});}
     setTimeout(cycle,1300);}
-  // 6 — Tilt + Licht-Sweep
-  var card=document.getElementById('card'),sheen=document.getElementById('sheen');
-  if(card){
-    card.addEventListener('pointermove',function(e){var r=card.getBoundingClientRect();var x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
-      sheen.style.setProperty('--mx',(x*100)+'%');sheen.style.setProperty('--my',(y*100)+'%');
-      if(!reduce)card.style.transform='rotateY('+((x-0.5)*18)+'deg) rotateX('+((0.5-y)*18)+'deg)';});
-    card.addEventListener('pointerleave',function(){card.style.transform='';sheen.style.setProperty('--mx','50%');sheen.style.setProperty('--my','38%');});
-  }
-  // 2 — Material-Konfigurator: tauscht Foto + Akzent/Sheen + Caption
-  var cimg=document.getElementById('cimg'),cap=document.getElementById('cap');
-  document.querySelectorAll('#sw button').forEach(function(b){b.addEventListener('click',function(){
-    document.querySelectorAll('#sw button').forEach(function(x){x.setAttribute('aria-pressed','false');});
-    b.setAttribute('aria-pressed','true');
-    document.documentElement.style.setProperty('--accent',b.getAttribute('data-accent'));
-    if(cap)cap.textContent=b.getAttribute('data-cap');
-    var url=b.getAttribute('data-img');
-    if(cimg && cimg.getAttribute('src')!==url){cimg.style.opacity=0;var pre=new Image();pre.onload=function(){cimg.src=url;cimg.style.opacity=1;};pre.src=url;}
-  });});
 })();
+</script><script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas=document.getElementById('ringcanvas');
+const fallback=document.getElementById('fallback');
+const loadnote=document.getElementById('loadnote');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const URL='assets/jewelery_ring_diamonds.glb';
+let metals=[];
+
+try{
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0.3,4);
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+  const key=new THREE.PointLight(0xffffff,18,40,2); key.position.set(3,5,4); scene.add(key);
+  const fill=new THREE.PointLight(0xbfe6ff,10,40,2); fill.position.set(-4,-1,3); scene.add(fill);
+
+  const controls=new OrbitControls(camera,canvas);
+  controls.enablePan=false; controls.enableZoom=true; controls.minDistance=2.4; controls.maxDistance=6;
+  controls.enableDamping=true; controls.dampingFactor=0.08;
+  controls.autoRotate=!reduce; controls.autoRotateSpeed=1.4;
+  controls.target.set(0,0,0);
+
+  function fit(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',fit); fit(); setTimeout(fit,150);
+
+  const loader=new GLTFLoader();
+  loader.load(URL,(gltf)=>{
+    const root=gltf.scene;
+    const box=new THREE.Box3().setFromObject(root);
+    const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
+    const maxDim=Math.max(size.x,size.y,size.z)||1;
+    const pivot=new THREE.Group();
+    root.position.sub(center);
+    pivot.add(root);
+    pivot.scale.setScalar(2.2/maxDim);
+    scene.add(pivot);
+    root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
+      ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
+    if(loadnote)loadnote.classList.add('hide');
+    if(fallback)fallback.style.display='none';
+  },(xhr)=>{ if(loadnote && xhr.total){ loadnote.textContent='Ring wird geladen … '+Math.round(xhr.loaded/xhr.total*100)+'%'; } },
+  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); /* Foto-Fallback bleibt */ });
+
+  // Metall-Umschaltung
+  document.querySelectorAll('#sw button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#sw button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    if(b.dataset.accent)document.documentElement.style.setProperty('--accent',b.dataset.accent);
+    const tint=new THREE.Color(b.dataset.tint);
+    metals.forEach(m=>{ if(m.color)m.color.copy(tint); });
+  }));
+
+  let run=true,raf;
+  document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run&&!raf)loop();});
+  function loop(){raf=requestAnimationFrame(loop);if(!run){raf=0;return;}controls.update();renderer.render(scene,camera);}
+  loop();
+}catch(e){ if(loadnote)loadnote.classList.add('hide'); console.error(e); }
 </script></body></html>
