@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON VEYRA — Alle 5 Navbar-Optionen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#0E0D0C;--panel:#17150F;--fg:#F3EDE2;--muted:#9C948650;--muted2:#A89F8F;--gold:#C9A45B;--line:rgba(243,237,226,.14)}
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Inter",system-ui,sans-serif;line-height:1.6}
+  .top{text-align:center;padding:clamp(34px,6vw,68px) 20px 8px}
+  .top .eb{font-family:"JetBrains Mono",monospace;font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+  .top h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2.1rem,6vw,3.6rem);margin:0 0 12px}
+  .top p{color:var(--muted2);max-width:64ch;margin:0 auto;font-size:1.02rem}
+  .wrap{max-width:1240px;margin:0 auto;padding:24px clamp(14px,3vw,30px) 70px}
+  .demo{margin:30px 0 44px}
+  .lab{display:flex;align-items:center;gap:18px;margin:0 0 14px;flex-wrap:wrap}
+  .lab .n{font-family:"JetBrains Mono",monospace;font-size:1.1rem;color:var(--gold);border:1px solid var(--line);
+    border-radius:10px;padding:8px 12px}
+  .lab h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;margin:0}
+  .lab p{margin:2px 0 0;color:var(--muted2);font-size:.9rem;max-width:70ch}
+  .lab .hint{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.1em;color:var(--muted2);opacity:.8}
+  .frame{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#000;
+    box-shadow:0 30px 70px -36px rgba(0,0,0,.8)}
+  .frame iframe{display:block;width:100%;height:min(80vh,720px);border:0;background:#fff}
+  footer{text-align:center;color:var(--muted2);font-size:.85rem;padding:0 20px 60px}
+  footer b{color:var(--gold);font-weight:600}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="eb">MAISON VEYRA · Redesign</p>
+  <h1>Navbar — alle fünf auf einen Blick</h1>
+  <p>Jede Vorschau ist eine vollständige, isolierte Live-Demo. Scrolle <em>innerhalb</em> eines Rahmens,
+  um Scroll-Effekte zu sehen (transparent→solid, Hide-on-Scroll, Loading, Sektions-Index). Mit Internet öffnen.</p>
+</header>
+<div class="wrap">
+  <section class="demo">
+    <div class="lab">
+      <span class="n">01</span>
+      <div><h2>Option 1 · Maison</h2><p>Inspiriert von Cartier — mehrstufiger Header, zentriertes Serif-Logo, transparent→solid, Mega-Drawer.</p></div>
+      <span class="hint">Im Rahmen scrollen ↓</span>
+    </div>
+    <div class="frame"><iframe loading="lazy" title="Option 1 · Maison" srcdoc="<!DOCTYPE html>
+<html lang=&quot;de&quot;>
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 1 &quot;Maison&quot;
+  Inspiration: cartier.com (Watches &amp; Wonders) — mehrstufiger Header, zentriertes
+  Serif-Wordmark, transparenter Header ueber dem Hero der beim Scrollen solide wird,
+  Mega-Menue als Drawer von links mit Bild-Teasern. Boutique-Locator-Logik (Cartier).
+-->
+<meta charset=&quot;UTF-8&quot; />
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; />
+<title>MAISON VEYRA — Navbar 1 · Maison</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot; />
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin />
+<link href=&quot;https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot; />
+<style>
+  :root{
+    --ink:#14110E; --paper:#FBF8F2; --paper-2:#F2ECE0; --line:rgba(20,17,14,.14);
+    --gold:#9C7B3C; --muted:#6B6356; --ease:cubic-bezier(.22,1,.36,1); --t:280ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:&quot;Inter&quot;,system-ui,sans-serif;color:var(--ink);background:var(--paper);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--ink);color:var(--paper);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  /* ====== HEADER (mehrstufig, transparent ueber Hero) ====== */
+  .header{position:fixed;top:0;left:0;right:0;z-index:100;color:#fff;
+    transition:color var(--t) var(--ease)}
+  .header::before{content:&quot;&quot;;position:absolute;inset:0;background:var(--paper);
+    opacity:0;transform:translateY(-100%);transition:opacity var(--t) var(--ease),transform var(--t) var(--ease);
+    box-shadow:0 1px 0 var(--line);z-index:-1}
+  .header.solid{color:var(--ink)}
+  .header.solid::before{opacity:1;transform:none}
+
+  .utility{display:flex;align-items:center;justify-content:space-between;
+    padding:9px clamp(16px,4vw,40px);font-size:.74rem;letter-spacing:.08em;
+    border-bottom:1px solid rgba(255,255,255,.16);transition:border-color var(--t) var(--ease)}
+  .header.solid .utility{border-bottom-color:var(--line)}
+  .utility .u-l,.utility .u-r{display:flex;align-items:center;gap:22px}
+  .utility a{opacity:.82;transition:opacity var(--t)}
+  .utility a:hover{opacity:1}
+  .utility .lang{display:inline-flex;gap:7px}
+  .utility .lang b{font-weight:600}
+  @media (max-width:720px){ .utility .u-l{display:none} }
+
+  .bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:clamp(14px,2vw,20px) clamp(16px,4vw,40px)}
+  .menu-btn{grid-column:1;justify-self:start;display:inline-flex;align-items:center;gap:11px;
+    background:none;border:none;color:inherit;cursor:pointer;font-family:inherit;font-size:.8rem;
+    letter-spacing:.16em;text-transform:uppercase;padding:8px 4px}
+  .menu-btn .lines{display:inline-flex;flex-direction:column;gap:4px;width:24px}
+  .menu-btn .lines span{height:1.5px;background:currentColor;transition:transform var(--t) var(--ease)}
+  .menu-btn:hover .lines span:first-child{transform:translateX(4px)}
+
+  .wordmark{grid-column:2;justify-self:center;text-align:center;font-family:&quot;Cormorant Garamond&quot;,serif;
+    font-weight:500;letter-spacing:.34em;font-size:clamp(1.15rem,2.4vw,1.7rem);line-height:1;
+    padding-left:.34em;white-space:nowrap}
+  .wordmark small{display:block;font-family:&quot;Inter&quot;,sans-serif;font-size:.56rem;letter-spacing:.42em;
+    opacity:.7;margin-top:6px;padding-left:.42em}
+
+  .icons{grid-column:3;justify-self:end;display:flex;align-items:center;gap:clamp(10px,1.5vw,20px)}
+  .icons button{background:none;border:none;color:inherit;cursor:pointer;padding:6px;display:inline-flex;
+    border-radius:999px;transition:opacity var(--t)}
+  .icons button:hover{opacity:.65}
+  .icons svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6}
+  .icons .label{font-size:.78rem;letter-spacing:.1em}
+  @media (max-width:720px){ .icons .boutique .label{display:none} }
+
+  /* ====== MEGA DRAWER ====== */
+  .scrim{position:fixed;inset:0;background:rgba(10,8,6,.5);z-index:110;opacity:0;visibility:hidden;
+    transition:opacity var(--t) var(--ease),visibility var(--t)}
+  .scrim.open{opacity:1;visibility:visible}
+  .drawer{position:fixed;top:0;left:0;bottom:0;width:min(92vw,860px);background:var(--paper);z-index:120;
+    transform:translateX(-100%);transition:transform var(--t) var(--ease);
+    display:grid;grid-template-columns:1fr 1fr;overflow:auto}
+  .drawer.open{transform:none}
+  @media (max-width:680px){ .drawer{grid-template-columns:1fr} }
+  .drawer .nav-col{padding:clamp(28px,4vw,52px)}
+  .drawer .close{display:inline-flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:34px}
+  .drawer .close svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}
+  .mega-list{list-style:none;margin:0;padding:0}
+  .mega-list li{border-top:1px solid var(--line)}
+  .mega-list li:last-child{border-bottom:1px solid var(--line)}
+  .mega-list a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 2px;
+    font-family:&quot;Cormorant Garamond&quot;,serif;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:500;
+    transition:padding var(--t) var(--ease),color var(--t)}
+  .mega-list a span{font-family:&quot;Inter&quot;,sans-serif;font-size:.72rem;letter-spacing:.1em;color:var(--muted)}
+  .mega-list a:hover{padding-left:16px;color:var(--gold)}
+  .drawer .promo{position:relative;background:var(--paper-2);overflow:hidden;min-height:100%}
+  .drawer .promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    transition:transform 1.6s var(--ease)}
+  .drawer .promo:hover img{transform:scale(1.05)}
+  .drawer .promo .cap{position:absolute;left:0;right:0;bottom:0;padding:28px;color:#fff;
+    background:linear-gradient(to top,rgba(0,0,0,.6),transparent)}
+  .drawer .promo .cap em{font-style:normal;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+  .drawer .promo .cap h3{font-family:&quot;Cormorant Garamond&quot;,serif;font-weight:500;font-size:1.6rem;margin:6px 0 0}
+  @media (max-width:680px){ .drawer .promo{display:none} }
+
+  /* ====== HERO (Kontext) ====== */
+  .hero{position:relative;height:100vh;min-height:600px;display:grid;place-items:center;text-align:center;color:#fff}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero::after{content:&quot;&quot;;position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.18) 40%,rgba(0,0,0,.5))}
+  .hero .inner{position:relative;z-index:2;padding:0 24px;max-width:30ch}
+  .hero .eyebrow{font-size:.74rem;letter-spacing:.32em;text-transform:uppercase;opacity:.85;margin:0 0 18px}
+  .hero h1{font-family:&quot;Cormorant Garamond&quot;,serif;font-weight:500;font-size:clamp(2.6rem,7vw,5.2rem);
+    line-height:1.05;margin:0 0 26px}
+  .hero .cta{display:inline-block;border:1px solid rgba(255,255,255,.7);padding:15px 34px;border-radius:999px;
+    font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;transition:background var(--t),color var(--t)}
+  .hero .cta:hover{background:#fff;color:var(--ink)}
+  .scroll-cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;color:#fff;
+    font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;opacity:.8}
+  .filler{height:120vh;background:linear-gradient(180deg,var(--paper),var(--paper-2));display:grid;place-items:center;color:var(--muted)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+<span class=&quot;badge&quot;>Option 1 · Maison</span>
+
+<header class=&quot;header&quot; id=&quot;header&quot;>
+  <div class=&quot;utility&quot;>
+    <div class=&quot;u-l&quot;>
+      <a href=&quot;#&quot;>Boutique Düsseldorf</a>
+      <a href=&quot;#&quot;>Service &amp;amp; Reparatur</a>
+      <a href=&quot;#&quot;>Kontakt</a>
+    </div>
+    <div class=&quot;u-r&quot;>
+      <a href=&quot;#&quot; class=&quot;lang&quot;><b>DE</b> / EN</a>
+      <a href=&quot;#&quot;>Termin</a>
+    </div>
+  </div>
+  <nav class=&quot;bar&quot; aria-label=&quot;Hauptnavigation&quot;>
+    <button class=&quot;menu-btn&quot; id=&quot;menuBtn&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;drawer&quot;>
+      <span class=&quot;lines&quot; aria-hidden=&quot;true&quot;><span></span><span></span><span></span></span> Menü
+    </button>
+    <a class=&quot;wordmark&quot; href=&quot;#&quot; aria-label=&quot;MAISON VEYRA Startseite&quot;>
+      MAISON VEYRA<small>DÜSSELDORF · SEIT 1968</small>
+    </a>
+    <div class=&quot;icons&quot;>
+      <button class=&quot;boutique&quot; aria-label=&quot;Boutique finden&quot;>
+        <svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z&quot;/><circle cx=&quot;12&quot; cy=&quot;10&quot; r=&quot;2.5&quot;/></svg>
+        <span class=&quot;label&quot;>Boutiquen</span>
+      </button>
+      <button aria-label=&quot;Suche&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/><path d=&quot;m21 21-4.3-4.3&quot;/></svg></button>
+      <button aria-label=&quot;Konto&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;8&quot; r=&quot;4&quot;/><path d=&quot;M5 21c0-4 3.5-6 7-6s7 2 7 6&quot;/></svg></button>
+      <button aria-label=&quot;Merkliste&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 7a4 4 0 0 1 7 3.7C19 15.6 12 20 12 20z&quot;/></svg></button>
+    </div>
+  </nav>
+</header>
+
+<!-- Mega Drawer -->
+<div class=&quot;scrim&quot; id=&quot;scrim&quot;></div>
+<aside class=&quot;drawer&quot; id=&quot;drawer&quot; aria-label=&quot;Menü&quot; aria-hidden=&quot;true&quot;>
+  <div class=&quot;nav-col&quot;>
+    <button class=&quot;close&quot; id=&quot;closeBtn&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M6 6l12 12M18 6 6 18&quot;/></svg> Schließen</button>
+    <ul class=&quot;mega-list&quot;>
+      <li><a href=&quot;#&quot;>Hohe Juwelierkunst <span>High Jewellery</span></a></li>
+      <li><a href=&quot;#&quot;>Trauringe <span>nach Maß</span></a></li>
+      <li><a href=&quot;#&quot;>Verlobungsringe <span>Solitäre</span></a></li>
+      <li><a href=&quot;#&quot;>Uhren <span>Manufakturen</span></a></li>
+      <li><a href=&quot;#&quot;>Schmuck <span>Kollektionen</span></a></li>
+      <li><a href=&quot;#&quot;>Das Atelier <span>Service</span></a></li>
+    </ul>
+  </div>
+  <a class=&quot;promo&quot; href=&quot;#&quot; aria-label=&quot;Neue Kollektion&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=900&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Solitär-Ring der neuen Kollektion&quot; />
+    <span class=&quot;cap&quot;><em>Neu im Haus</em><h3>Veyra Solitaire</h3></span>
+  </a>
+</aside>
+
+<!-- Hero context -->
+<section class=&quot;hero&quot;>
+  <img src=&quot;https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=2000&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Portrait mit feinem Schmuck&quot; />
+  <div class=&quot;inner&quot;>
+    <p class=&quot;eyebrow&quot;>Watches &amp;amp; Wonders</p>
+    <h1>Ein Versprechen, in Gold gefasst.</h1>
+    <a class=&quot;cta&quot; href=&quot;#&quot;>Kollektion entdecken</a>
+  </div>
+  <div class=&quot;scroll-cue&quot;>Scrollen</div>
+</section>
+<div class=&quot;filler&quot;>Beim Scrollen wird der Header solide.</div>
+
+<script>
+(function(){
+  var header=document.getElementById(&quot;header&quot;);
+  var onScroll=function(){ header.classList.toggle(&quot;solid&quot;, window.scrollY>40); };
+  window.addEventListener(&quot;scroll&quot;,onScroll,{passive:true}); onScroll();
+
+  var drawer=document.getElementById(&quot;drawer&quot;), scrim=document.getElementById(&quot;scrim&quot;);
+  var menuBtn=document.getElementById(&quot;menuBtn&quot;), closeBtn=document.getElementById(&quot;closeBtn&quot;);
+  function open(){drawer.classList.add(&quot;open&quot;);scrim.classList.add(&quot;open&quot;);drawer.setAttribute(&quot;aria-hidden&quot;,&quot;false&quot;);
+    menuBtn.setAttribute(&quot;aria-expanded&quot;,&quot;true&quot;);document.body.style.overflow=&quot;hidden&quot;;}
+  function close(){drawer.classList.remove(&quot;open&quot;);scrim.classList.remove(&quot;open&quot;);drawer.setAttribute(&quot;aria-hidden&quot;,&quot;true&quot;);
+    menuBtn.setAttribute(&quot;aria-expanded&quot;,&quot;false&quot;);document.body.style.overflow=&quot;&quot;;}
+  menuBtn.addEventListener(&quot;click&quot;,open); closeBtn.addEventListener(&quot;click&quot;,close); scrim.addEventListener(&quot;click&quot;,close);
+  document.addEventListener(&quot;keydown&quot;,function(e){if(e.key===&quot;Escape&quot;)close();});
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+  </section>
+  <section class="demo">
+    <div class="lab">
+      <span class="n">02</span>
+      <div><h2>Option 2 · Atelier</h2><p>Inspiriert von JURI &amp; INO — Editorial-Minimal, Announcement-Bar mit Live-Goldpreis, Hide-on-Scroll.</p></div>
+      <span class="hint">Im Rahmen scrollen ↓</span>
+    </div>
+    <div class="frame"><iframe loading="lazy" title="Option 2 · Atelier" srcdoc="<!DOCTYPE html>
+<html lang=&quot;de&quot;>
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 2 &quot;Atelier&quot;
+  Inspiration: jurijewelry.com &amp; ino.jewelry — editoriales Minimal, Announcement-Bar
+  mit Live-Edelmetallpreis (INO), Logo links / zentrierte Links mit Underline-Grow,
+  Icons rechts (Suche/Konto/Warenkorb mit Counter), Sprachpille. Sticky mit
+  Hide-on-Scroll-Down / Show-on-Scroll-Up.
+-->
+<meta charset=&quot;UTF-8&quot; />
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; />
+<title>MAISON VEYRA — Navbar 2 · Atelier</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot; />
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin />
+<link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Marcellus&amp;display=swap&quot; rel=&quot;stylesheet&quot; />
+<style>
+  :root{
+    --ink:#1A1714; --cream:#F6F1E9; --cream-2:#ECE3D5; --line:rgba(26,23,20,.13);
+    --muted:#7A7064; --gold:#A6803F; --ease:cubic-bezier(.22,1,.36,1); --t:260ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:&quot;Inter&quot;,system-ui,sans-serif;color:var(--ink);background:var(--cream);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--ink);color:var(--cream);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  /* ====== Announcement (Ticker mit Live-Goldpreis) ====== */
+  .announce{background:var(--ink);color:var(--cream);font-size:.74rem;letter-spacing:.14em;
+    text-transform:uppercase;overflow:hidden;white-space:nowrap}
+  .announce .track{display:inline-flex;gap:60px;padding:9px 0;animation:marquee 26s linear infinite;will-change:transform}
+  .announce .track span{display:inline-flex;gap:60px}
+  .announce b{color:#E7C988;font-weight:600}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ====== Header (sticky, hide on scroll) ====== */
+  .header{position:sticky;top:0;z-index:100;background:rgba(246,241,233,.86);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+    transition:transform var(--t) var(--ease)}
+  .header.hide{transform:translateY(-100%)}
+  .bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:clamp(13px,1.7vw,18px) clamp(16px,4vw,40px)}
+  .logo{grid-column:1;justify-self:start;font-family:&quot;Marcellus&quot;,serif;font-size:clamp(1.2rem,2vw,1.55rem);
+    letter-spacing:.18em}
+  .nav{grid-column:2;justify-self:center;display:flex;gap:clamp(16px,2.4vw,34px);list-style:none;margin:0;padding:0}
+  .nav a{position:relative;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;padding:6px 0;color:var(--ink)}
+  .nav a::after{content:&quot;&quot;;position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;
+    transform:scaleX(0);transform-origin:right;transition:transform var(--t) var(--ease)}
+  .nav a:hover::after{transform:scaleX(1);transform-origin:left}
+  .nav .has-sub > a::before{content:&quot;&quot;;position:absolute;right:-13px;top:50%;width:5px;height:5px;
+    border-right:1.3px solid currentColor;border-bottom:1.3px solid currentColor;transform:translateY(-70%) rotate(45deg)}
+  .nav li{position:relative}
+  .submenu{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(8px);
+    background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:210px;
+    box-shadow:0 24px 50px -24px rgba(0,0,0,.35);opacity:0;visibility:hidden;transition:opacity var(--t),transform var(--t) var(--ease)}
+  .nav li:hover .submenu,.nav li:focus-within .submenu{opacity:1;visibility:visible;transform:translateX(-50%)}
+  .submenu a{display:block;padding:10px 14px;border-radius:9px;font-size:.86rem;letter-spacing:.04em;text-transform:none}
+  .submenu a:hover{background:var(--cream-2)}
+  .submenu a::after{display:none}
+
+  .tools{grid-column:3;justify-self:end;display:flex;align-items:center;gap:clamp(8px,1.4vw,16px)}
+  .tools button{background:none;border:none;color:inherit;cursor:pointer;padding:7px;border-radius:999px;
+    display:inline-flex;transition:background var(--t)}
+  .tools button:hover{background:var(--cream-2)}
+  .tools svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6}
+  .lang{font-size:.76rem;letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+  .cart{position:relative}
+  .cart .count{position:absolute;top:0;right:0;background:var(--gold);color:#fff;font-size:.6rem;font-weight:600;
+    width:15px;height:15px;border-radius:50%;display:grid;place-items:center}
+  .burger{display:none}
+  @media (max-width:860px){
+    .nav{display:none} .lang{display:none}
+    .burger{display:inline-flex} .bar{grid-template-columns:auto 1fr auto}
+    .logo{grid-column:2;justify-self:center} .burger{grid-column:1;justify-self:start} .tools{grid-column:3}
+  }
+
+  /* mobile sheet */
+  .sheet{position:fixed;inset:0;z-index:120;background:var(--cream);transform:translateY(-100%);
+    transition:transform var(--t) var(--ease);padding:24px;display:flex;flex-direction:column;gap:6px;overflow:auto}
+  .sheet.open{transform:none}
+  .sheet .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .sheet .top button{background:none;border:none;font-size:1.6rem;cursor:pointer}
+  .sheet a{font-family:&quot;Marcellus&quot;,serif;font-size:1.7rem;padding:12px 0;border-bottom:1px solid var(--line)}
+
+  /* ====== Hero (Kontext) ====== */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;min-height:84vh}
+  @media (max-width:840px){ .hero{grid-template-columns:1fr} }
+  .hero .copy{display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,6vw,90px)}
+  .hero .copy p.eb{font-size:.74rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin:0 0 18px}
+  .hero h1{font-family:&quot;Marcellus&quot;,serif;font-size:clamp(2.4rem,5.4vw,4.4rem);line-height:1.06;margin:0 0 22px;font-weight:400}
+  .hero .lead{color:var(--muted);max-width:42ch;margin:0 0 28px}
+  .hero .cta{align-self:flex-start;border:1px solid var(--ink);padding:14px 30px;border-radius:999px;
+    font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;transition:background var(--t),color var(--t)}
+  .hero .cta:hover{background:var(--ink);color:var(--cream)}
+  .hero .pic{position:relative;overflow:hidden;min-height:46vh}
+  .hero .pic img{width:100%;height:100%;object-fit:cover}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+<span class=&quot;badge&quot;>Option 2 · Atelier</span>
+
+<div class=&quot;announce&quot; aria-label=&quot;Hinweise&quot;>
+  <div class=&quot;track&quot; id=&quot;track&quot;>
+    <span>
+      <span>Goldpreis 24K <b>76,40 €/g</b></span>
+      <span>Versandkostenfrei ab 250 €</span>
+      <span>Trauringe nach Maß im Atelier</span>
+      <span>Platin 950 <b>31,10 €/g</b></span>
+      <span>Beratung nach Termin</span>
+    </span>
+    <span aria-hidden=&quot;true&quot;>
+      <span>Goldpreis 24K <b>76,40 €/g</b></span>
+      <span>Versandkostenfrei ab 250 €</span>
+      <span>Trauringe nach Maß im Atelier</span>
+      <span>Platin 950 <b>31,10 €/g</b></span>
+      <span>Beratung nach Termin</span>
+    </span>
+  </div>
+</div>
+
+<header class=&quot;header&quot; id=&quot;header&quot;>
+  <nav class=&quot;bar&quot; aria-label=&quot;Hauptnavigation&quot;>
+    <button class=&quot;burger tools&quot; id=&quot;burger&quot; aria-label=&quot;Menü&quot; style=&quot;padding:7px&quot;>
+      <svg viewBox=&quot;0 0 24 24&quot; width=&quot;22&quot; height=&quot;22&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.6&quot;><path d=&quot;M4 7h16M4 12h16M4 17h16&quot;/></svg>
+    </button>
+    <a class=&quot;logo&quot; href=&quot;#&quot;>VEYRA</a>
+    <ul class=&quot;nav&quot;>
+      <li class=&quot;has-sub&quot;><a href=&quot;#&quot;>Kollektionen</a>
+        <div class=&quot;submenu&quot;>
+          <a href=&quot;#&quot;>Trauringe</a><a href=&quot;#&quot;>Verlobungsringe</a><a href=&quot;#&quot;>Halsschmuck</a><a href=&quot;#&quot;>Ohrschmuck</a>
+        </div>
+      </li>
+      <li><a href=&quot;#&quot;>Uhren</a></li>
+      <li><a href=&quot;#&quot;>Atelier</a></li>
+      <li><a href=&quot;#&quot;>Über uns</a></li>
+      <li><a href=&quot;#&quot;>Journal</a></li>
+    </ul>
+    <div class=&quot;tools&quot;>
+      <span class=&quot;lang&quot;>DE</span>
+      <button aria-label=&quot;Suche&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/><path d=&quot;m21 21-4.3-4.3&quot;/></svg></button>
+      <button aria-label=&quot;Konto&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;8&quot; r=&quot;4&quot;/><path d=&quot;M5 21c0-4 3.5-6 7-6s7 2 7 6&quot;/></svg></button>
+      <button class=&quot;cart&quot; aria-label=&quot;Warenkorb&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M6 7h12l-1 13H7L6 7z&quot;/><path d=&quot;M9 7a3 3 0 0 1 6 0&quot;/></svg><span class=&quot;count&quot;>2</span></button>
+    </div>
+  </nav>
+</header>
+
+<div class=&quot;sheet&quot; id=&quot;sheet&quot; aria-hidden=&quot;true&quot;>
+  <div class=&quot;top&quot;><span class=&quot;logo&quot;>VEYRA</span><button id=&quot;sheetClose&quot; aria-label=&quot;Schließen&quot;>&amp;times;</button></div>
+  <a href=&quot;#&quot;>Kollektionen</a><a href=&quot;#&quot;>Uhren</a><a href=&quot;#&quot;>Atelier</a><a href=&quot;#&quot;>Über uns</a><a href=&quot;#&quot;>Journal</a>
+</div>
+
+<section class=&quot;hero&quot;>
+  <div class=&quot;copy&quot;>
+    <p class=&quot;eb&quot;>Maison Veyra · Düsseldorf</p>
+    <h1>Schmuck, der eine Geschichte trägt.</h1>
+    <p class=&quot;lead&quot;>Von Hand gefertigt in unserem Atelier am Rhein. Trauringe, feine Uhren und Stücke,
+      die bleiben.</p>
+    <a class=&quot;cta&quot; href=&quot;#&quot;>Zur Kollektion</a>
+  </div>
+  <div class=&quot;pic&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1400&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Feine Halskette aus Gold&quot; />
+  </div>
+</section>
+
+<script>
+(function(){
+  // hide on scroll down, show on scroll up
+  var header=document.getElementById(&quot;header&quot;), last=0;
+  window.addEventListener(&quot;scroll&quot;,function(){
+    var y=window.scrollY;
+    if(y>last &amp;&amp; y>140) header.classList.add(&quot;hide&quot;); else header.classList.remove(&quot;hide&quot;);
+    last=y;
+  },{passive:true});
+
+  var sheet=document.getElementById(&quot;sheet&quot;);
+  document.getElementById(&quot;burger&quot;).addEventListener(&quot;click&quot;,function(){sheet.classList.add(&quot;open&quot;);sheet.setAttribute(&quot;aria-hidden&quot;,&quot;false&quot;);});
+  document.getElementById(&quot;sheetClose&quot;).addEventListener(&quot;click&quot;,function(){sheet.classList.remove(&quot;open&quot;);sheet.setAttribute(&quot;aria-hidden&quot;,&quot;true&quot;);});
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+  </section>
+  <section class="demo">
+    <div class="lab">
+      <span class="n">03</span>
+      <div><h2>Option 3 · Cinématique</h2><p>Inspiriert von Smart Device Tec — dunkel, Loading-Intro mit Zähler, Sektions-Index, magnetischer CTA.</p></div>
+      <span class="hint">Im Rahmen scrollen ↓</span>
+    </div>
+    <div class="frame"><iframe loading="lazy" title="Option 3 · Cinématique" srcdoc="<!DOCTYPE html>
+<html lang=&quot;de&quot;>
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 3 &quot;Cinématique&quot;
+  Inspiration: smartdevicetec.com — Loading-Intro mit Zaehler, dunkle cinematische
+  Buehne, sehr reduzierte Nav (Wordmark links, 2 Links rechts), Sektions-Index
+  &quot;№ 01 / 05&quot;, magnetischer CTA, Grotesk/Mono-Typo, Linien-Reveals.
+-->
+<meta charset=&quot;UTF-8&quot; />
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; />
+<title>MAISON VEYRA — Navbar 3 · Cinématique</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot; />
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin />
+<link href=&quot;https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot; />
+<style>
+  :root{
+    --bg:#0B0B0D; --bg-2:#121216; --fg:#EFE9DF; --muted:#8A867E; --gold:#C9A45B;
+    --line:rgba(239,233,223,.16); --ease:cubic-bezier(.16,1,.3,1); --t:500ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:&quot;Space Grotesk&quot;,system-ui,sans-serif;background:var(--bg);color:var(--fg);
+    line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .mono{font-family:&quot;JetBrains Mono&quot;,monospace}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--fg);color:var(--bg);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  /* ====== Loading Intro ====== */
+  .loader{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;
+    transition:opacity .6s ease,visibility .6s}
+  .loader.done{opacity:0;visibility:hidden}
+  .loader .lc{text-align:center;width:min(80vw,420px)}
+  .loader .num{font-family:&quot;JetBrains Mono&quot;,monospace;font-size:clamp(3rem,12vw,6rem);font-weight:500;letter-spacing:-.02em}
+  .loader .lbl{font-size:.72rem;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .loader .barwrap{height:1px;background:var(--line);margin-top:26px;overflow:hidden}
+  .loader .barwrap i{display:block;height:100%;width:0;background:var(--gold);transition:width .1s linear}
+
+  /* ====== Header ====== */
+  .header{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;justify-content:space-between;
+    padding:clamp(16px,2.4vw,28px) clamp(18px,4vw,46px);mix-blend-mode:difference;color:#fff}
+  .wordmark{font-weight:600;letter-spacing:.2em;font-size:1.02rem}
+  .wordmark b{color:var(--gold);mix-blend-mode:normal}
+  .header .right{display:flex;align-items:center;gap:clamp(16px,2.4vw,34px)}
+  .header .right a{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;position:relative}
+  .header .right a::after{content:&quot;&quot;;position:absolute;left:0;bottom:-5px;width:100%;height:1px;background:currentColor;
+    transform:scaleX(0);transform-origin:left;transition:transform var(--t) var(--ease)}
+  .header .right a:hover::after{transform:scaleX(1)}
+  @media (max-width:640px){ .header .right .lnk{display:none} }
+
+  /* magnetic CTA */
+  .magnet{border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:11px 22px;cursor:pointer;
+    background:none;color:inherit;font-family:inherit;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;
+    transition:transform .2s var(--ease),background .3s,color .3s;will-change:transform}
+  .magnet:hover{background:#fff;color:#000}
+
+  /* section index, vertical right */
+  .index{position:fixed;right:clamp(14px,2vw,30px);top:50%;transform:translateY(-50%);z-index:80;
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;mix-blend-mode:difference;color:#fff}
+  .index .big{font-family:&quot;JetBrains Mono&quot;,monospace;font-size:.84rem;letter-spacing:.1em}
+  .index .ticks{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .index .ticks i{width:22px;height:1.5px;background:currentColor;opacity:.3;transition:opacity var(--t),width var(--t)}
+  .index .ticks i.on{opacity:1;width:34px;background:var(--gold)}
+  @media (max-width:640px){ .index{display:none} }
+
+  /* ====== Slides (Kontext fuer Index) ====== */
+  .slide{position:relative;height:100vh;min-height:600px;display:flex;align-items:flex-end;overflow:hidden}
+  .slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08);
+    transition:transform 1.6s var(--ease)}
+  .slide::after{content:&quot;&quot;;position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(11,11,13,.5),transparent 30%,rgba(11,11,13,.85))}
+  .slide .meta{position:relative;z-index:2;padding:clamp(28px,6vw,90px);width:100%}
+  .slide .no{font-family:&quot;JetBrains Mono&quot;,monospace;color:var(--gold);font-size:.8rem;letter-spacing:.2em;margin:0 0 14px}
+  .slide h2{font-weight:500;font-size:clamp(2.6rem,8vw,6rem);line-height:.98;margin:0;letter-spacing:-.02em;
+    text-transform:uppercase}
+  .slide .sub{color:var(--muted);max-width:46ch;margin:18px 0 0}
+  .slide:first-of-type{align-items:center;text-align:center;justify-content:center}
+  .slide:first-of-type .meta{max-width:24ch}
+  .slide:first-of-type h2{font-size:clamp(2.8rem,9vw,7rem)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;scroll-behavior:auto !important}
+    .slide img{transform:none}
+  }
+</style>
+</head>
+<body>
+<span class=&quot;badge&quot;>Option 3 · Cinématique</span>
+
+<!-- Loading -->
+<div class=&quot;loader&quot; id=&quot;loader&quot;>
+  <div class=&quot;lc&quot;>
+    <div class=&quot;num mono&quot;><span id=&quot;lnum&quot;>00</span></div>
+    <div class=&quot;lbl&quot;>Maison Veyra · lädt</div>
+    <div class=&quot;barwrap&quot;><i id=&quot;lbar&quot;></i></div>
+  </div>
+</div>
+
+<header class=&quot;header&quot;>
+  <a class=&quot;wordmark&quot; href=&quot;#&quot;>MAISON <b>VEYRA</b></a>
+  <div class=&quot;right&quot;>
+    <a class=&quot;lnk&quot; href=&quot;#&quot;>Kollektion</a>
+    <a class=&quot;lnk&quot; href=&quot;#&quot;>Atelier</a>
+    <button class=&quot;magnet&quot; id=&quot;magnet&quot;>Termin</button>
+  </div>
+</header>
+
+<div class=&quot;index&quot; aria-hidden=&quot;true&quot;>
+  <span class=&quot;big mono&quot; id=&quot;idxNum&quot;>№ 01 / 03</span>
+  <div class=&quot;ticks&quot; id=&quot;ticks&quot;><i class=&quot;on&quot;></i><i></i><i></i></div>
+</div>
+
+<main>
+  <section class=&quot;slide&quot; data-i=&quot;0&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=2000&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Feine Uhr in Szene&quot; />
+    <div class=&quot;meta&quot;>
+      <p class=&quot;no mono&quot;>№ 01 — Ouverture</p>
+      <h2>Zeit,<br>in Form gebracht.</h2>
+    </div>
+  </section>
+  <section class=&quot;slide&quot; data-i=&quot;1&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=2000&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Solitär-Ring&quot; />
+    <div class=&quot;meta&quot;>
+      <p class=&quot;no mono&quot;>№ 02 — Solitaire</p>
+      <h2>Ein Stein.<br>Ein Versprechen.</h2>
+      <p class=&quot;sub&quot;>Verlobungsringe aus dem Meisteratelier, gefasst von Hand.</p>
+    </div>
+  </section>
+  <section class=&quot;slide&quot; data-i=&quot;2&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=2000&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Goldschmuck&quot; />
+    <div class=&quot;meta&quot;>
+      <p class=&quot;no mono&quot;>№ 03 — Atelier</p>
+      <h2>Handwerk,<br>das bleibt.</h2>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var reduce=matchMedia(&quot;(prefers-reduced-motion: reduce)&quot;).matches;
+  // loader
+  var loader=document.getElementById(&quot;loader&quot;),lnum=document.getElementById(&quot;lnum&quot;),lbar=document.getElementById(&quot;lbar&quot;);
+  var p=0, dur=reduce?1:1400, step=reduce?100:2;
+  var iv=setInterval(function(){
+    p=Math.min(100,p+step+Math.random()*4);
+    lnum.textContent=String(Math.floor(p)).padStart(2,&quot;0&quot;); lbar.style.width=p+&quot;%&quot;;
+    if(p>=100){clearInterval(iv);setTimeout(function(){loader.classList.add(&quot;done&quot;);},reduce?0:300);}
+  },dur/(100/step));
+
+  // magnetic CTA
+  var m=document.getElementById(&quot;magnet&quot;);
+  if(!matchMedia(&quot;(pointer: coarse)&quot;).matches &amp;&amp; !reduce){
+    m.addEventListener(&quot;pointermove&quot;,function(e){var r=m.getBoundingClientRect();
+      m.style.transform=&quot;translate(&quot;+((e.clientX-(r.left+r.width/2))*.35)+&quot;px,&quot;+((e.clientY-(r.top+r.height/2))*.45)+&quot;px)&quot;;});
+    m.addEventListener(&quot;pointerleave&quot;,function(){m.style.transform=&quot;&quot;;});
+  }
+
+  // section index via IntersectionObserver
+  var ticks=document.getElementById(&quot;ticks&quot;).children, idxNum=document.getElementById(&quot;idxNum&quot;);
+  var total=document.querySelectorAll(&quot;.slide&quot;).length;
+  var io=new IntersectionObserver(function(ents){
+    ents.forEach(function(en){
+      if(en.isIntersecting){
+        var i=+en.target.getAttribute(&quot;data-i&quot;);
+        for(var k=0;k<ticks.length;k++) ticks[k].classList.toggle(&quot;on&quot;,k===i);
+        idxNum.textContent=&quot;№ &quot;+String(i+1).padStart(2,&quot;0&quot;)+&quot; / &quot;+String(total).padStart(2,&quot;0&quot;);
+      }
+    });
+  },{threshold:.5});
+  document.querySelectorAll(&quot;.slide&quot;).forEach(function(s){io.observe(s);});
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+  </section>
+  <section class="demo">
+    <div class="lab">
+      <span class="n">04</span>
+      <div><h2>Option 4 · Configurateur</h2><p>Inspiriert von WebGi — Floating-Glass-Pill, Material-Selektor der den Akzent live ändert.</p></div>
+      <span class="hint">Im Rahmen scrollen ↓</span>
+    </div>
+    <div class="frame"><iframe loading="lazy" title="Option 4 · Configurateur" srcdoc="<!DOCTYPE html>
+<html lang=&quot;de&quot;>
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 4 &quot;Configurateur&quot;
+  Inspiration: webgi-jewelry.vercel.app — schwebende Glas-Pill-Navigation zentriert,
+  grosse Bold-Typo, integrierter Material-Selektor (Gelb-/Weiss-/Rosegold, Platin)
+  der den Akzent live aendert, &quot;Scrollen zum Entdecken&quot;-Hinweis, hell und luftig.
+-->
+<meta charset=&quot;UTF-8&quot; />
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; />
+<title>MAISON VEYRA — Navbar 4 · Configurateur</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot; />
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin />
+<link href=&quot;https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot; />
+<style>
+  :root{
+    --bg:#F4F2EE; --ink:#16140F; --muted:#6E695E; --line:rgba(22,20,15,.12);
+    --accent:#C99A4E; /* wird per JS gesetzt */
+    --ease:cubic-bezier(.22,1,.36,1); --t:300ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:&quot;Manrope&quot;,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+    line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--ink);color:var(--bg);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  /* ====== Floating glass pill nav ====== */
+  .nav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:8px;
+    padding:8px 8px 8px 18px;border-radius:999px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+    box-shadow:0 18px 50px -22px rgba(0,0,0,.4);max-width:calc(100vw - 28px)}
+  .nav .logo{font-weight:800;letter-spacing:.04em;font-size:1rem;padding-right:10px}
+  .nav .logo b{color:var(--accent);transition:color var(--t)}
+  .nav .links{display:flex;gap:2px}
+  .nav .links a{font-size:.86rem;font-weight:500;padding:9px 14px;border-radius:999px;color:var(--muted);
+    transition:background var(--t),color var(--t)}
+  .nav .links a:hover{background:rgba(22,20,15,.06);color:var(--ink)}
+  .nav .pill{background:var(--accent);color:#1c1407;font-weight:700;font-size:.84rem;border:none;cursor:pointer;
+    padding:10px 18px;border-radius:999px;font-family:inherit;transition:background var(--t),transform .15s}
+  .nav .pill:active{transform:scale(.96)}
+  .nav .burger{display:none;background:none;border:none;cursor:pointer;padding:8px}
+  .nav .burger svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.7}
+  @media (max-width:760px){ .nav .links{display:none} .nav .burger{display:inline-flex} }
+
+  .mnav{position:fixed;inset:0;z-index:95;background:var(--bg);display:flex;flex-direction:column;
+    justify-content:center;padding:32px;gap:6px;transform:translateY(-100%);transition:transform var(--t) var(--ease)}
+  .mnav.open{transform:none}
+  .mnav a{font-size:2rem;font-weight:700;padding:12px 0;border-bottom:1px solid var(--line)}
+  .mnav .x{position:absolute;top:24px;right:28px;font-size:2rem;background:none;border:none;cursor:pointer}
+
+  /* ====== Hero / Configurator stage ====== */
+  .stage{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;
+    padding:120px clamp(20px,5vw,80px) 60px;gap:40px}
+  @media (max-width:860px){ .stage{grid-template-columns:1fr;text-align:center;padding-top:110px} }
+  .stage .word{font-weight:800;font-size:clamp(3rem,9vw,7rem);line-height:.95;letter-spacing:-.03em;margin:0}
+  .stage .word em{font-style:normal;color:var(--accent);transition:color var(--t)}
+  .stage .lead{color:var(--muted);max-width:42ch;margin:22px 0 30px;font-size:1.05rem}
+  @media (max-width:860px){ .stage .lead{margin-left:auto;margin-right:auto} }
+
+  .visual{position:relative;justify-self:center;width:min(80vw,440px);aspect-ratio:1;border-radius:32px;overflow:hidden;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.5)}
+  .visual img{width:100%;height:100%;object-fit:cover}
+  .visual .ring-glow{position:absolute;inset:0;mix-blend-mode:overlay;
+    background:radial-gradient(circle at 50% 42%,var(--accent),transparent 62%);opacity:.55;transition:background var(--t)}
+
+  /* Material selector */
+  .config{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+  @media (max-width:860px){ .config{align-items:center} }
+  .config .ctitle{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .swatches{display:flex;gap:12px}
+  .swatches button{width:46px;height:46px;border-radius:50%;border:2px solid transparent;cursor:pointer;
+    position:relative;transition:transform .2s var(--ease),border-color var(--t);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .swatches button:hover{transform:translateY(-3px)}
+  .swatches button[aria-pressed=&quot;true&quot;]{border-color:var(--ink)}
+  .swatches button .nm{position:absolute;top:54px;left:50%;transform:translateX(-50%);white-space:nowrap;
+    font-size:.7rem;letter-spacing:.06em;color:var(--muted)}
+  .sw-gelb{background:radial-gradient(circle at 35% 30%,#F6DC97,#C99A4E)}
+  .sw-weiss{background:radial-gradient(circle at 35% 30%,#F4F6F9,#B9C0CC)}
+  .sw-rose{background:radial-gradient(circle at 35% 30%,#EDC9B8,#C98E76)}
+  .sw-platin{background:radial-gradient(circle at 35% 30%,#EAECEF,#9098A2)}
+
+  .scroll-hint{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:60;
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .scroll-hint .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+<span class=&quot;badge&quot;>Option 4 · Configurateur</span>
+
+<nav class=&quot;nav&quot; aria-label=&quot;Hauptnavigation&quot;>
+  <a class=&quot;logo&quot; href=&quot;#&quot;>VE<b>Y</b>RA</a>
+  <div class=&quot;links&quot;>
+    <a href=&quot;#&quot;>Ringe</a><a href=&quot;#&quot;>Uhren</a><a href=&quot;#&quot;>Schmuck</a><a href=&quot;#&quot;>Atelier</a>
+  </div>
+  <button class=&quot;pill&quot;>Konfigurieren</button>
+  <button class=&quot;burger&quot; id=&quot;burger&quot; aria-label=&quot;Menü&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M4 7h16M4 12h16M4 17h16&quot;/></svg></button>
+</nav>
+
+<div class=&quot;mnav&quot; id=&quot;mnav&quot; aria-hidden=&quot;true&quot;>
+  <button class=&quot;x&quot; id=&quot;mx&quot; aria-label=&quot;Schließen&quot;>&amp;times;</button>
+  <a href=&quot;#&quot;>Ringe</a><a href=&quot;#&quot;>Uhren</a><a href=&quot;#&quot;>Schmuck</a><a href=&quot;#&quot;>Atelier</a>
+</div>
+
+<section class=&quot;stage&quot;>
+  <div>
+    <h1 class=&quot;word&quot;>Ihr Ring,<br><em>Ihr Material</em>.</h1>
+    <p class=&quot;lead&quot;>Wählen Sie das Edelmetall und sehen Sie Ihren Ring in Echtzeit. In Produktion als
+      3D-Konfigurator (WebGL).</p>
+    <div class=&quot;config&quot;>
+      <span class=&quot;ctitle&quot;>Material</span>
+      <div class=&quot;swatches&quot; role=&quot;group&quot; aria-label=&quot;Material wählen&quot;>
+        <button class=&quot;sw-gelb&quot; aria-pressed=&quot;true&quot; data-accent=&quot;#C99A4E&quot; aria-label=&quot;Gelbgold&quot;><span class=&quot;nm&quot;>Gelbgold</span></button>
+        <button class=&quot;sw-weiss&quot; aria-pressed=&quot;false&quot; data-accent=&quot;#9AA3B2&quot; aria-label=&quot;Weißgold&quot;><span class=&quot;nm&quot;>Weißgold</span></button>
+        <button class=&quot;sw-rose&quot; aria-pressed=&quot;false&quot; data-accent=&quot;#C98E76&quot; aria-label=&quot;Roségold&quot;><span class=&quot;nm&quot;>Roségold</span></button>
+        <button class=&quot;sw-platin&quot; aria-pressed=&quot;false&quot; data-accent=&quot;#8C95A1&quot; aria-label=&quot;Platin&quot;><span class=&quot;nm&quot;>Platin</span></button>
+      </div>
+    </div>
+  </div>
+  <div class=&quot;visual&quot;>
+    <img src=&quot;https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Ring im Konfigurator&quot; />
+    <div class=&quot;ring-glow&quot; aria-hidden=&quot;true&quot;></div>
+  </div>
+</section>
+
+<div class=&quot;scroll-hint&quot;><span class=&quot;dot&quot;></span> Scrollen zum Entdecken</div>
+
+<script>
+(function(){
+  var burger=document.getElementById(&quot;burger&quot;),mnav=document.getElementById(&quot;mnav&quot;),mx=document.getElementById(&quot;mx&quot;);
+  burger.addEventListener(&quot;click&quot;,function(){mnav.classList.add(&quot;open&quot;);mnav.setAttribute(&quot;aria-hidden&quot;,&quot;false&quot;);});
+  mx.addEventListener(&quot;click&quot;,function(){mnav.classList.remove(&quot;open&quot;);mnav.setAttribute(&quot;aria-hidden&quot;,&quot;true&quot;);});
+
+  var sw=document.querySelectorAll(&quot;.swatches button&quot;);
+  sw.forEach(function(b){
+    b.addEventListener(&quot;click&quot;,function(){
+      sw.forEach(function(x){x.setAttribute(&quot;aria-pressed&quot;,&quot;false&quot;);});
+      b.setAttribute(&quot;aria-pressed&quot;,&quot;true&quot;);
+      document.documentElement.style.setProperty(&quot;--accent&quot;,b.getAttribute(&quot;data-accent&quot;));
+    });
+  });
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+  </section>
+  <section class="demo">
+    <div class="lab">
+      <span class="n">05</span>
+      <div><h2>Option 5 · Boutique</h2><p>Inspiriert von Cartier &amp; JURI — Full-Width-Mega-Menü mit Bild-Thumbnails, Such-Overlay.</p></div>
+      <span class="hint">Im Rahmen scrollen ↓</span>
+    </div>
+    <div class="frame"><iframe loading="lazy" title="Option 5 · Boutique" srcdoc="<!DOCTYPE html>
+<html lang=&quot;de&quot;>
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 5 &quot;Boutique&quot;
+  Inspiration: cartier.com + jurijewelry.com — E-Commerce-Luxus mit Full-Width-
+  Mega-Menue inkl. Bild-Thumbnails je Kollektion, duenne Top-Bar, Logo links,
+  Hauptkategorien zentriert, Utility-Icons rechts (Suche/Konto/Wunschliste/Warenkorb),
+  Such-Overlay. Produktionsreif gedacht.
+-->
+<meta charset=&quot;UTF-8&quot; />
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; />
+<title>MAISON VEYRA — Navbar 5 · Boutique</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot; />
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin />
+<link href=&quot;https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=Inter:wght@400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot; />
+<style>
+  :root{
+    --ink:#181512; --paper:#FFFFFF; --soft:#F4EFE7; --line:rgba(24,21,18,.12);
+    --muted:#736B5F; --gold:#9C7B3C; --ease:cubic-bezier(.22,1,.36,1); --t:240ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:&quot;Inter&quot;,system-ui,sans-serif;background:var(--paper);color:var(--ink);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--ink);color:#fff;
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  .topbar{background:var(--ink);color:#EBE4D8;font-size:.72rem;letter-spacing:.1em;text-align:center;padding:8px 16px}
+  .topbar b{color:#E7C988}
+
+  .header{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line)}
+  .bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;
+    padding:14px clamp(16px,4vw,44px)}
+  .logo{grid-column:1;justify-self:start;font-family:&quot;Cormorant Garamond&quot;,serif;font-weight:600;
+    font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:.16em}
+  .mainnav{grid-column:2;justify-self:center;display:flex;gap:clamp(14px,2vw,30px);list-style:none;margin:0;padding:0}
+  .mainnav > li > a{display:inline-flex;align-items:center;padding:20px 2px;font-size:.84rem;letter-spacing:.1em;
+    text-transform:uppercase;position:relative}
+  .mainnav > li > a::after{content:&quot;&quot;;position:absolute;left:0;right:0;bottom:14px;height:1.5px;background:var(--gold);
+    transform:scaleX(0);transform-origin:center;transition:transform var(--t) var(--ease)}
+  .mainnav > li.open > a::after,.mainnav > li:hover > a::after{transform:scaleX(1)}
+
+  .util{grid-column:3;justify-self:end;display:flex;align-items:center;gap:clamp(8px,1.3vw,14px)}
+  .util button{background:none;border:none;color:inherit;cursor:pointer;padding:8px;border-radius:999px;display:inline-flex;
+    transition:background var(--t)}
+  .util button:hover{background:var(--soft)}
+  .util svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6}
+  .util .cart{position:relative}
+  .util .cart .c{position:absolute;top:1px;right:1px;background:var(--gold);color:#fff;font-size:.58rem;font-weight:600;
+    width:15px;height:15px;border-radius:50%;display:grid;place-items:center}
+  .burger{display:none}
+
+  /* ===== Mega menu ===== */
+  .mega{position:absolute;left:0;right:0;top:100%;background:var(--paper);border-top:1px solid var(--line);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.3);opacity:0;visibility:hidden;transform:translateY(8px);
+    transition:opacity var(--t) var(--ease),transform var(--t) var(--ease);z-index:99}
+  .mainnav > li.open .mega{opacity:1;visibility:visible;transform:none}
+  .mega .inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.1fr 2fr;gap:40px;
+    padding:clamp(26px,3vw,42px) clamp(16px,4vw,44px)}
+  .mega .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px 36px}
+  .mega h4{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  .mega ul{list-style:none;margin:0 0 18px;padding:0}
+  .mega ul li{margin:0 0 9px}
+  .mega ul a{font-size:.95rem;color:var(--ink);position:relative}
+  .mega ul a:hover{color:var(--gold)}
+  .mega .feat{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .mega .feat a{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/3;display:block;background:var(--soft)}
+  .mega .feat img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+  .mega .feat a:hover img{transform:scale(1.06)}
+  .mega .feat .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;color:#fff;
+    background:linear-gradient(to top,rgba(0,0,0,.6),transparent)}
+  .mega .feat .cap em{font-style:normal;font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;opacity:.85}
+  .mega .feat .cap b{display:block;font-family:&quot;Cormorant Garamond&quot;,serif;font-weight:600;font-size:1.2rem}
+  @media (max-width:980px){ .mega{display:none} }
+
+  @media (max-width:980px){
+    .mainnav{display:none} .bar{grid-template-columns:auto 1fr auto}
+    .logo{grid-column:2;justify-self:center} .burger{display:inline-flex;grid-column:1;justify-self:start} .util{grid-column:3}
+  }
+
+  /* ===== Search overlay ===== */
+  .search{position:fixed;inset:0;z-index:140;background:rgba(255,255,255,.97);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity var(--t);
+    display:flex;flex-direction:column;align-items:center;padding-top:18vh}
+  .search.open{opacity:1;visibility:visible}
+  .search .box{width:min(90vw,640px);border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:14px;padding-bottom:14px}
+  .search input{flex:1;border:none;background:none;font-size:clamp(1.3rem,4vw,2rem);font-family:&quot;Cormorant Garamond&quot;,serif;outline:none}
+  .search svg{width:26px;height:26px;stroke:var(--ink);fill:none;stroke-width:1.6}
+  .search .sclose{position:absolute;top:26px;right:30px;font-size:2rem;background:none;border:none;cursor:pointer}
+  .search .sugg{margin-top:26px;color:var(--muted);font-size:.85rem;letter-spacing:.04em}
+  .search .sugg a{margin:0 10px;border-bottom:1px solid var(--line)}
+
+  /* mobile sheet */
+  .sheet{position:fixed;inset:0;z-index:130;background:var(--paper);transform:translateX(-100%);
+    transition:transform var(--t) var(--ease);padding:22px;overflow:auto}
+  .sheet.open{transform:none}
+  .sheet .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .sheet .top button{background:none;border:none;font-size:1.8rem;cursor:pointer}
+  .sheet a{display:block;font-family:&quot;Cormorant Garamond&quot;,serif;font-size:1.5rem;padding:13px 0;border-bottom:1px solid var(--line)}
+
+  /* hero context */
+  .hero{position:relative;height:74vh;min-height:520px;display:grid;place-items:center;text-align:center;color:#fff}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .hero::after{content:&quot;&quot;;position:absolute;inset:0;background:rgba(0,0,0,.32)}
+  .hero .in{position:relative;z-index:2}
+  .hero h1{font-family:&quot;Cormorant Garamond&quot;,serif;font-weight:600;font-size:clamp(2.4rem,6vw,4.6rem);margin:0 0 18px}
+  .hero a{display:inline-block;background:#fff;color:var(--ink);padding:13px 30px;border-radius:999px;
+    font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+<span class=&quot;badge&quot;>Option 5 · Boutique</span>
+
+<div class=&quot;topbar&quot;>Kostenfreier versicherter Versand &amp;amp; Geschenkverpackung · <b>Goldpreis 24K 76,40 €/g</b></div>
+
+<header class=&quot;header&quot; id=&quot;header&quot;>
+  <nav class=&quot;bar&quot; aria-label=&quot;Hauptnavigation&quot;>
+    <button class=&quot;burger util&quot; id=&quot;burger&quot; aria-label=&quot;Menü&quot; style=&quot;padding:8px&quot;>
+      <svg viewBox=&quot;0 0 24 24&quot; width=&quot;22&quot; height=&quot;22&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.6&quot;><path d=&quot;M4 7h16M4 12h16M4 17h16&quot;/></svg>
+    </button>
+    <a class=&quot;logo&quot; href=&quot;#&quot;>MAISON VEYRA</a>
+    <ul class=&quot;mainnav&quot; id=&quot;mainnav&quot;>
+      <li data-menu>
+        <a href=&quot;#&quot;>Schmuck</a>
+        <div class=&quot;mega&quot;><div class=&quot;inner&quot;>
+          <div class=&quot;cols&quot;>
+            <div><h4>Kategorien</h4><ul><li><a href=&quot;#&quot;>Ringe</a></li><li><a href=&quot;#&quot;>Halsketten</a></li><li><a href=&quot;#&quot;>Ohrringe</a></li><li><a href=&quot;#&quot;>Armbänder</a></li></ul></div>
+            <div><h4>Kollektionen</h4><ul><li><a href=&quot;#&quot;>Veyra Solitaire</a></li><li><a href=&quot;#&quot;>Rivière</a></li><li><a href=&quot;#&quot;>Héritage</a></li><li><a href=&quot;#&quot;>Lumière</a></li></ul></div>
+          </div>
+          <div class=&quot;feat&quot;>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Halskette&quot;><span class=&quot;cap&quot;><em>Neu</em><b>Rivière</b></span></a>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Ohrschmuck&quot;><span class=&quot;cap&quot;><em>Bestseller</em><b>Lumière</b></span></a>
+          </div>
+        </div></div>
+      </li>
+      <li data-menu>
+        <a href=&quot;#&quot;>Trauringe</a>
+        <div class=&quot;mega&quot;><div class=&quot;inner&quot;>
+          <div class=&quot;cols&quot;>
+            <div><h4>Nach Maß</h4><ul><li><a href=&quot;#&quot;>Konfigurator</a></li><li><a href=&quot;#&quot;>Materialien</a></li><li><a href=&quot;#&quot;>Profile &amp;amp; Breiten</a></li><li><a href=&quot;#&quot;>Gravur</a></li></ul></div>
+            <div><h4>Verlobung</h4><ul><li><a href=&quot;#&quot;>Solitäre</a></li><li><a href=&quot;#&quot;>Memoire</a></li><li><a href=&quot;#&quot;>Diamanten</a></li><li><a href=&quot;#&quot;>Beratung</a></li></ul></div>
+          </div>
+          <div class=&quot;feat&quot;>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Trauringe&quot;><span class=&quot;cap&quot;><em>Atelier</em><b>Nach Maß</b></span></a>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Solitär&quot;><span class=&quot;cap&quot;><em>Verlobung</em><b>Solitaire</b></span></a>
+          </div>
+        </div></div>
+      </li>
+      <li data-menu>
+        <a href=&quot;#&quot;>Uhren</a>
+        <div class=&quot;mega&quot;><div class=&quot;inner&quot;>
+          <div class=&quot;cols&quot;>
+            <div><h4>Manufakturen</h4><ul><li><a href=&quot;#&quot;>Damenuhren</a></li><li><a href=&quot;#&quot;>Herrenuhren</a></li><li><a href=&quot;#&quot;>Automatik</a></li><li><a href=&quot;#&quot;>Vintage</a></li></ul></div>
+            <div><h4>Service</h4><ul><li><a href=&quot;#&quot;>Revision</a></li><li><a href=&quot;#&quot;>Bandwechsel</a></li><li><a href=&quot;#&quot;>Ankauf</a></li><li><a href=&quot;#&quot;>Garantie</a></li></ul></div>
+          </div>
+          <div class=&quot;feat&quot;>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Uhr&quot;><span class=&quot;cap&quot;><em>Neu</em><b>Manufaktur</b></span></a>
+            <a href=&quot;#&quot;><img src=&quot;https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=700&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Uhr Detail&quot;><span class=&quot;cap&quot;><em>Service</em><b>Atelier</b></span></a>
+          </div>
+        </div></div>
+      </li>
+      <li><a href=&quot;#&quot;>Atelier</a></li>
+      <li><a href=&quot;#&quot;>Maison</a></li>
+    </ul>
+    <div class=&quot;util&quot;>
+      <button id=&quot;searchBtn&quot; aria-label=&quot;Suche&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/><path d=&quot;m21 21-4.3-4.3&quot;/></svg></button>
+      <button aria-label=&quot;Konto&quot;><svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;8&quot; r=&quot;4&quot;/><path d=&quot;M5 21c0-4 3.5-6 7-6s7 2 7 6&quot;/></svg></button>
+      <button aria-label=&quot;Wunschliste&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 7a4 4 0 0 1 7 3.7C19 15.6 12 20 12 20z&quot;/></svg></button>
+      <button class=&quot;cart&quot; aria-label=&quot;Warenkorb&quot;><svg viewBox=&quot;0 0 24 24&quot;><path d=&quot;M6 7h12l-1 13H7L6 7z&quot;/><path d=&quot;M9 7a3 3 0 0 1 6 0&quot;/></svg><span class=&quot;c&quot;>3</span></button>
+    </div>
+  </nav>
+</header>
+
+<!-- Search overlay -->
+<div class=&quot;search&quot; id=&quot;search&quot;>
+  <button class=&quot;sclose&quot; id=&quot;searchClose&quot; aria-label=&quot;Schließen&quot;>&amp;times;</button>
+  <div class=&quot;box&quot;>
+    <svg viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/><path d=&quot;m21 21-4.3-4.3&quot;/></svg>
+    <input type=&quot;text&quot; placeholder=&quot;Wonach suchen Sie?&quot; aria-label=&quot;Suche&quot; id=&quot;searchInput&quot; />
+  </div>
+  <p class=&quot;sugg&quot;>Beliebt: <a href=&quot;#&quot;>Solitär</a><a href=&quot;#&quot;>Trauringe</a><a href=&quot;#&quot;>Automatik</a></p>
+</div>
+
+<!-- mobile sheet -->
+<div class=&quot;sheet&quot; id=&quot;sheet&quot; aria-hidden=&quot;true&quot;>
+  <div class=&quot;top&quot;><span class=&quot;logo&quot;>VEYRA</span><button id=&quot;sheetClose&quot; aria-label=&quot;Schließen&quot;>&amp;times;</button></div>
+  <a href=&quot;#&quot;>Schmuck</a><a href=&quot;#&quot;>Trauringe</a><a href=&quot;#&quot;>Uhren</a><a href=&quot;#&quot;>Atelier</a><a href=&quot;#&quot;>Maison</a>
+</div>
+
+<section class=&quot;hero&quot;>
+  <img src=&quot;https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=2000&amp;q=80&amp;auto=format&amp;fit=crop&quot; alt=&quot;Edelstein-Schmuck&quot; />
+  <div class=&quot;in&quot;>
+    <h1>Die Boutique am Rhein.</h1>
+    <a href=&quot;#&quot;>Jetzt entdecken</a>
+  </div>
+</section>
+
+<script>
+(function(){
+  // mega menu: hover (desktop) + click toggle
+  var items=document.querySelectorAll(&quot;.mainnav > li[data-menu]&quot;);
+  items.forEach(function(li){
+    var a=li.querySelector(&quot;:scope > a&quot;);
+    li.addEventListener(&quot;mouseenter&quot;,function(){items.forEach(function(x){x.classList.remove(&quot;open&quot;);});li.classList.add(&quot;open&quot;);});
+    li.addEventListener(&quot;mouseleave&quot;,function(){li.classList.remove(&quot;open&quot;);});
+    a.addEventListener(&quot;click&quot;,function(e){e.preventDefault();var was=li.classList.contains(&quot;open&quot;);
+      items.forEach(function(x){x.classList.remove(&quot;open&quot;);}); if(!was)li.classList.add(&quot;open&quot;);});
+  });
+  document.addEventListener(&quot;keydown&quot;,function(e){if(e.key===&quot;Escape&quot;)items.forEach(function(x){x.classList.remove(&quot;open&quot;);});});
+
+  // search overlay
+  var search=document.getElementById(&quot;search&quot;);
+  document.getElementById(&quot;searchBtn&quot;).addEventListener(&quot;click&quot;,function(){search.classList.add(&quot;open&quot;);
+    setTimeout(function(){document.getElementById(&quot;searchInput&quot;).focus();},60);});
+  document.getElementById(&quot;searchClose&quot;).addEventListener(&quot;click&quot;,function(){search.classList.remove(&quot;open&quot;);});
+  document.addEventListener(&quot;keydown&quot;,function(e){if(e.key===&quot;Escape&quot;)search.classList.remove(&quot;open&quot;);});
+
+  // mobile sheet
+  var sheet=document.getElementById(&quot;sheet&quot;);
+  document.getElementById(&quot;burger&quot;).addEventListener(&quot;click&quot;,function(){sheet.classList.add(&quot;open&quot;);sheet.setAttribute(&quot;aria-hidden&quot;,&quot;false&quot;);});
+  document.getElementById(&quot;sheetClose&quot;).addEventListener(&quot;click&quot;,function(){sheet.classList.remove(&quot;open&quot;);sheet.setAttribute(&quot;aria-hidden&quot;,&quot;true&quot;);});
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+  </section>
+</div>
+<footer>Sag mir die <b>Nummer</b> (oder Mischform) — dann baue ich darauf auf und mache die Hero-Sektion.</footer>
+</body>
+</html>
