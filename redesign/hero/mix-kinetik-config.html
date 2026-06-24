@@ -86,6 +86,7 @@
   .kin .eb{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin:0 0 22px;transition:color var(--t)}
   .kin h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(2.6rem,6.4vw,5.4rem);line-height:.98;margin:0;letter-spacing:-.01em}
   .kin h1 .scr{font-family:"JetBrains Mono",monospace;font-style:normal;color:var(--accent);font-size:.66em;transition:color var(--t)}
+  .kin h1 .hl2{white-space:nowrap}
   .kin .lead{color:var(--muted);max-width:40ch;margin:22px 0 28px;font-size:1.05rem}
   .picker{display:flex;flex-direction:column;gap:12px}
   .picker .pt{font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
@@ -130,6 +131,11 @@
   .bgctl .lbl{font-family:"JetBrains Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 10px}
   .bgctl button{font-family:"Inter",sans-serif;font-size:.74rem;letter-spacing:.04em;border:none;background:transparent;color:#1B2128;padding:9px 14px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s}
   .bgctl button[aria-pressed="true"]{background:#1B2128;color:#fff}
+
+  /* CTAs in Platin/Weißgold-Optik (silbriger Verlauf, dunkle Schrift) */
+  .cta, .sidebar .cta{background:linear-gradient(140deg,#F4F6F9 0%,#D8DDE4 55%,#C4CAD3 100%) !important;color:#1B2128 !important;
+    border:1px solid rgba(27,33,40,.16) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 12px 26px -14px rgba(20,24,30,.5)}
+  .cta:hover, .sidebar .cta:hover{filter:brightness(1.05)}
 </style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div><span class="badge">Mix · 8 + 6 + 2 · echter 3D-Ring</span>
 <aside class="sidebar" id="sidebar">
   <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
@@ -197,7 +203,7 @@
   <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
 </div>
-<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><script>
+<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><script>
 (function(){
   var sidebar=document.getElementById("sidebar"),scrim=document.getElementById("scrim"),flyout=document.getElementById("flyout"),
       panelTitle=document.getElementById("panelTitle"),previewImg=document.getElementById("previewImg"),
@@ -233,6 +239,14 @@
     function scramble(target,cb){if(reduce){scr.textContent=target;if(cb)setTimeout(cb,2000);return;}var fr=0;var iv=setInterval(function(){fr++;var out='';for(var i=0;i<target.length;i++){out+= i<fr/2?target[i]:chars[Math.floor(Math.random()*chars.length)];}scr.textContent=out;if(fr/2>=target.length){clearInterval(iv);scr.textContent=target;if(cb)setTimeout(cb,1700);}},45);}
     function cycle(){scramble(words[wi],function(){wi=(wi+1)%words.length;cycle();});}
     setTimeout(cycle,1300);}
+  // Wortfarbe folgt dem gewählten Metall (lesbarer Ton)
+  var sws=document.querySelectorAll('#sw button');
+  function setWordColor(c){ if(scr&&c)scr.style.color=c; }
+  sws.forEach(function(b){ b.addEventListener('click',function(){
+    sws.forEach(function(x){x.setAttribute('aria-pressed','false');}); b.setAttribute('aria-pressed','true');
+    setWordColor(b.getAttribute('data-word'));
+  });});
+  var pr0=document.querySelector('#sw button[aria-pressed="true"]'); if(pr0)setWordColor(pr0.getAttribute('data-word'));
 })();
 </script><script type="module">
 import * as THREE from 'three';
