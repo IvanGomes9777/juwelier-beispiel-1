@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  ============================================================================
+  MAISON AURÉLIE · Düsseldorf — Konzept 5 "Bordeaux & Gold" (moderne Ausfuehrung)
+  ----------------------------------------------------------------------------
+  AUFBAU (Section-by-Section):
+    1) Navbar: Design 03 "Command Bar" — sauber gefittet, CTA laeuft nicht mehr ueber.
+       Zentrierte Links ab >=1024px, darunter Hamburger. Command-Palette (Strg/Cmd K).
+    2) Hero: modern + interaktiv. Echtes Ring-Foto (assets/ring.png) mit Pointer-Tilt,
+       cursorgefuehrtem Gold-Glint, Diamant-Funkeln und Tiefenschatten. Eleganter
+       CSS-Platzhalter-Ring, falls das Foto fehlt. Optionaler Weiss-Knockout (ueber http).
+  COMPLIANCE: Markennamen nur nominativ als Text (Trust-Zeile). Offizielle
+       Konzessionaer-Module in PROD einsetzen.
+  PROD: next/font lokal statt Google-Fonts-Link; Ring als next/image (transparenter
+       Freisteller); Tilt/Glint via motion/react; Funkeln als Canvas/R3F-Layer.
+  ============================================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MAISON AURÉLIE Düsseldorf: Trauringe, Verlobungsringe, feine Uhren und Schmuck. Handwerk aus dem Meisteratelier." />
+<title>MAISON AURÉLIE · Hero in 3D</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- PROD: next/font lokal -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg:#160709; --bg2:#210B11; --panel:rgba(255,255,255,0.05);
+    --text:#F6ECE6; --text-2:#C9A7AD; --gold:#E6C07A; --gold-2:#C99A4E; --gold-deep:#8A5A22;
+    --line:rgba(255,220,190,0.12);
+    --ease:cubic-bezier(0.22,1,0.36,1); --t:200ms;
+    --pill:999px; --r-2xl:26px; --r-xl:18px;
+    --shadow-soft:0 18px 50px -18px rgba(0,0,0,0.65);
+    --shadow-glow:0 0 0 1px var(--line), 0 24px 70px -24px rgba(0,0,0,0.8);
+    --maxw:1220px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 700px at 80% -10%, rgba(230,192,122,0.10), transparent 60%),
+      radial-gradient(900px 600px at 6% 4%, rgba(150,30,50,0.16), transparent 55%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden; min-height:100svh;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:rgba(230,192,122,0.28);color:#fff}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+  .wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,24px)}
+
+  .skip-link{position:fixed;left:16px;top:-120px;z-index:200;background:var(--gold);color:#2a0f14;
+    padding:12px 18px;border-radius:var(--pill);font-family:"Space Grotesk",sans-serif;font-weight:600;
+    transition:top var(--t) var(--ease)}
+  .skip-link:focus{top:16px}
+
+  /* ============ NAVBAR (Command Bar) ============ */
+  .site-header{position:sticky;top:0;z-index:90;padding:14px 0}
+  .commandbar{
+    display:flex;align-items:center;gap:clamp(10px,1.6vw,18px);
+    padding:10px 12px 10px 16px;border-radius:var(--pill);
+    background:rgba(22,7,9,0.6);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    backdrop-filter:blur(18px) saturate(140%);
+    border:1px solid var(--line);box-shadow:var(--shadow-soft);
+  }
+  .wordmark{display:inline-flex;align-items:center;gap:11px;font-family:"Space Grotesk",sans-serif;
+    font-weight:600;font-size:1.08rem;letter-spacing:.05em;color:var(--text);white-space:nowrap;
+    padding:6px;border-radius:14px;flex:0 0 auto}
+  .wordmark .mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+    background:linear-gradient(150deg,var(--gold),var(--gold-2));color:#2a0f14;font-weight:700;
+    box-shadow:0 6px 18px -6px rgba(230,192,122,.5);transition:transform var(--t) var(--ease)}
+  .wordmark:hover .mark{transform:rotate(-6deg) scale(1.06)}
+  .wordmark .sub{color:var(--text-2);font-weight:400;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase}
+
+  .nav-center{flex:1 1 auto;min-width:0;display:flex;justify-content:center}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;margin:0;padding:0}
+  .nav-links a{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 15px;
+    border-radius:var(--pill);color:var(--text-2);font-size:.95rem;font-weight:500;white-space:nowrap;
+    transition:color var(--t) var(--ease),background var(--t) var(--ease)}
+  .nav-links a::after{content:"";position:absolute;left:15px;right:15px;bottom:9px;height:1.5px;
+    background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform var(--t) var(--ease)}
+  .nav-links a:hover,.nav-links a:focus-visible{color:var(--text);background:rgba(255,255,255,.04)}
+  .nav-links a:hover::after,.nav-links a:focus-visible::after{transform:scaleX(1)}
+
+  .nav-right{flex:0 0 auto;display:flex;align-items:center;gap:10px}
+
+  .cmd-trigger{display:inline-flex;align-items:center;gap:12px;min-height:44px;padding:0 8px 0 14px;
+    border-radius:var(--pill);border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text-2);
+    font-family:"Inter",sans-serif;font-size:.9rem;cursor:pointer;
+    transition:border-color var(--t) var(--ease),background var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+  .cmd-trigger:hover{border-color:rgba(230,192,122,.5);background:rgba(255,255,255,.06);color:var(--text);
+    box-shadow:0 10px 30px -14px rgba(230,192,122,.4)}
+  .cmd-trigger svg{width:18px;height:18px;flex:0 0 auto}
+  .cmd-trigger .hint{white-space:nowrap}
+  .cmd-trigger .kbd{display:inline-flex;align-items:center;gap:3px;padding:5px 9px;border-radius:var(--pill);
+    background:rgba(255,255,255,.06);border:1px solid var(--line);font-family:"Space Grotesk",sans-serif;
+    font-size:.74rem;font-weight:600;color:var(--text)}
+
+  .cta{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;
+    border-radius:var(--pill);background:linear-gradient(150deg,var(--gold),var(--gold-2));color:#2a0f14;
+    font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.92rem;border:none;cursor:pointer;
+    white-space:nowrap;flex:0 0 auto;box-shadow:0 12px 30px -12px rgba(230,192,122,.55);
+    transition:transform 120ms var(--ease),box-shadow var(--t) var(--ease);will-change:transform}
+  .cta:hover{box-shadow:0 16px 40px -12px rgba(230,192,122,.7)}
+  .cta:active{transform:scale(.97)}
+
+  .menu-btn{display:none;align-items:center;justify-content:center;width:44px;height:44px;flex:0 0 auto;
+    border-radius:var(--pill);border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);
+    cursor:pointer;transition:background var(--t) var(--ease)}
+  .menu-btn:hover{background:rgba(255,255,255,.07)}
+  .menu-btn svg{width:22px;height:22px}
+
+  .mobile-nav{margin-top:10px;padding:12px;border-radius:var(--r-2xl);background:rgba(22,7,9,.92);
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:var(--shadow-soft)}
+  .mobile-nav[hidden]{display:none}
+  .mobile-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+  .mobile-nav a{display:flex;align-items:center;min-height:48px;padding:0 16px;border-radius:var(--r-xl);
+    color:var(--text);font-size:1rem;transition:background var(--t) var(--ease)}
+  .mobile-nav a:hover,.mobile-nav a:focus-visible{background:rgba(255,255,255,.06)}
+  .mobile-nav .cta{width:100%;margin-top:8px}
+
+  /* Navbar-Fitting per Breakpoint (verhindert CTA-Ueberlauf) */
+  /* Zentrierte Links nur auf grossen Screens; sonst Hamburger. */
+  @media (max-width:1024px){
+    .nav-center{display:none}
+    .menu-btn{display:inline-flex}
+    .cmd-trigger .hint,.cmd-trigger .kbd{display:none}
+    .cmd-trigger{padding:0 13px}
+  }
+  @media (min-width:1025px){ .mobile-nav{display:none} }
+  @media (max-width:560px){
+    .wordmark .sub{display:none}
+    .cta{display:none}            /* CTA wandert ins Mobile-Menue, damit nichts ueberlaeuft */
+  }
+
+  /* ============ HERO ============ */
+  .hero{position:relative;padding:clamp(40px,7vw,86px) 0 clamp(48px,7vw,90px);overflow:hidden}
+  .hero-glow{position:absolute;inset:-12% 0 auto 0;height:680px;pointer-events:none;z-index:0;filter:blur(10px);
+    background:
+      radial-gradient(620px 360px at 72% 24%, rgba(230,192,122,0.20), transparent 60%),
+      radial-gradient(520px 320px at 18% 8%, rgba(160,28,52,0.26), transparent 60%)}
+  .hero .wrap{position:relative;z-index:1}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,48px);align-items:center}
+  @media (min-width:980px){ .hero-grid{grid-template-columns:1.04fr .96fr} }
+
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:7px 15px;border-radius:var(--pill);
+    border:1px solid var(--line);background:var(--panel);color:var(--gold);font-family:"Space Grotesk",sans-serif;
+    font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+
+  .hero h1{font-family:"Fraunces","Space Grotesk",serif;font-weight:500;
+    font-size:clamp(2.6rem,6.4vw,4.9rem);line-height:1.03;letter-spacing:-0.015em;margin:0 0 20px;max-width:16ch}
+  .hero h1 em{font-style:italic;color:var(--gold)}
+  .hero .lead{font-size:clamp(1.05rem,1.7vw,1.24rem);color:var(--text-2);max-width:50ch;margin:0 0 30px}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .btn-ghost{display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:0 22px;border-radius:var(--pill);
+    border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:"Space Grotesk",sans-serif;
+    font-weight:500;cursor:pointer;transition:background var(--t) var(--ease),border-color var(--t) var(--ease),transform var(--t) var(--ease)}
+  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(230,192,122,.4)}
+  .btn-ghost:active{transform:scale(.98)}
+  .hero-actions .cta{display:inline-flex;min-height:48px}
+
+  /* Trust-Zeile (Markennamen NUR als Text) */
+  .trust{margin-top:34px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+  .trust .label{font-family:"Space Grotesk",sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+  .trust .brands{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--text-2);font-size:.9rem;letter-spacing:.04em}
+  .trust .brands span{white-space:nowrap}
+
+  /* Ring-Buehne (interaktiv) */
+  .stage-wrap{display:grid;place-items:center}
+  .ring-stage{position:relative;width:min(82vw,30rem);aspect-ratio:1/1;perspective:1100px}
+  .ring-halo{position:absolute;inset:6%;border-radius:50%;z-index:0;filter:blur(28px);
+    background:radial-gradient(circle at 50% 42%, rgba(230,192,122,0.36), rgba(160,28,52,0.18) 55%, transparent 72%)}
+  .ring-tilt{position:absolute;inset:0;display:grid;place-items:center;transform-style:preserve-3d;
+    transition:transform .18s var(--ease);will-change:transform;z-index:1}
+  .ring-img{width:82%;height:82%;object-fit:contain;transform:translateZ(42px);
+    filter:drop-shadow(0 28px 34px rgba(0,0,0,0.6))}
+  .glint{position:absolute;inset:8%;border-radius:50%;mix-blend-mode:screen;pointer-events:none;transform:translateZ(64px);
+    background:radial-gradient(7rem 7rem at var(--gx,42%) var(--gy,34%), rgba(245,228,180,0.6), transparent 64%);
+    transition:background .12s linear}
+  .sparkle{position:absolute;inset:0;transform:translateZ(80px);pointer-events:none}
+  .floor{position:absolute;left:50%;bottom:3%;width:60%;height:7%;transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(0,0,0,.55), transparent);filter:blur(7px)}
+
+  /* CSS-Platzhalter-Ring, falls assets/ring.png fehlt */
+  .ring-ph{width:72%;height:72%;transform:translateZ(42px);position:relative;display:grid;place-items:center}
+  .ring-ph .band{position:absolute;bottom:6%;width:62%;aspect-ratio:1/1;border-radius:50%;border:15px solid transparent;
+    background:linear-gradient(var(--bg2),var(--bg2)) padding-box,
+      conic-gradient(from 210deg,var(--gold-deep),var(--gold),var(--gold-2),var(--gold-deep)) border-box}
+  .ring-ph .stone{position:absolute;top:1%;width:33%;aspect-ratio:1/1;
+    background:conic-gradient(from 90deg,#fff,#cfd6df,#ffffff,#bcc6d4,#ffffff);
+    clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%);
+    box-shadow:0 0 22px rgba(220,230,245,.6)}
+  .ring-ph .note{position:absolute;bottom:-1.8rem;left:0;right:0;text-align:center;font-size:.7rem;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--text-2)}
+
+  /* ============ NAECHSTE SEKTION (Teaser, Kontext) ============ */
+  .section{padding:clamp(56px,8vw,92px) 0}
+  .section-head{max-width:60ch;margin-bottom:40px}
+  .section-head h2{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(1.9rem,4vw,2.9rem);
+    letter-spacing:-0.01em;margin:0 0 12px}
+  .section-head h2 em{font-style:italic;color:var(--gold)}
+  .section-head p{color:var(--text-2);margin:0;font-size:1.06rem}
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+  .card{position:relative;border-radius:var(--r-2xl);border:1px solid var(--line);background:var(--panel);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:26px;overflow:hidden;min-height:200px;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    transition:transform var(--t) var(--ease),border-color var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+  .card:hover{transform:translateY(-4px);border-color:rgba(230,192,122,.35);box-shadow:var(--shadow-soft)}
+  .card .icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin-bottom:auto;
+    background:rgba(230,192,122,.12);border:1px solid var(--line);color:var(--gold)}
+  .card .icon svg{width:22px;height:22px}
+  .card h3{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:1.2rem;margin:16px 0 6px}
+  .card p{color:var(--text-2);margin:0;font-size:.94rem}
+  .card.col-3{grid-column:span 3}.card.col-2{grid-column:span 2}
+  @media (max-width:760px){ .bento{grid-template-columns:repeat(2,1fr)} .card.col-3,.card.col-2{grid-column:span 2} }
+
+  footer{border-top:1px solid var(--line);padding:46px 0 56px;margin-top:30px}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:center}
+  footer .copy{color:var(--text-2);font-size:.86rem}
+
+  /* ============ COMMAND PALETTE ============ */
+  .cmd-overlay{position:fixed;inset:0;z-index:150;display:none;padding:14vh 20px 20px;
+    background:rgba(10,4,6,0.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    opacity:0;transition:opacity var(--t) var(--ease)}
+  .cmd-overlay.open{display:block;opacity:1}
+  .cmd-palette{width:100%;max-width:600px;margin:0 auto;border-radius:var(--r-2xl);border:1px solid var(--line);
+    background:rgba(36,13,19,0.88);-webkit-backdrop-filter:blur(26px) saturate(150%);backdrop-filter:blur(26px) saturate(150%);
+    box-shadow:var(--shadow-glow);overflow:hidden;transform:translateY(12px) scale(.985);opacity:0;
+    transition:transform var(--t) var(--ease),opacity var(--t) var(--ease)}
+  .cmd-overlay.open .cmd-palette{transform:none;opacity:1}
+  .cmd-search{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
+  .cmd-search svg{width:22px;height:22px;color:var(--gold);flex:0 0 auto}
+  .cmd-search input{flex:1 1 auto;background:transparent;border:none;color:var(--text);font-family:"Inter",sans-serif;
+    font-size:1.08rem;padding:6px 0;min-height:44px}
+  .cmd-search input::placeholder{color:var(--text-2)} .cmd-search input:focus{outline:none}
+  .cmd-search .esc{flex:0 0 auto;padding:5px 10px;border-radius:var(--pill);border:1px solid var(--line);
+    background:rgba(255,255,255,.05);font-family:"Space Grotesk",sans-serif;font-size:.72rem;font-weight:600;color:var(--text-2)}
+  .cmd-section-label{padding:14px 20px 6px;font-family:"Space Grotesk",sans-serif;font-size:.72rem;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+  .cmd-list{list-style:none;margin:0;padding:0 10px 12px}
+  .cmd-item{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;padding:11px 13px;border-radius:var(--r-xl);
+    border:none;background:transparent;color:var(--text);font-family:"Inter",sans-serif;font-size:1rem;text-align:left;
+    cursor:pointer;transition:background 120ms var(--ease)}
+  .cmd-item .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(230,192,122,.1);border:1px solid var(--line);color:var(--gold);flex:0 0 auto}
+  .cmd-item .ic svg{width:20px;height:20px}
+  .cmd-item .txt{display:flex;flex-direction:column} .cmd-item .txt .t{font-weight:500}
+  .cmd-item .txt .d{color:var(--text-2);font-size:.84rem}
+  .cmd-item .go{margin-left:auto;color:var(--text-2);opacity:0;transition:opacity 120ms var(--ease)}
+  .cmd-item:hover,.cmd-item.active{background:rgba(255,255,255,.07)}
+  .cmd-item.active{box-shadow:inset 0 0 0 1px rgba(230,192,122,.4)}
+  .cmd-item:hover .go,.cmd-item.active .go{opacity:1}
+  .cmd-empty{padding:26px 20px 30px;color:var(--text-2);text-align:center;display:none}
+  .cmd-empty.show{display:block}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+    .ring-tilt{transition:none !important}
+  }
+
+  /* 3D-Canvas */
+  .ring-gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;touch-action:pan-y;cursor:grab}
+  .ring-gl:active{cursor:grabbing}
+  .ring-stage .floor{z-index:0}
+  .ring-loader{position:absolute;inset:0;display:grid;place-items:center;z-index:2;pointer-events:none;transition:opacity .5s var(--ease)}
+  .ring-loader.done{opacity:0}
+  .ring-loader span{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--gold);
+    animation:ringspin .8s linear infinite}
+  @keyframes ringspin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){ .ring-loader span{animation:none} }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<!-- ============ NAVBAR ============ -->
+<header class="site-header">
+  <div class="wrap">
+    <nav class="commandbar" aria-label="Hauptnavigation">
+      <a class="wordmark" href="#top" aria-label="MAISON AURÉLIE Startseite">
+        <span class="mark" aria-hidden="true">A</span>
+        <span>MAISON AURÉLIE <span class="sub">Düsseldorf</span></span>
+      </a>
+
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="#trauringe">Trauringe</a></li>
+          <li><a href="#uhren">Uhren</a></li>
+          <li><a href="#schmuck">Schmuck</a></li>
+          <li><a href="#atelier">Atelier</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-right">
+        <button class="cmd-trigger" id="cmdTrigger" type="button"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="cmdPalette"
+                aria-keyshortcuts="Control+K Meta+K" aria-label="Suche und Schnellziele oeffnen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <span class="hint">Suchen oder springen</span>
+          <span class="kbd" id="kbdHint" aria-hidden="true">Strg K</span>
+        </button>
+
+        <a class="cta" href="#termin">Termin buchen</a>
+
+        <button class="menu-btn" id="menuBtn" type="button"
+                aria-expanded="false" aria-controls="mobileNav" aria-label="Menue oeffnen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav" hidden>
+      <ul>
+        <li><a href="#trauringe">Trauringe</a></li>
+        <li><a href="#uhren">Uhren</a></li>
+        <li><a href="#schmuck">Schmuck</a></li>
+        <li><a href="#atelier">Atelier</a></li>
+      </ul>
+      <a class="cta" href="#termin">Termin buchen</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <span id="top"></span>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow"><span class="dot" aria-hidden="true"></span> Offizieller Konzessionär · seit 1968</span>
+          <h1 id="hero-title">Ein Versprechen, in <em>Gold</em> gefasst.</h1>
+          <p class="lead">
+            Trauringe und Verlobungsringe aus unserem Meisteratelier in Düsseldorf, feine Uhren und
+            Schmuck von Rang. Lassen Sie sich zu zweit beraten, in Ruhe und ohne Eile.
+          </p>
+          <div class="hero-actions">
+            <a class="cta" href="#termin">Termin buchen</a>
+            <button class="btn-ghost" type="button" id="heroSearchBtn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+              </svg>
+              Kollektion entdecken
+            </button>
+          </div>
+
+          <!-- COMPLIANCE: Markennamen nur nominativ als Text. Offizielle Konzessionaer-Module in PROD. -->
+          <div class="trust" aria-label="Markenwelt">
+            <span class="label">Manufakturen</span>
+            <div class="brands">
+              <span>Rolex</span><span>Patek Philippe</span><span>Audemars Piguet</span>
+              <span>Vacheron Constantin</span><span>A. Lange &amp; Söhne</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-wrap">
+          <div class="ring-stage" id="stage">
+            <div class="ring-halo" aria-hidden="true"></div>
+            <canvas id="gl" class="ring-gl" role="img" aria-label="Interaktives 3D-Modell des Verlobungsrings mit Brillant. Ziehen zum Drehen."></canvas>
+            <img class="ring-img" id="ringFallback" src="assets/ring-hero.png" alt="Verlobungsring in Gelbgold mit Brillant" />
+            <div class="ring-loader" id="ringLoader" aria-hidden="true"><span></span></div>
+            <div class="floor" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NAECHSTE SEKTION (Teaser) ============ -->
+  <section class="section" id="schmuck">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Vier Welten, <em>ein Haus</em>.</h2>
+        <p>Von der Verlobung bis zur Vitrine. Die Bereiche von Maison Aurélie auf einen Blick.</p>
+      </div>
+      <div class="bento">
+        <article class="card col-3" id="trauringe">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="6"></circle><path d="M9 6 12 2l3 4"></path></svg></span>
+          <h3>Trauringe nach Maß</h3>
+          <p>Gemeinsam entworfen, von Hand gefertigt in unserer Werkstatt am Rhein.</p>
+        </article>
+        <article class="card col-3" id="uhren">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+          <h3>Feine Uhren</h3>
+          <p>Eine kuratierte Auswahl mechanischer Zeitmesser, betreut von unseren Uhrmachern.</p>
+        </article>
+        <article class="card col-2" id="atelier">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13"></path></svg></span>
+          <h3>Das Atelier</h3>
+          <p>Reparatur, Politur und Anpassung von erfahrenen Goldschmieden.</p>
+        </article>
+        <article class="card col-2">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 9l8 12 8-12z"></path></svg></span>
+          <h3>Diamanten</h3>
+          <p>Zertifiziert und verantwortungsvoll bezogen.</p>
+        </article>
+        <article class="card col-2" id="termin">
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg></span>
+          <h3>Privater Termin</h3>
+          <p>Persönliche Beratung bei einem Glas Champagner.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <a class="wordmark" href="#top" aria-label="MAISON AURÉLIE Startseite">
+      <span class="mark" aria-hidden="true">A</span><span>MAISON AURÉLIE</span>
+    </a>
+    <span class="copy">Königsallee, Düsseldorf · 2025 Maison Aurélie</span>
+  </div>
+</footer>
+
+<!-- ============ COMMAND PALETTE ============ -->
+<div class="cmd-overlay" id="cmdOverlay">
+  <div class="cmd-palette" id="cmdPalette" role="dialog" aria-modal="true" aria-labelledby="cmdLabel">
+    <h2 id="cmdLabel" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Suche und Schnellziele</h2>
+    <div class="cmd-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="text" id="cmdInput" placeholder="Suchen Sie nach Trauringen, Uhren, Schmuck ..."
+             aria-label="Suche und Befehle" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="cmdList" aria-activedescendant="" />
+      <span class="esc" aria-hidden="true">ESC</span>
+    </div>
+    <p class="cmd-section-label">Schnellziele</p>
+    <ul class="cmd-list" id="cmdList" role="listbox" aria-label="Schnellziele">
+      <li role="option" id="opt-0"><button class="cmd-item" type="button" data-href="#trauringe" tabindex="-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="6"></circle><path d="M9 6 12 2l3 4"></path></svg></span><span class="txt"><span class="t">Trauringe</span><span class="d">Ringe nach Maß im Atelier</span></span><span class="go" aria-hidden="true">&#8594;</span></button></li>
+      <li role="option" id="opt-1"><button class="cmd-item" type="button" data-href="#uhren" tabindex="-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span><span class="txt"><span class="t">Uhren</span><span class="d">Feine mechanische Zeitmesser</span></span><span class="go" aria-hidden="true">&#8594;</span></button></li>
+      <li role="option" id="opt-2"><button class="cmd-item" type="button" data-href="#schmuck" tabindex="-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 9l8 12 8-12z"></path></svg></span><span class="txt"><span class="t">Schmuck</span><span class="d">Kollektionen und Einzelstuecke</span></span><span class="go" aria-hidden="true">&#8594;</span></button></li>
+      <li role="option" id="opt-3"><button class="cmd-item" type="button" data-href="#termin" tabindex="-1"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg></span><span class="txt"><span class="t">Termin</span><span class="d">Private Beratung buchen</span></span><span class="go" aria-hidden="true">&#8594;</span></button></li>
+    </ul>
+    <p class="cmd-empty" id="cmdEmpty">Keine Treffer. Versuchen Sie es mit einem anderen Begriff.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var coarse = window.matchMedia("(pointer: coarse)").matches;
+
+  /* ---------- Shortcut-Hinweis je Plattform ---------- */
+  var isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  var kbdHint = document.getElementById("kbdHint");
+  if (isMac && kbdHint) kbdHint.textContent = "⌘ K";
+
+  /* ====================================================
+     COMMAND PALETTE
+     ==================================================== */
+  var overlay=document.getElementById("cmdOverlay"), palette=document.getElementById("cmdPalette"),
+      trigger=document.getElementById("cmdTrigger"), input=document.getElementById("cmdInput"),
+      list=document.getElementById("cmdList"), emptyMsg=document.getElementById("cmdEmpty"),
+      heroBtn=document.getElementById("heroSearchBtn"), lastFocused=null, activeIndex=-1;
+  function items(){return Array.prototype.slice.call(list.querySelectorAll(".cmd-item")).filter(function(b){return b.parentElement.style.display!=="none";});}
+  function lockScroll(){document.body.dataset.scrollY=window.scrollY;document.body.style.top="-"+window.scrollY+"px";document.body.style.position="fixed";document.body.style.width="100%";}
+  function unlockScroll(){var y=document.body.dataset.scrollY||"0";document.body.style.position="";document.body.style.top="";document.body.style.width="";window.scrollTo(0,parseInt(y,10));}
+  function openPalette(){if(overlay.classList.contains("open"))return;lastFocused=document.activeElement;overlay.classList.add("open");trigger.setAttribute("aria-expanded","true");lockScroll();input.value="";filterList("");setActive(0);requestAnimationFrame(function(){input.focus();});document.addEventListener("keydown",onKeydown,true);}
+  function closePalette(){if(!overlay.classList.contains("open"))return;overlay.classList.remove("open");trigger.setAttribute("aria-expanded","false");document.removeEventListener("keydown",onKeydown,true);unlockScroll();(lastFocused&&lastFocused.focus?lastFocused:trigger).focus();}
+  function setActive(idx){var its=items();if(!its.length){activeIndex=-1;input.setAttribute("aria-activedescendant","");return;}if(idx<0)idx=its.length-1;if(idx>=its.length)idx=0;activeIndex=idx;its.forEach(function(b,i){var li=b.parentElement;if(i===idx){b.classList.add("active");li.setAttribute("aria-selected","true");input.setAttribute("aria-activedescendant",li.id);b.scrollIntoView({block:"nearest"});}else{b.classList.remove("active");li.removeAttribute("aria-selected");}});}
+  function activate(b){if(!b)return;var href=b.getAttribute("data-href");closePalette();if(href){var t=document.querySelector(href);if(t)t.scrollIntoView({behavior:"smooth",block:"start"});history.replaceState(null,"",href);}}
+  function filterList(q){q=q.trim().toLowerCase();var any=false;Array.prototype.forEach.call(list.querySelectorAll(".cmd-item"),function(b){var show=q===""||b.textContent.toLowerCase().indexOf(q)!==-1;b.parentElement.style.display=show?"":"none";if(show)any=true;});emptyMsg.classList.toggle("show",!any);setActive(0);}
+  function onKeydown(e){if(e.key==="Escape"){e.preventDefault();closePalette();return;}if(e.key==="ArrowDown"){e.preventDefault();setActive(activeIndex+1);return;}if(e.key==="ArrowUp"){e.preventDefault();setActive(activeIndex-1);return;}if(e.key==="Enter"){e.preventDefault();var its=items();if(activeIndex>=0&&its[activeIndex])activate(its[activeIndex]);return;}if(e.key==="Tab"){var f=palette.querySelectorAll('input, button:not([tabindex="-1"])');f=Array.prototype.filter.call(f,function(el){return el.offsetParent!==null||el===input;});if(!f.length){e.preventDefault();return;}var first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}
+  document.addEventListener("keydown",function(e){var key=(e.key||"").toLowerCase();if((e.metaKey||e.ctrlKey)&&key==="k"){e.preventDefault();overlay.classList.contains("open")?closePalette():openPalette();return;}if(key==="/"&&!overlay.classList.contains("open")){var t=e.target,typing=t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.isContentEditable);if(!typing){e.preventDefault();openPalette();}}});
+  trigger.addEventListener("click",openPalette);
+  if(heroBtn)heroBtn.addEventListener("click",openPalette);
+  input.addEventListener("input",function(){filterList(input.value);});
+  overlay.addEventListener("mousedown",function(e){if(e.target===overlay)closePalette();});
+  list.addEventListener("click",function(e){var b=e.target.closest(".cmd-item");if(b)activate(b);});
+  list.addEventListener("mousemove",function(e){var b=e.target.closest(".cmd-item");if(!b)return;var i=items().indexOf(b);if(i!==-1&&i!==activeIndex)setActive(i);});
+
+  /* ====================================================
+     MOBILE MENU
+     ==================================================== */
+  var menuBtn=document.getElementById("menuBtn"), mobileNav=document.getElementById("mobileNav");
+  function setMenu(open){menuBtn.setAttribute("aria-expanded",String(open));menuBtn.setAttribute("aria-label",open?"Menue schliessen":"Menue oeffnen");mobileNav.hidden=!open;}
+  menuBtn.addEventListener("click",function(){setMenu(mobileNav.hidden);});
+  mobileNav.addEventListener("click",function(e){if(e.target.closest("a"))setMenu(false);});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!mobileNav.hidden){setMenu(false);menuBtn.focus();}});
+  var mq=window.matchMedia("(min-width: 1025px)");
+  (mq.addEventListener?mq.addEventListener.bind(mq,"change"):mq.addListener.bind(mq))(function(ev){if(ev.matches&&!mobileNav.hidden)setMenu(false);});
+
+  /* ====================================================
+     MAGNETIC CTA
+     ==================================================== */
+  if(!reduce&&!coarse){
+    document.querySelectorAll(".cta").forEach(function(btn){
+      btn.addEventListener("pointermove",function(e){var r=btn.getBoundingClientRect();var dx=Math.max(-6,Math.min(6,(e.clientX-(r.left+r.width/2))*0.3));var dy=Math.max(-6,Math.min(6,(e.clientY-(r.top+r.height/2))*0.3));btn.style.transform="translate("+dx+"px,"+dy+"px)";});
+      btn.addEventListener("pointerleave",function(){btn.style.transform="";});
+    });
+  }
+
+})();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "./assets/three/three.module.js",
+  "three/addons/": "./assets/three/addons/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const stage = document.getElementById('stage');
+const canvas = document.getElementById('gl');
+const fallback = document.getElementById('ringFallback');
+const loaderEl = document.getElementById('ringLoader');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarse = matchMedia('(pointer: coarse)').matches;
+
+function show2D(){ try{ canvas.style.display='none'; }catch(e){} if(loaderEl) loaderEl.style.display='none'; if(fallback) fallback.hidden=false; }
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'high-performance' }); }
+catch(e){ show2D(); }
+
+if (renderer){
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+  camera.position.set(0, 0.5, 3.6);
+
+  const key = new THREE.DirectionalLight(0xfff1d6, 1.3); key.position.set(2.5,3,2); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xE6C07A, 0.7); rim.position.set(-3,1.5,-2); scene.add(rim);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.enableZoom = false; controls.enablePan = false;
+  controls.autoRotate = !reduce; controls.autoRotateSpeed = 1.5;
+  controls.minPolarAngle = Math.PI*0.30; controls.maxPolarAngle = Math.PI*0.64;
+  if (coarse) controls.enabled = false; // kein Touch-Drag (Scroll-Footgun); autoRotate laeuft via update()
+
+  const loader = new GLTFLoader();
+  loader.load('assets/jewelery_ring_diamonds.glb', (gltf)=>{
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    model.scale.setScalar(2.2 / maxDim);
+    scene.add(model);
+    controls.target.set(0,0,0);
+    controls.update();
+    if (loaderEl) loaderEl.classList.add('done');
+    if (fallback) fallback.hidden = true;   // 3D ist da: 2D-Fallback ausblenden
+    resize();
+  }, (ev)=>{ /* Fortschritt */ }, (err)=>{ console.error('GLB load error', err); show2D(); });
+
+  function resize(){
+    const w = stage.clientWidth || stage.offsetWidth, h = stage.clientHeight || stage.offsetHeight;
+    if(!w||!h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize); resize();
+
+  const DPR = Math.min(window.devicePixelRatio||1, 2);
+  function fit(){
+    const w = canvas.clientWidth || stage.clientWidth, h = canvas.clientHeight || stage.clientHeight;
+    if(!w||!h) return;
+    if(canvas.width !== Math.round(w*DPR) || canvas.height !== Math.round(h*DPR)){
+      renderer.setSize(w, h, false);
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+    }
+  }
+
+  let raf=0, run=true;
+  function loop(){ if(!run) return; fit(); controls.update(); renderer.render(scene, camera); raf=requestAnimationFrame(loop); }
+  const io = new IntersectionObserver((es)=>{ es.forEach(e=>{ run = e.isIntersecting && !document.hidden;
+    if(run && !raf) raf=requestAnimationFrame(loop); else if(!run){ cancelAnimationFrame(raf); raf=0; } }); });
+  io.observe(stage);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ run=false; cancelAnimationFrame(raf); raf=0; }
+    else { run=true; if(!raf) raf=requestAnimationFrame(loop); } });
+  raf=requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
