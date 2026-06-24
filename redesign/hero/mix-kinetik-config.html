@@ -175,7 +175,7 @@
   <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
 </div>
-<div class="main"><section class="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-accent="#E6C079" aria-pressed="true" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-accent="#CFD8E2" aria-pressed="false" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-accent="#E7B79F" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-accent="#CFE5EE" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><script>
+<div class="main"><section class="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck, der <span class="scr" id="scr">bleibt</span>.</h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><script>
 (function(){
   var sidebar=document.getElementById("sidebar"),scrim=document.getElementById("scrim"),flyout=document.getElementById("flyout"),
       panelTitle=document.getElementById("panelTitle"),previewImg=document.getElementById("previewImg"),
@@ -258,6 +258,9 @@ try{
     scene.add(pivot);
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
       ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
+    // Standard-Metall (Weißgold) direkt anwenden
+    const pressed=document.querySelector('#sw button[aria-pressed="true"]');
+    if(pressed){ const tint=new THREE.Color(pressed.dataset.tint); metals.forEach(m=>{ if(m.color)m.color.copy(tint); }); }
     if(loadnote)loadnote.classList.add('hide');
     if(fallback)fallback.style.display='none';
   },(xhr)=>{ if(loadnote && xhr.total){ loadnote.textContent='Ring wird geladen … '+Math.round(xhr.loaded/xhr.total*100)+'%'; } },
@@ -267,7 +270,6 @@ try{
   document.querySelectorAll('#sw button').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('#sw button').forEach(x=>x.setAttribute('aria-pressed','false'));
     b.setAttribute('aria-pressed','true');
-    if(b.dataset.accent)document.documentElement.style.setProperty('--accent',b.dataset.accent);
     const tint=new THREE.Color(b.dataset.tint);
     metals.forEach(m=>{ if(m.color)m.color.copy(tint); });
   }));

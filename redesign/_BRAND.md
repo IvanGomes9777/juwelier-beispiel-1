@@ -39,9 +39,17 @@
 ## Bilder
 Vorerst Unsplash-Platzhalter (themenpassend, URLs auf HTTP 200 geprüft). Später echte Produktfotos.
 
+## Getroffene Entscheidungen
+- **Navbar:** Sidebar-Mix (Option 6 + 5 + 8) — `redesign/navbars/mix-sidebar-mega.html`
+  (vertikale Sidebar, Mega-Flyout, Hover-Bildvorschau).
+- **Hero:** `redesign/hero/mixkinetikconfig.html` (Quelle: mix-kinetik-config.html) —
+  kinetische Headline + echter 3D-Ring in der Card (drehbar, OrbitControls), Reveal-Intro.
+  Farbwelt/Design von Option 02 "Configurateur" (hell/weiss, webgi-Minimal).
+  Metall-Standard: **Weißgold**. Modell: `redesign/hero/assets/jewelery_ring_diamonds.glb`.
+
 ## Aufbau (Section-by-Section, je 5 Varianten zur Auswahl)
-1. Navbar ✓ (`redesign/navbars/`) — Empfehlung: Cinématique × Maison
-2. Hero (`redesign/hero/`)
+1. Navbar ✓ — Sidebar-Mix (6+5+8)
+2. Hero ✓ — kinetik + 3D-Ring (Weißgold), 02-Design
 3. Kollektionen / Vitrine
 4. Trauringe / Konfigurator
 5. Atelier / Manufaktur
