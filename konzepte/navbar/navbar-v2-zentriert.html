@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  ============================================================================
+  MAISON AURELIE  -  Navbar-Konzept v2 "Zentrierte Wordmark, symmetrisch"
+  ----------------------------------------------------------------------------
+  Premium-Juwelier, Duesseldorf. Design-Richtung: Bordeaux & Gold.
+  Standalone, offline lauffaehige HTML-Demo (eine Datei).
+
+  Konzept:
+  - Wordmark MAISON AURELIE mittig, gross, editorial (Bodoni Moda).
+  - Links zwei Nav-Links (Trauringe, Uhren), rechts zwei (Schmuck, Manufaktur),
+    symmetrisch ausbalanciert um die Wordmark.
+  - Termin-Button ganz rechts; bei knappem Platz unter der Wordmark.
+  - Sticky Header mit Hairline-Border, duenne Oberlinie in Gold.
+
+  Responsiv:
+  - Unter ~900px loest sich die Symmetrie auf: Wordmark links/mittig,
+    Links wandern in ein zugaengliches Mobile-Menue (Hamburger).
+  - aria-expanded / aria-controls, ESC schliesst, Schliessen-Button,
+    sichtbarer Fokus, Touch-Ziele >= 44px.
+
+  Barrierefreiheit:
+  - Skip-Link, semantisches <header><nav aria-label>, :focus-visible,
+    Kontrast >= 4.5:1, prefers-reduced-motion respektiert.
+
+  PROD: next/font lokal statt Google-Fonts-<link> einbinden.
+  Hinweis: Keine em-dashes in sichtbarer Copy.
+  ============================================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON AURELIE  -  Navbar v2, zentrierte Wordmark</title>
+
+<!-- PROD: next/font lokal -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #21090E;
+    --panel: #2E1118;
+    --text: #F4E7DD;
+    --text-2: #C49AA0;
+    --gold: #CBA15A;
+    --gold-light: #E6C783;
+    --gold-deep: #93702F;
+    --hairline: rgba(255, 210, 180, 0.14);
+
+    --font-display: "Bodoni Moda", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+    --maxw: 1280px;
+    --header-h: 92px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Skip-Link ---------- */
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -100px;
+    z-index: 1000;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--gold);
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus { top: 16px; }
+
+  /* ---------- Fokus sichtbar ---------- */
+  :focus-visible {
+    outline: 2px solid var(--gold-light);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* ============================================================
+     HEADER / NAVBAR
+     ============================================================ */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  /* duenne Oberlinie in Gold */
+  .site-header::before {
+    content: "";
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent,
+      var(--gold-deep) 18%,
+      var(--gold) 50%,
+      var(--gold-deep) 82%,
+      transparent);
+    opacity: 0.85;
+  }
+
+  .nav {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    min-height: var(--header-h);
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    column-gap: 28px;
+  }
+
+  /* ----- Nav-Link-Gruppen (Desktop) ----- */
+  .nav-group {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+  .nav-group--left { justify-self: start; }
+  .nav-group--right { justify-self: end; }
+
+  .nav-link {
+    position: relative;
+    font-size: 0.82rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    padding: 10px 2px;
+    transition: color 0.25s ease;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible { color: var(--text); }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after { transform: scaleX(1); }
+
+  /* ----- Wordmark (zentriert) ----- */
+  .wordmark {
+    justify-self: center;
+    text-align: center;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    padding: 6px 0;
+  }
+  .wordmark__name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.2vw + 0.6rem, 2.35rem);
+    letter-spacing: 0.14em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .wordmark__accent { color: var(--gold-light); }
+  .wordmark__tag {
+    margin-top: 7px;
+    font-size: 0.6rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+
+  /* ----- Termin-Button ----- */
+  .nav-cta-wrap { display: flex; justify-content: flex-end; }
+  .btn-termin {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 11px 22px;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    border: 1px solid var(--gold-deep);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+  }
+  .btn-termin:hover,
+  .btn-termin:focus-visible {
+    filter: brightness(1.06);
+    box-shadow: 0 6px 22px rgba(203, 161, 90, 0.28);
+    transform: translateY(-1px);
+  }
+
+  /* ----- Hamburger (mobil) ----- */
+  .nav-toggle {
+    display: none;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text);
+    justify-self: end;
+  }
+  .nav-toggle__bars,
+  .nav-toggle__bars::before,
+  .nav-toggle__bars::after {
+    content: "";
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--text);
+    transition: transform 0.25s ease;
+  }
+  .nav-toggle__bars { position: relative; }
+  .nav-toggle__bars::before { position: absolute; top: -7px; left: 0; }
+  .nav-toggle__bars::after  { position: absolute; top: 7px; left: 0; }
+
+  /* ----- Mobile-Menue Panel ----- */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--panel);
+    transform: translateY(-100%);
+    visibility: hidden;
+    transition: transform 0.35s ease, visibility 0s linear 0.35s;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-menu[data-open="true"] {
+    transform: translateY(0);
+    visibility: visible;
+    transition: transform 0.35s ease, visibility 0s linear 0s;
+  }
+  .mobile-menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .mobile-menu__brand {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.14em;
+    color: var(--text);
+  }
+  .mobile-menu__brand span { color: var(--gold-light); }
+  .menu-close {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .mobile-menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 14px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-menu__link {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .mobile-menu__link:hover,
+  .mobile-menu__link:focus-visible { color: var(--gold-light); }
+  .mobile-menu__cta {
+    margin: 22px 28px 32px;
+  }
+  .mobile-menu__cta .btn-termin {
+    width: 100%;
+    justify-content: center;
+    min-height: 52px;
+    font-size: 0.85rem;
+  }
+
+  /* ============================================================
+     RESPONSIV  -  Symmetrie unter ~900px aufloesen
+     ============================================================ */
+  @media (max-width: 900px) {
+    :root { --header-h: 72px; }
+    .nav {
+      grid-template-columns: 1fr auto;
+      padding: 0 20px;
+      column-gap: 16px;
+    }
+    .nav-group { display: none; }
+    .nav-cta-wrap { display: none; }
+    .wordmark { justify-self: start; text-align: left; align-items: flex-start; }
+    .wordmark__tag { letter-spacing: 0.3em; }
+    .nav-toggle { display: inline-flex; }
+  }
+
+  @media (max-width: 420px) {
+    .wordmark__name { letter-spacing: 0.08em; }
+  }
+
+  /* ============================================================
+     HERO + FUELL-SEKTIONEN (Kontext fuer Sticky/Scroll-Test)
+     ============================================================ */
+  main { display: block; }
+
+  .hero {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(80px, 12vw, 160px) 32px clamp(60px, 9vw, 120px);
+    text-align: center;
+  }
+  .hero__eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 22px;
+  }
+  .hero__headline {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 1.08;
+    letter-spacing: 0.01em;
+    margin: 0 auto 26px;
+    max-width: 14ch;
+    color: var(--text);
+  }
+  .hero__headline em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .hero__lede {
+    max-width: 56ch;
+    margin: 0 auto 38px;
+    font-size: 1.06rem;
+    color: var(--text-2);
+  }
+  .hero__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 15px 34px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    border: 1px solid var(--gold-deep);
+    border-radius: 2px;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+  }
+  .hero__cta:hover,
+  .hero__cta:focus-visible {
+    filter: brightness(1.06);
+    box-shadow: 0 8px 30px rgba(203, 161, 90, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .section {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(70px, 10vw, 130px) 32px;
+    border-top: 1px solid var(--hairline);
+  }
+  .section__kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 18px;
+  }
+  .section__title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    margin: 0 0 22px;
+    color: var(--text);
+    max-width: 20ch;
+  }
+  .section__text {
+    max-width: 60ch;
+    color: var(--text-2);
+    font-size: 1.02rem;
+  }
+
+  /* aspect-ratio-Platzhalter */
+  .media-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+  }
+  .placeholder {
+    /* aspect-ratio-Platzhalter (Bild folgt in PROD) */
+    aspect-ratio: 4 / 5;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(203,161,90,0.12), transparent 60%),
+      var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+  .placeholder--wide { aspect-ratio: 16 / 9; }
+
+  .site-footer {
+    border-top: 1px solid var(--hairline);
+    padding: 48px 32px;
+    text-align: center;
+    color: var(--text-2);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* ============================================================
+     prefers-reduced-motion
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header">
+  <nav class="nav" aria-label="Hauptnavigation">
+
+    <!-- Linke Nav-Gruppe -->
+    <div class="nav-group nav-group--left">
+      <a class="nav-link" href="#trauringe">Trauringe</a>
+      <a class="nav-link" href="#uhren">Uhren</a>
+    </div>
+
+    <!-- Zentrierte Wordmark -->
+    <a class="wordmark" href="#top" aria-label="MAISON AURELIE, Startseite">
+      <span class="wordmark__name">MAISON <span class="wordmark__accent">AURELIE</span></span>
+      <span class="wordmark__tag">Duesseldorf seit 1924</span>
+    </a>
+
+    <!-- Rechte Nav-Gruppe + CTA -->
+    <div class="nav-group nav-group--right">
+      <a class="nav-link" href="#schmuck">Schmuck</a>
+      <a class="nav-link" href="#manufaktur">Manufaktur</a>
+      <div class="nav-cta-wrap">
+        <a class="btn-termin" href="#termin">Termin</a>
+      </div>
+    </div>
+
+    <!-- Hamburger (nur mobil sichtbar) -->
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-label="Menue oeffnen"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+  </nav>
+</header>
+
+<!-- Mobile-Menue -->
+<div class="mobile-menu" id="mobile-menu" data-open="false" aria-hidden="true">
+  <div class="mobile-menu__top">
+    <span class="mobile-menu__brand">MAISON <span>AURELIE</span></span>
+    <button class="menu-close" type="button" aria-label="Menue schliessen">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <nav aria-label="Mobile Navigation">
+    <ul class="mobile-menu__list">
+      <li><a class="mobile-menu__link" href="#trauringe">Trauringe</a></li>
+      <li><a class="mobile-menu__link" href="#uhren">Uhren</a></li>
+      <li><a class="mobile-menu__link" href="#schmuck">Schmuck</a></li>
+      <li><a class="mobile-menu__link" href="#manufaktur">Manufaktur</a></li>
+    </ul>
+  </nav>
+  <div class="mobile-menu__cta">
+    <a class="btn-termin" href="#termin">Termin vereinbaren</a>
+  </div>
+</div>
+
+<main id="main">
+  <section class="hero" id="top">
+    <p class="hero__eyebrow">Haute Joaillerie</p>
+    <h1 class="hero__headline">Schmuck, der eine <em>Geschichte</em> traegt</h1>
+    <p class="hero__lede">
+      Seit 1924 fertigt MAISON AURELIE in Duesseldorf Trauringe, Schmuck und
+      Uhren von bleibendem Wert. Jedes Stueck entsteht in unserer hauseigenen
+      Manufaktur, von Hand und mit Sinn fuer das Detail.
+    </p>
+    <a class="hero__cta" href="#termin">Beratungstermin anfragen</a>
+  </section>
+
+  <section class="section" id="trauringe">
+    <p class="section__kicker">Trauringe</p>
+    <h2 class="section__title">Zwei Ringe, eine Linie, ein Versprechen</h2>
+    <p class="section__text">
+      Wir begleiten Sie von der ersten Skizze bis zum fertigen Paar. In ruhiger
+      Atmosphaere waehlen Sie Material, Profil und Oberflaeche aus und sehen Ihre
+      Ringe Schritt fuer Schritt entstehen. Auf Wunsch mit Gravur und einer
+      Auswahl ethisch gewonnener Diamanten.
+    </p>
+    <div class="media-grid">
+      <div class="placeholder">Bild 4:5</div>
+      <div class="placeholder">Bild 4:5</div>
+      <div class="placeholder">Bild 4:5</div>
+    </div>
+  </section>
+
+  <section class="section" id="manufaktur">
+    <p class="section__kicker">Manufaktur</p>
+    <h2 class="section__title">Handwerk, das man fuehlt</h2>
+    <p class="section__text">
+      In unserem Atelier verbinden sich traditionelle Goldschmiedekunst und
+      praezise moderne Technik. Hier werden Fassungen gesetzt, Oberflaechen
+      poliert und Unikate geschaffen, die ein Leben lang halten und weiter
+      vererbt werden koennen.
+    </p>
+    <div class="media-grid">
+      <div class="placeholder placeholder--wide">Bild 16:9</div>
+      <div class="placeholder placeholder--wide">Bild 16:9</div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  MAISON AURELIE, Koenigsallee, Duesseldorf. Nach Vereinbarung geoeffnet.
+</footer>
+
+<script>
+  (function () {
+    var toggle = document.querySelector(".nav-toggle");
+    var menu = document.getElementById("mobile-menu");
+    var closeBtn = menu.querySelector(".menu-close");
+    var menuLinks = menu.querySelectorAll("a");
+    var lastFocused = null;
+
+    function openMenu() {
+      lastFocused = document.activeElement;
+      menu.setAttribute("data-open", "true");
+      menu.setAttribute("aria-hidden", "false");
+      toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", "Menue schliessen");
+      document.body.style.overflow = "hidden";
+      closeBtn.focus();
+      document.addEventListener("keydown", onKeydown);
+    }
+
+    function closeMenu() {
+      menu.setAttribute("data-open", "false");
+      menu.setAttribute("aria-hidden", "true");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Menue oeffnen");
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKeydown);
+      if (lastFocused && typeof lastFocused.focus === "function") {
+        lastFocused.focus();
+      }
+    }
+
+    function onKeydown(e) {
+      if (e.key === "Escape" || e.key === "Esc") {
+        closeMenu();
+        return;
+      }
+      // simple focus trap
+      if (e.key === "Tab") {
+        var focusables = menu.querySelectorAll(
+          'a[href], button, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+        var first = focusables[0];
+        var last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    toggle.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", closeMenu);
+    menuLinks.forEach(function (link) {
+      link.addEventListener("click", closeMenu);
+    });
+  })();
+</script>
+
+</body>
+</html>

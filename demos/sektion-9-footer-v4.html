@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 9 — Footer · v4 "Kontakt & Anfahrt"
+  TRAGENDE IDEE: Der Footer als Wegweiser in die Boutique. Mini-Kontaktblock, Anfahrt-Link
+                 (DSGVO-konform ohne Auto-Karte), kurze Oeffnungszeiten und die Pflicht-
+                 Rechtslinks. Servicehaltung statt Werbung.
+  TECHNIK: CSS-Grid auto-fit, dl/dt/dd fuer Oeffnungszeiten, Anfahrt nur als Consent-Link
+           (kein eingebettetes Maps-iframe), Touch-Ziele >=44px, Fokus sichtbar, NAP
+           konsistent, prefers-reduced-motion respektiert.
+  PRODUKTIONSPFAD: PROD -> next/font lokal statt Google-Fonts-<link>. Rechtstext-Links nach
+           rechtstexte-website-compliance.md verdrahten. Karte als Consent-Gate / statische
+           Karte einbinden, kein direktes Google-Maps-iframe ohne Consent.
+-->
+<title>MAISON AURÉLIE · Footer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+footer{
+  padding:clamp(3rem,8vw,6rem) clamp(1.25rem,5vw,4rem) clamp(1.5rem,4vw,2.5rem);
+}
+.shell{max-width:1500px;margin:0 auto}
+.wordmark{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.5rem,3.4vw,2.1rem);
+  letter-spacing:0.08em;
+  color:var(--offwhite);
+}
+.wordmark span{color:var(--gold)}
+.grid{
+  margin-top:clamp(2.5rem,6vw,3.5rem);
+  display:grid;
+  gap:clamp(2rem,4vw,3rem);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));
+}
+.block h3{
+  font-size:clamp(0.72rem,1.6vw,0.8rem);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:600;
+  margin-bottom:1rem;
+}
+address{font-style:normal;color:var(--muted)}
+address .line{font-size:clamp(0.94rem,2vw,1.02rem);color:var(--offwhite);line-height:1.55;padding:3px 0}
+address a{color:var(--offwhite);text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+address a:hover{color:var(--gold-bright)}
+.maplink{
+  margin-top:0.75rem;
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  min-height:44px;
+  color:var(--gold-bright);
+  text-decoration:none;
+  font-size:clamp(0.9rem,1.9vw,1rem);
+  border-bottom:1px solid color-mix(in oklch,var(--gold-bright),transparent 60%);
+  padding-bottom:2px;
+}
+.maplink:hover{color:var(--gold)}
+.maplink svg{width:1.1em;height:1.1em;flex:0 0 auto}
+.maphint{margin-top:0.5rem;color:var(--muted);font-size:clamp(0.78rem,1.5vw,0.84rem);max-width:36ch}
+dl.hours{display:grid;grid-template-columns:auto 1fr;gap:0.4rem 1.5rem;font-size:clamp(0.92rem,2vw,1rem)}
+dl.hours dt{color:var(--muted)}
+dl.hours dd{color:var(--offwhite);font-variant-numeric:tabular-nums;text-align:right}
+.note{margin-top:0.9rem;color:var(--muted);font-size:clamp(0.8rem,1.6vw,0.86rem)}
+.legal{
+  border-top:1px solid var(--hairline);
+  margin-top:clamp(2.5rem,6vw,3.5rem);
+  padding-top:clamp(1.5rem,4vw,2rem);
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.25rem 1.5rem;
+  align-items:center;
+  justify-content:space-between;
+}
+.legal nav ul{list-style:none;display:flex;flex-wrap:wrap;gap:0.25rem 1.25rem}
+.legal nav a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:clamp(0.82rem,1.7vw,0.9rem);
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+}
+.legal nav a:hover{color:var(--offwhite)}
+.copy{color:var(--muted);font-size:clamp(0.8rem,1.6vw,0.88rem)}
+a:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<footer aria-labelledby="ft-heading">
+  <div class="shell">
+    <h2 id="ft-heading" class="wordmark">MAISON <span>AURÉLIE</span></h2>
+
+    <div class="grid">
+      <div class="block">
+        <h3>Boutique</h3>
+        <address>
+          <div class="line">MAISON AURÉLIE</div>
+          <div class="line">Königsallee 1</div>
+          <div class="line">40212 Düsseldorf</div>
+          <a href="tel:+492110000000">+49 211 000000</a><br>
+          <a href="mailto:kontakt@maison-aurelie.example">kontakt@maison-aurelie.example</a>
+        </address>
+      </div>
+
+      <div class="block">
+        <h3>Anfahrt</h3>
+        <!-- COMPLIANCE: DSGVO — kein direktes Google-Maps-iframe ohne Consent. Link statt Auto-Karte. -->
+        <a class="maplink" href="#karte" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/>
+            <circle cx="12" cy="10" r="2.5"/>
+          </svg>
+          Route &amp; Karte anzeigen
+        </a>
+        <p class="maphint">Die Karte wird erst nach Ihrer Zustimmung geladen, um Ihre Daten zu schützen.</p>
+      </div>
+
+      <div class="block">
+        <h3>Öffnungszeiten</h3>
+        <dl class="hours">
+          <dt>Mo – Fr</dt><dd>10:00 – 19:00</dd>
+          <dt>Samstag</dt><dd>10:00 – 18:00</dd>
+          <dt>Sonntag</dt><dd>geschlossen</dd>
+        </dl>
+        <p class="note">Beratung gern auch nach Terminvereinbarung.</p>
+      </div>
+    </div>
+
+    <div class="legal">
+      <!-- PROD: Rechtstexte nach rechtstexte-website-compliance.md -->
+      <nav aria-label="Rechtliche Hinweise">
+        <ul>
+          <li><a href="#impressum">Impressum</a></li>
+          <li><a href="#datenschutz">Datenschutz</a></li>
+          <li><a href="#agb">AGB</a></li>
+          <li><a href="#widerruf">Widerruf</a></li>
+          <li><a href="#cookies">Cookie-Einstellungen</a></li>
+        </ul>
+      </nav>
+      <p class="copy">© 2026 MAISON AURÉLIE, Düsseldorf</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

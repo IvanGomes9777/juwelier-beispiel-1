@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 7 — Bewertungen / Trust · v2 "Animierte Stat-Counter + Zitat-Grid"
+  TRAGENDE IDEE: Wenige, ehrliche Kennzahlen (Jahre, begleitete Paare, Meister) zaehlen
+                 beim Scrollen ruhig hoch und verankern Erfahrung in Zahlen. Darunter ein
+                 schlichtes Zitat-Grid gibt den Zahlen ein menschliches Gesicht.
+  TECHNIK: IntersectionObserver startet Counter (requestAnimationFrame, ease-out) einmalig.
+           Zahlen mit aria-label fuer Endwert, tabular-nums. prefers-reduced-motion:
+           Counter degradiert zu statischem Endwert (kein Hochzaehlen). CSS-Grid auto-fit.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Kennzahlen serverseitig aus belegbarer Quelle
+           (CMS/Erhebung) rendern, damit ohne JS der korrekte Wert sofort sichtbar ist.
+-->
+<title>MAISON AURÉLIE · Zahlen, die Vertrauen tragen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden;
+}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem);max-width:100%}
+.shell{max-width:1280px;margin:0 auto}
+.intro{text-align:center;max-width:60ch;margin:0 auto clamp(2.5rem,6vw,4rem)}
+.kicker{font-size:clamp(0.72rem,1.6vw,0.82rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.08;color:var(--offwhite)}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+
+/* Stat-Reihe */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));
+  gap:clamp(1rem,3vw,2rem);
+  border-block:1px solid var(--hairline);
+  padding-block:clamp(2.25rem,5vw,3.25rem);
+}
+.stat{text-align:center;position:relative;padding-inline:1rem}
+.stat:not(:last-child)::after{
+  content:"";position:absolute;inset-block:10% ;inset-inline-end:0;
+  inline-size:1px;background:var(--hairline);
+}
+.stat .value{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(2.8rem,8vw,4.5rem);
+  line-height:1;
+  color:var(--gold-bright);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.01em;
+}
+.stat .suffix{color:var(--gold-deep)}
+.stat .label{margin-top:0.6rem;font-size:clamp(0.85rem,1.9vw,0.98rem);color:var(--platinum);font-weight:600}
+.stat .sub{margin-top:0.2rem;font-size:clamp(0.78rem,1.6vw,0.85rem);color:var(--muted)}
+
+/* Zitat-Grid */
+.quotes{
+  margin-top:clamp(2.5rem,6vw,4rem);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));
+  gap:clamp(1rem,2.5vw,1.5rem);
+}
+figure.q{
+  background:var(--ink);
+  border:1px solid var(--hairline);
+  border-radius:4px;
+  padding:clamp(1.5rem,3.5vw,2rem);
+  display:flex;flex-direction:column;
+}
+figure.q blockquote{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(1.1rem,2.6vw,1.35rem);
+  line-height:1.45;color:var(--offwhite);flex:1;
+}
+figure.q figcaption{margin-top:1.25rem;display:flex;align-items:center;gap:0.75rem}
+.av{
+  inline-size:2.4rem;block-size:2.4rem;flex:0 0 auto;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--gold-deep),var(--ink));
+  border:1px solid var(--hairline);
+  font-family:"Cormorant Garamond",Georgia,serif;color:var(--offwhite);
+}
+.nm{font-size:0.95rem;color:var(--platinum);font-weight:600}
+.ct{font-size:0.82rem;color:var(--muted)}
+.foot{margin-top:clamp(1.75rem,4vw,2.5rem);text-align:center;color:var(--muted);font-size:clamp(0.8rem,1.7vw,0.88rem)}
+
+@media (max-width:520px){
+  .stat:not(:last-child)::after{display:none}
+  .stat:not(:last-child){border-bottom:1px solid var(--hairline);padding-bottom:1.5rem}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s7-title">
+  <div class="shell">
+    <div class="intro">
+      <p class="kicker">Maison Aurélie in Düsseldorf</p>
+      <h2 id="s7-title">Erfahrung lässt sich nachrechnen</h2>
+      <p class="lede">
+        Drei Zahlen, hinter denen Menschen stehen. Und Stimmen, die ihnen ein Gesicht geben.
+      </p>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat">
+        <div class="value"><span class="num" data-to="57" aria-hidden="true">57</span></div>
+        <p class="label" aria-label="Seit 57 Jahren">Jahre am Königsallee-Viertel</p>
+        <p class="sub">gegründet 1968, in Familienhand</p>
+      </div>
+      <div class="stat">
+        <div class="value"><span class="num" data-to="4200" data-format="thousand" aria-hidden="true">4.200</span><span class="suffix">+</span></div>
+        <p class="label" aria-label="Über 4.200 Paare">begleitete Paare</p>
+        <p class="sub">Trauringe und besondere Anlässe</p>
+      </div>
+      <div class="stat">
+        <div class="value"><span class="num" data-to="3" aria-hidden="true">3</span></div>
+        <p class="label" aria-label="3 Goldschmiedemeister">Goldschmiedemeister</p>
+        <p class="sub">in der eigenen Werkstatt</p>
+      </div>
+    </div>
+
+    <div class="quotes">
+      <figure class="q">
+        <blockquote>Hier zählt der Mensch vor dem Verkauf. Wir haben uns von der ersten Minute an gut aufgehoben gefühlt.</blockquote>
+        <figcaption><span class="av" aria-hidden="true">C</span>
+          <span><span class="nm">Carla&nbsp;M.</span><br><span class="ct">Trauringe, 2024</span></span>
+        </figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote>Eine Reparatur, die andere abgelehnt haben, wurde hier in der Werkstatt sauber gelöst. Ehrliche Arbeit.</blockquote>
+        <figcaption><span class="av" aria-hidden="true">D</span>
+          <span><span class="nm">Dr.&nbsp;Walter&nbsp;H.</span><br><span class="ct">Schmuckreparatur, 2025</span></span>
+        </figcaption>
+      </figure>
+      <figure class="q">
+        <blockquote>Beratung ohne Druck, klare Preise, ein offenes Wort zur Wertentwicklung. Genau so wünscht man es sich.</blockquote>
+        <figcaption><span class="av" aria-hidden="true">I</span>
+          <span><span class="nm">Ingrid&nbsp;S.</span><br><span class="ct">Uhrenkauf, 2023</span></span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- COMPLIANCE: Kennzahlen nur mit belegbarer Erhebung ausweisen, keine Schaetzwerte als Fakt. -->
+    <p class="foot">Kennzahlen aus eigener Erhebung, Stand 2025. Zitate sinngemäß, Namen auf Wunsch gekürzt.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nums = document.querySelectorAll('.num');
+
+  function fmt(n, format){
+    n = Math.round(n);
+    if(format==='thousand') return n.toLocaleString('de-DE');
+    return String(n);
+  }
+  function animate(el){
+    var to = parseFloat(el.getAttribute('data-to'));
+    var format = el.getAttribute('data-format');
+    if(reduce){ el.textContent = fmt(to, format); return; }
+    var dur = 1600, start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts-start)/dur, 1);
+      var eased = 1 - Math.pow(1-p, 3);
+      el.textContent = fmt(to*eased, format);
+      if(p<1) requestAnimationFrame(step);
+      else el.textContent = fmt(to, format);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if(reduce || !('IntersectionObserver' in window)){
+    nums.forEach(function(el){ animate(el); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ animate(e.target); io.unobserve(e.target); }
+    });
+  }, {threshold:0.4});
+  nums.forEach(function(el){ el.textContent='0'; io.observe(el); });
+})();
+</script>
+</body>
+</html>

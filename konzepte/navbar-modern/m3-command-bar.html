@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  ============================================================================
+  MAISON AURELIE  -  Duesseldorf
+  Konzept: "Bordeaux & Gold"  |  Moderne Ausfuehrung 2025
+  Navbar-Konzept M3: "Command Bar"
+  ----------------------------------------------------------------------------
+  Schlanke moderne Leiste: Wordmark links, Links mittig, rechts ein
+  Command-Palette-Trigger (Pill mit Lupe + Tastenkuerzel Strg K / Cmd K).
+  Klick oder Tastenkuerzel oeffnet ein zugaengliches Glas-Modal
+  (role="dialog", aria-modal) mit Suche und Schnellzielen, voll
+  tastaturnavigierbar inkl. Fokus-Trap, ESC, Fokus-Rueckgabe, Scroll-Sperre.
+
+  Standalone, offline lauffaehig. Keine externen Skripte ausser Google Fonts.
+  PROD: next/font lokal statt Google-Fonts-<link> verwenden.
+  ============================================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maison Aurelie  -  Feine Juwelierkunst aus Duesseldorf</title>
+
+<!-- PROD: next/font lokal. Hier Google-Fonts-<link> fuer Offline-Demo-Bequemlichkeit. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #1A0A0E;
+    --bg2: #240D13;
+    --panel: rgba(255, 255, 255, 0.05);
+    --text: #F6ECE6;
+    --text-2: #C9A7AD;
+    --gold: #E6C07A;
+    --gold-2: #C99A4E;
+    --line: rgba(255, 220, 190, 0.12);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --t: 200ms;
+    --radius-2xl: 28px;
+    --radius-xl: 20px;
+    --radius-pill: 999px;
+    --shadow-soft: 0 18px 50px -18px rgba(0, 0, 0, 0.65);
+    --shadow-glow: 0 0 0 1px var(--line), 0 24px 70px -24px rgba(0, 0, 0, 0.8);
+    --maxw: 1200px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 700px at 78% -8%, rgba(230, 192, 122, 0.10), transparent 60%),
+      radial-gradient(900px 600px at 8% 6%, rgba(201, 154, 78, 0.08), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection { background: rgba(230, 192, 122, 0.28); color: #fff; }
+
+  /* ---------- Skip link ---------- */
+  .skip-link {
+    position: fixed;
+    left: 16px;
+    top: -120px;
+    z-index: 200;
+    background: var(--gold);
+    color: #2a0f14;
+    padding: 12px 18px;
+    border-radius: var(--radius-pill);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    transition: top var(--t) var(--ease);
+  }
+  .skip-link:focus { top: 16px; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* ---------- Layout helpers ---------- */
+  .wrap {
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ============================================================
+     COMMAND BAR / HEADER
+     ============================================================ */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    padding: 14px 0;
+  }
+
+  .commandbar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 12px 10px 18px;
+    border-radius: var(--radius-pill);
+    background: rgba(26, 10, 14, 0.55);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Wordmark */
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 1.12rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    white-space: nowrap;
+    padding: 6px 6px;
+    border-radius: 14px;
+    flex: 0 0 auto;
+  }
+  .wordmark .mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--gold), var(--gold-2));
+    color: #2a0f14;
+    font-weight: 700;
+    box-shadow: 0 6px 18px -6px rgba(230, 192, 122, 0.5);
+    transition: transform var(--t) var(--ease);
+  }
+  .wordmark:hover .mark { transform: rotate(-6deg) scale(1.06); }
+  .wordmark .sub { color: var(--text-2); font-weight: 400; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+
+  /* Center nav */
+  .nav-center {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .nav-links a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: var(--radius-pill);
+    color: var(--text-2);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color var(--t) var(--ease), background var(--t) var(--ease);
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 16px; right: 16px; bottom: 9px;
+    height: 1.5px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t) var(--ease);
+  }
+  .nav-links a:hover, .nav-links a:focus-visible { color: var(--text); background: rgba(255,255,255,0.04); }
+  .nav-links a:hover::after, .nav-links a:focus-visible::after { transform: scaleX(1); }
+
+  /* Right cluster */
+  .nav-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Command-palette trigger */
+  .cmd-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 8px 0 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-2);
+    font-family: "Inter", sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color var(--t) var(--ease), background var(--t) var(--ease), transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
+  }
+  .cmd-trigger:hover {
+    border-color: rgba(230, 192, 122, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    box-shadow: 0 10px 30px -14px rgba(230, 192, 122, 0.4);
+  }
+  .cmd-trigger svg { width: 18px; height: 18px; flex: 0 0 auto; }
+  .cmd-trigger .hint { color: var(--text-2); white-space: nowrap; }
+  .cmd-trigger .kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 9px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--line);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  /* CTA (magnetic) */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(150deg, var(--gold), var(--gold-2));
+    color: #2a0f14;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 12px 30px -12px rgba(230, 192, 122, 0.55);
+    transition: transform 120ms var(--ease), box-shadow var(--t) var(--ease);
+    will-change: transform;
+  }
+  .cta:hover { box-shadow: 0 16px 40px -12px rgba(230, 192, 122, 0.7); }
+  .cta:active { transform: scale(0.97); }
+
+  /* Mobile menu button */
+  .menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    cursor: pointer;
+    transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
+  }
+  .menu-btn:hover { background: rgba(255,255,255,0.07); }
+  .menu-btn svg { width: 22px; height: 22px; }
+
+  /* Mobile nav panel */
+  .mobile-nav {
+    display: none;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: var(--radius-2xl);
+    background: rgba(26, 10, 14, 0.85);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+  .mobile-nav[hidden] { display: none; }
+  .mobile-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .mobile-nav a {
+    display: flex; align-items: center;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: var(--radius-xl);
+    color: var(--text);
+    font-size: 1rem;
+    transition: background var(--t) var(--ease);
+  }
+  .mobile-nav a:hover, .mobile-nav a:focus-visible { background: rgba(255,255,255,0.06); }
+  .mobile-nav .cta { width: 100%; margin-top: 8px; }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  main { display: block; }
+
+  .hero {
+    position: relative;
+    padding: 110px 0 90px;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    inset: -10% 0 auto 0;
+    height: 620px;
+    background:
+      radial-gradient(620px 360px at 70% 30%, rgba(230, 192, 122, 0.18), transparent 60%),
+      radial-gradient(520px 320px at 20% 10%, rgba(150, 30, 50, 0.22), transparent 60%);
+    filter: blur(8px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--gold);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 26px;
+  }
+  .hero-eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+
+  .hero h1 {
+    font-family: "Fraunces", "Space Grotesk", serif;
+    font-weight: 500;
+    font-size: clamp(2.6rem, 7vw, 5.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0 0 22px;
+    max-width: 14ch;
+  }
+  .hero h1 .accent {
+    font-style: italic;
+    background: linear-gradient(120deg, var(--gold), var(--gold-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.lead {
+    font-size: clamp(1.05rem, 2vw, 1.28rem);
+    color: var(--text-2);
+    max-width: 54ch;
+    margin: 0 0 36px;
+  }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 9px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--t) var(--ease), border-color var(--t) var(--ease), transform var(--t) var(--ease);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(230,192,122,0.4); }
+  .btn-ghost:active { transform: scale(0.98); }
+
+  /* Media placeholder */
+  .hero-media {
+    position: relative;
+    margin-top: 64px;
+    height: clamp(280px, 42vw, 520px);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(700px 400px at 30% 20%, rgba(230,192,122,0.16), transparent 60%),
+      linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: var(--shadow-glow);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .hero-media .ph-badge {
+    position: absolute; top: 16px; left: 16px;
+    padding: 7px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(0,0,0,0.4);
+    border: 1px dashed rgba(230,192,122,0.5);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .hero-media .ph-label { color: var(--text-2); font-family: "Space Grotesk", sans-serif; letter-spacing: 0.06em; }
+
+  /* ============================================================
+     BENTO SECTION
+     ============================================================ */
+  .section { padding: 90px 0; position: relative; }
+  .section-head { margin-bottom: 44px; max-width: 60ch; }
+  .section-head h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+  }
+  .section-head p { color: var(--text-2); margin: 0; font-size: 1.08rem; }
+
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 18px;
+  }
+  .card {
+    position: relative;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--line);
+    background: var(--panel);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    padding: 28px;
+    overflow: hidden;
+    transition: transform var(--t) var(--ease), border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(360px 200px at 80% 0%, rgba(230,192,122,0.14), transparent 60%);
+    opacity: 0;
+    transition: opacity var(--t) var(--ease);
+    pointer-events: none;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(230,192,122,0.35); box-shadow: var(--shadow-soft); }
+  .card:hover::before { opacity: 1; }
+  .card .icon {
+    width: 46px; height: 46px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    background: rgba(230,192,122,0.12);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    margin-bottom: auto;
+  }
+  .card .icon svg { width: 22px; height: 22px; }
+  .card h3 { font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 1.25rem; margin: 18px 0 8px; }
+  .card p { color: var(--text-2); margin: 0; font-size: 0.96rem; }
+
+  .card.col-3 { grid-column: span 3; }
+  .card.col-2 { grid-column: span 2; }
+  .card.col-4 { grid-column: span 4; }
+  .card.feature { min-height: 320px; }
+  .card.feature h3 { font-size: 1.6rem; }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 50px 0 60px;
+    margin-top: 40px;
+  }
+  .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: center; }
+  footer .wordmark { font-size: 1rem; }
+  footer .copy { color: var(--text-2); font-size: 0.88rem; }
+
+  /* ============================================================
+     COMMAND PALETTE (DIALOG)
+     ============================================================ */
+  .cmd-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: none;
+    padding: 14vh 20px 20px;
+    background: rgba(10, 4, 6, 0.62);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity var(--t) var(--ease);
+  }
+  .cmd-overlay.open { display: block; opacity: 1; }
+
+  .cmd-palette {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--line);
+    background: rgba(36, 13, 19, 0.86);
+    -webkit-backdrop-filter: blur(26px) saturate(150%);
+    backdrop-filter: blur(26px) saturate(150%);
+    box-shadow: var(--shadow-glow);
+    overflow: hidden;
+    transform: translateY(12px) scale(0.985);
+    opacity: 0;
+    transition: transform var(--t) var(--ease), opacity var(--t) var(--ease);
+  }
+  .cmd-overlay.open .cmd-palette { transform: translateY(0) scale(1); opacity: 1; }
+
+  .cmd-search {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cmd-search svg { width: 22px; height: 22px; color: var(--gold); flex: 0 0 auto; }
+  .cmd-search input {
+    flex: 1 1 auto;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    font-size: 1.1rem;
+    padding: 6px 0;
+    min-height: 44px;
+  }
+  .cmd-search input::placeholder { color: var(--text-2); }
+  .cmd-search input:focus { outline: none; }
+  .cmd-search .esc {
+    flex: 0 0 auto;
+    padding: 5px 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.05);
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  .cmd-section-label {
+    padding: 16px 22px 8px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-2);
+  }
+  .cmd-list { list-style: none; margin: 0; padding: 0 12px 14px; }
+  .cmd-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 56px;
+    padding: 12px 14px;
+    border-radius: var(--radius-xl);
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 120ms var(--ease);
+  }
+  .cmd-item .ic {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    background: rgba(230,192,122,0.1);
+    border: 1px solid var(--line);
+    color: var(--gold);
+    flex: 0 0 auto;
+  }
+  .cmd-item .ic svg { width: 20px; height: 20px; }
+  .cmd-item .txt { display: flex; flex-direction: column; }
+  .cmd-item .txt .t { font-weight: 500; }
+  .cmd-item .txt .d { color: var(--text-2); font-size: 0.84rem; }
+  .cmd-item .go { margin-left: auto; color: var(--text-2); opacity: 0; transition: opacity 120ms var(--ease); }
+  .cmd-item:hover, .cmd-item.active {
+    background: rgba(255,255,255,0.07);
+  }
+  .cmd-item.active { box-shadow: inset 0 0 0 1px rgba(230,192,122,0.4); }
+  .cmd-item:hover .go, .cmd-item.active .go { opacity: 1; }
+  .cmd-empty { padding: 28px 22px 32px; color: var(--text-2); text-align: center; display: none; }
+  .cmd-empty.show { display: block; }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 860px) {
+    .nav-center { display: none; }
+    .cmd-trigger .hint { display: none; }
+    .cta { display: none; }
+    .menu-btn { display: inline-flex; }
+    .cmd-trigger { padding: 0 14px; }
+  }
+
+  @media (max-width: 760px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .card.col-3, .card.col-2, .card.col-4 { grid-column: span 2; }
+  }
+
+  @media (max-width: 520px) {
+    .wrap { padding: 0 16px; }
+    .wordmark .sub { display: none; }
+    .cmd-trigger .kbd { display: none; }
+    .hero { padding: 70px 0 60px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <nav class="commandbar" aria-label="Hauptnavigation">
+      <a class="wordmark" href="#" aria-label="Maison Aurelie Startseite">
+        <span class="mark" aria-hidden="true">A</span>
+        <span>MAISON AURELIE <span class="sub">Duesseldorf</span></span>
+      </a>
+
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="#trauringe">Trauringe</a></li>
+          <li><a href="#uhren">Uhren</a></li>
+          <li><a href="#schmuck">Schmuck</a></li>
+          <li><a href="#atelier">Atelier</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-right">
+        <button class="cmd-trigger" id="cmdTrigger" type="button"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="cmdPalette"
+                aria-keyshortcuts="Control+K Meta+K">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <span class="hint">Suchen oder springen</span>
+          <span class="kbd" id="kbdHint" aria-hidden="true">Strg K</span>
+        </button>
+
+        <a class="cta" href="#termin">Termin buchen</a>
+
+        <button class="menu-btn" id="menuBtn" type="button"
+                aria-expanded="false" aria-controls="mobileNav" aria-label="Menue oeffnen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav" hidden>
+      <ul>
+        <li><a href="#trauringe">Trauringe</a></li>
+        <li><a href="#uhren">Uhren</a></li>
+        <li><a href="#schmuck">Schmuck</a></li>
+        <li><a href="#atelier">Atelier</a></li>
+      </ul>
+      <a class="cta" href="#termin">Termin buchen</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="hero-eyebrow"><span class="dot" aria-hidden="true"></span> Feine Juwelierkunst seit 1932</span>
+      <h1>Glanz, der eine <span class="accent">Geschichte</span> erzaehlt.</h1>
+      <p class="lead">
+        Im Herzen von Duesseldorf fertigen wir Trauringe, kuratieren feine Uhren und
+        gestalten Schmuck, der ein Leben lang getragen wird. Handwerk trifft auf
+        zeitlose Eleganz in Bordeaux und Gold.
+      </p>
+      <div class="hero-actions">
+        <a class="cta" href="#termin" style="display:inline-flex;">Termin im Atelier</a>
+        <button class="btn-ghost" type="button" id="heroSearchBtn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+          </svg>
+          Kollektion durchsuchen
+        </button>
+      </div>
+
+      <div class="hero-media" role="img" aria-label="Platzhalter fuer Atelier-Aufnahme">
+        <span class="ph-badge">Platzhalter</span>
+        <span class="ph-label">Medien-Platzhalter  -  Atelieraufnahme 16:9</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENTO -->
+  <section class="section" id="schmuck">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Vier Welten, ein Haus.</h2>
+        <p>Von der Verlobung bis zur Vitrine: entdecken Sie die Bereiche von Maison Aurelie.</p>
+      </div>
+
+      <div class="bento">
+        <article class="card feature col-3">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="6"></circle><path d="M9 6 12 2l3 4"></path></svg>
+          </span>
+          <h3>Trauringe nach Mass</h3>
+          <p>Gemeinsam entworfen, von Hand gefertigt. Ihre Ringe entstehen in unserer Werkstatt am Rhein.</p>
+        </article>
+
+        <article class="card col-3" id="uhren">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+          </span>
+          <h3>Feine Uhren</h3>
+          <p>Eine kuratierte Auswahl mechanischer Zeitmesser, betreut von unseren Uhrmachern.</p>
+        </article>
+
+        <article class="card col-2" id="trauringe">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 9l8 12 8-12z"></path></svg>
+          </span>
+          <h3>Diamanten</h3>
+          <p>Zertifiziert und verantwortungsvoll bezogen.</p>
+        </article>
+
+        <article class="card col-2" id="atelier">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13"></path></svg>
+          </span>
+          <h3>Das Atelier</h3>
+          <p>Reparatur, Politur und Anpassung von erfahrenen Goldschmieden.</p>
+        </article>
+
+        <article class="card col-2" id="termin">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg>
+          </span>
+          <h3>Privater Termin</h3>
+          <p>Persoenliche Beratung bei einem Glas Champagner.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- spacer section for scroll testing -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Ein Haus mit Haltung.</h2>
+        <p>
+          Seit drei Generationen verbinden wir Duesseldorfer Eleganz mit ehrlichem
+          Handwerk. Jedes Stueck, das unser Atelier verlaesst, traegt eine Geschichte
+          und ein Versprechen.
+        </p>
+      </div>
+      <div class="bento">
+        <article class="card col-4">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 15 9l7 .5-5.5 4.5L18 21l-6-3.8L6 21l1.5-7L2 9.5 9 9z"></path></svg>
+          </span>
+          <h3>Meisterwerkstatt</h3>
+          <p>Auszeichnungen der Handwerkskammer und ein Team, das sein Handwerk liebt.</p>
+        </article>
+        <article class="card col-2">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"></path></svg>
+          </span>
+          <h3>Mit Liebe</h3>
+          <p>Beratung ohne Eile, ganz nach Ihrem Tempo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <a class="wordmark" href="#" aria-label="Maison Aurelie Startseite">
+      <span class="mark" aria-hidden="true">A</span>
+      <span>MAISON AURELIE</span>
+    </a>
+    <span class="copy">Koenigsallee, Duesseldorf  -  copyright 2025 Maison Aurelie. Alle Rechte vorbehalten.</span>
+  </div>
+</footer>
+
+<!-- ============ COMMAND PALETTE DIALOG ============ -->
+<div class="cmd-overlay" id="cmdOverlay">
+  <div class="cmd-palette" id="cmdPalette" role="dialog" aria-modal="true" aria-labelledby="cmdLabel">
+    <h2 id="cmdLabel" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Befehlspalette und Suche</h2>
+    <div class="cmd-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input type="text" id="cmdInput" placeholder="Suchen Sie nach Trauringen, Uhren, Schmuck ..."
+             aria-label="Suche und Befehle" autocomplete="off" role="combobox"
+             aria-expanded="true" aria-controls="cmdList" aria-activedescendant="" />
+      <span class="esc" aria-hidden="true">ESC</span>
+    </div>
+
+    <p class="cmd-section-label" id="cmdSectionLabel">Schnellziele</p>
+    <ul class="cmd-list" id="cmdList" role="listbox" aria-label="Schnellziele">
+      <li role="option" id="opt-0">
+        <button class="cmd-item" type="button" data-href="#trauringe" tabindex="-1">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="6"></circle><path d="M9 6 12 2l3 4"></path></svg></span>
+          <span class="txt"><span class="t">Trauringe</span><span class="d">Ringe nach Mass im Atelier</span></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+      </li>
+      <li role="option" id="opt-1">
+        <button class="cmd-item" type="button" data-href="#uhren" tabindex="-1">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+          <span class="txt"><span class="t">Uhren</span><span class="d">Feine mechanische Zeitmesser</span></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+      </li>
+      <li role="option" id="opt-2">
+        <button class="cmd-item" type="button" data-href="#schmuck" tabindex="-1">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 9l8 12 8-12z"></path></svg></span>
+          <span class="txt"><span class="t">Schmuck</span><span class="d">Kollektionen und Einzelstuecke</span></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+      </li>
+      <li role="option" id="opt-3">
+        <button class="cmd-item" type="button" data-href="#termin" tabindex="-1">
+          <span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg></span>
+          <span class="txt"><span class="t">Termin</span><span class="d">Private Beratung buchen</span></span>
+          <span class="go" aria-hidden="true">&#8594;</span>
+        </button>
+      </li>
+    </ul>
+    <p class="cmd-empty" id="cmdEmpty">Keine Treffer. Versuchen Sie es mit einem anderen Begriff.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Platform-aware shortcut hint ---------- */
+  var isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform) ||
+              (navigator.userAgentData && navigator.userAgentData.platform === "macOS");
+  var kbdHint = document.getElementById("kbdHint");
+  if (isMac && kbdHint) { kbdHint.textContent = "⌘ K"; }
+
+  /* ---------- Elements ---------- */
+  var overlay   = document.getElementById("cmdOverlay");
+  var palette   = document.getElementById("cmdPalette");
+  var trigger   = document.getElementById("cmdTrigger");
+  var input     = document.getElementById("cmdInput");
+  var list      = document.getElementById("cmdList");
+  var emptyMsg  = document.getElementById("cmdEmpty");
+  var heroBtn   = document.getElementById("heroSearchBtn");
+  var lastFocused = null;
+  var activeIndex = -1;
+
+  function items() {
+    return Array.prototype.slice.call(list.querySelectorAll(".cmd-item"))
+      .filter(function (b) { return b.parentElement.style.display !== "none"; });
+  }
+
+  /* ---------- Body scroll lock ---------- */
+  function lockScroll() {
+    document.body.style.top = "-" + window.scrollY + "px";
+    document.body.dataset.scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+  }
+  function unlockScroll() {
+    var y = document.body.dataset.scrollY || "0";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, parseInt(y, 10));
+  }
+
+  /* ---------- Open / close ---------- */
+  function openPalette() {
+    if (overlay.classList.contains("open")) return;
+    lastFocused = document.activeElement;
+    overlay.classList.add("open");
+    trigger.setAttribute("aria-expanded", "true");
+    lockScroll();
+    input.value = "";
+    filterList("");
+    setActive(0);
+    requestAnimationFrame(function () { input.focus(); });
+    document.addEventListener("keydown", onKeydown, true);
+  }
+
+  function closePalette() {
+    if (!overlay.classList.contains("open")) return;
+    overlay.classList.remove("open");
+    trigger.setAttribute("aria-expanded", "false");
+    document.removeEventListener("keydown", onKeydown, true);
+    unlockScroll();
+    if (lastFocused && typeof lastFocused.focus === "function") {
+      lastFocused.focus();
+    } else {
+      trigger.focus();
+    }
+  }
+
+  /* ---------- Active option (visual + aria) ---------- */
+  function setActive(idx) {
+    var its = items();
+    if (its.length === 0) { activeIndex = -1; input.setAttribute("aria-activedescendant", ""); return; }
+    if (idx < 0) idx = its.length - 1;
+    if (idx >= its.length) idx = 0;
+    activeIndex = idx;
+    its.forEach(function (b, i) {
+      var li = b.parentElement;
+      if (i === idx) {
+        b.classList.add("active");
+        li.setAttribute("aria-selected", "true");
+        input.setAttribute("aria-activedescendant", li.id);
+        b.scrollIntoView({ block: "nearest" });
+      } else {
+        b.classList.remove("active");
+        li.removeAttribute("aria-selected");
+      }
+    });
+  }
+
+  function activate(b) {
+    if (!b) return;
+    var href = b.getAttribute("data-href");
+    closePalette();
+    if (href) {
+      var target = document.querySelector(href);
+      if (target) { target.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      history.replaceState(null, "", href);
+    }
+  }
+
+  /* ---------- Filter ---------- */
+  function filterList(q) {
+    q = q.trim().toLowerCase();
+    var any = false;
+    Array.prototype.forEach.call(list.querySelectorAll(".cmd-item"), function (b) {
+      var text = b.textContent.toLowerCase();
+      var show = q === "" || text.indexOf(q) !== -1;
+      b.parentElement.style.display = show ? "" : "none";
+      if (show) any = true;
+    });
+    emptyMsg.classList.toggle("show", !any);
+    setActive(0);
+  }
+
+  /* ---------- Keyboard (within open dialog) ---------- */
+  function onKeydown(e) {
+    if (e.key === "Escape") { e.preventDefault(); closePalette(); return; }
+
+    if (e.key === "ArrowDown") { e.preventDefault(); setActive(activeIndex + 1); return; }
+    if (e.key === "ArrowUp")   { e.preventDefault(); setActive(activeIndex - 1); return; }
+    if (e.key === "Enter")     {
+      e.preventDefault();
+      var its = items();
+      if (activeIndex >= 0 && its[activeIndex]) activate(its[activeIndex]);
+      return;
+    }
+
+    /* Focus trap */
+    if (e.key === "Tab") {
+      var focusables = palette.querySelectorAll('input, button:not([tabindex="-1"]), [href], [tabindex]:not([tabindex="-1"])');
+      focusables = Array.prototype.filter.call(focusables, function (el) { return el.offsetParent !== null || el === input; });
+      if (focusables.length === 0) { e.preventDefault(); return; }
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }
+
+  /* ---------- Global shortcut (Ctrl/Cmd K) ---------- */
+  document.addEventListener("keydown", function (e) {
+    var key = (e.key || "").toLowerCase();
+    if ((e.metaKey || e.ctrlKey) && key === "k") {
+      e.preventDefault();
+      if (overlay.classList.contains("open")) closePalette(); else openPalette();
+      return;
+    }
+    /* Plain "/" opens, but not while typing in a field */
+    if (key === "/" && !overlay.classList.contains("open")) {
+      var t = e.target;
+      var typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+      if (!typing) { e.preventDefault(); openPalette(); }
+    }
+  });
+
+  /* ---------- Wiring ---------- */
+  trigger.addEventListener("click", openPalette);
+  if (heroBtn) heroBtn.addEventListener("click", openPalette);
+  input.addEventListener("input", function () { filterList(input.value); });
+
+  overlay.addEventListener("mousedown", function (e) {
+    if (e.target === overlay) closePalette();
+  });
+
+  list.addEventListener("click", function (e) {
+    var b = e.target.closest(".cmd-item");
+    if (b) activate(b);
+  });
+  list.addEventListener("mousemove", function (e) {
+    var b = e.target.closest(".cmd-item");
+    if (!b) return;
+    var its = items();
+    var i = its.indexOf(b);
+    if (i !== -1 && i !== activeIndex) setActive(i);
+  });
+
+  /* ---------- Mobile menu ---------- */
+  var menuBtn = document.getElementById("menuBtn");
+  var mobileNav = document.getElementById("mobileNav");
+  function setMenu(open) {
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Menue schliessen" : "Menue oeffnen");
+    mobileNav.hidden = !open;
+  }
+  menuBtn.addEventListener("click", function () {
+    setMenu(mobileNav.hidden);
+  });
+  mobileNav.addEventListener("click", function (e) {
+    if (e.target.closest("a")) setMenu(false);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !mobileNav.hidden) { setMenu(false); menuBtn.focus(); }
+  });
+  /* Close mobile menu when leaving mobile breakpoint */
+  var mq = window.matchMedia("(min-width: 861px)");
+  (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function (ev) {
+    if (ev.matches && !mobileNav.hidden) setMenu(false);
+  });
+
+  /* ---------- Magnetic CTA (<=6px), respects reduced motion ---------- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce) {
+    document.querySelectorAll(".cta").forEach(function (btn) {
+      btn.addEventListener("pointermove", function (e) {
+        if (e.pointerType === "touch") return;
+        var r = btn.getBoundingClientRect();
+        var mx = e.clientX - (r.left + r.width / 2);
+        var my = e.clientY - (r.top + r.height / 2);
+        var max = 6;
+        var dx = Math.max(-max, Math.min(max, mx * 0.3));
+        var dy = Math.max(-max, Math.min(max, my * 0.3));
+        btn.style.transform = "translate(" + dx + "px," + dy + "px)";
+      });
+      btn.addEventListener("pointerleave", function () { btn.style.transform = ""; });
+    });
+  }
+})();
+</script>
+</body>
+</html>

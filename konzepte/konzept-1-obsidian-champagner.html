@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="de">
+<!--
+  ============================================================================
+  KONZEPT 1 — "Obsidian & Champagner"
+  ----------------------------------------------------------------------------
+  Richtungsname : Obsidian & Champagner (dunkles Luxus-Minimal)
+  Stimmung/Idee : Tiefschwarze Ruhe, editoriale Serife, große Negativräume,
+                  zurückhaltende Opulenz. Champagner-Gold nur als seltener Akzent.
+  Farbwahl      : BG #0B0B0D · Panel #15151A · Text #F3EFE7 · Sek. #ADA697 ·
+                  Gold #C8A86A · Gold hell #E0C48C · Gold tief #8C6F3E ·
+                  Hairline rgba(255,255,255,.12)
+  Font-Wahl     : Display = Cormorant Garamond (500/600), Body/UI = Inter
+  Passt wann    : Marke will sich als hochwertiger, ruhiger Konzessionär
+                  positionieren; Fokus auf Trauringe/Verlobung, Vertrauen und
+                  zeitlose Eleganz statt lauter Werbung.
+  ============================================================================
+-->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MAISON AURÉLIE · Obsidian und Champagner</title>
+  <meta name="description" content="MAISON AURÉLIE in Düsseldorf: Trauringe, Uhren und Schmuck eines vertrauten Konzessionärs. Ruhige, editoriale Eleganz." />
+
+  <!-- PROD: next/font lokal. In der Demo per Google-Fonts-Link. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Farbpalette ----------------------------------------------------- */
+      --bg:            #0B0B0D; /* Hintergrund        */
+      --panel:         #15151A; /* Panel / Erhöhung   */
+      --text:          #F3EFE7; /* Text               */
+      --text-soft:     #ADA697; /* Sekundärer Text    */
+      --gold:          #C8A86A; /* Akzent Champagner  */
+      --gold-light:    #E0C48C; /* Gold hell          */
+      --gold-deep:     #8C6F3E; /* Gold tief          */
+      --hairline:      rgba(255,255,255,0.12);
+
+      /* Typografie ------------------------------------------------------ */
+      --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+      --font-body:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      /* Raster ---------------------------------------------------------- */
+      --maxw: 1280px;
+      --gutter: clamp(1.25rem, 4vw, 4rem);
+      --section-y: clamp(4rem, 9vw, 8rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.65;
+      font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    a { color: inherit; }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      font-weight: 500;
+      line-height: 1.08;
+      letter-spacing: 0.005em;
+      margin: 0;
+    }
+
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    /* Layout-Hilfen ----------------------------------------------------- */
+    .wrap {
+      width: 100%;
+      max-width: var(--maxw);
+      margin-inline: auto;
+      padding-inline: var(--gutter);
+    }
+
+    .hairline { border: 0; height: 1px; background: var(--hairline); margin: 0; }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* Fokus-States ------------------------------------------------------ */
+    :focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 0;
+      background: var(--panel);
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      z-index: 100;
+      border: 1px solid var(--hairline);
+    }
+    .skip-link:focus { left: 0.75rem; top: 0.75rem; }
+
+    /* ===================== NAV ======================================== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11,11,13,0.86);
+      border-bottom: 1px solid var(--hairline);
+    }
+    @supports (backdrop-filter: blur(8px)) {
+      .nav { backdrop-filter: blur(8px); }
+    }
+    .nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      min-height: 4.5rem;
+      padding-block: 0.5rem;
+    }
+    .wordmark {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    .nav__links {
+      display: none;
+      gap: clamp(1.25rem, 2.4vw, 2.5rem);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav__links a {
+      text-decoration: none;
+      color: var(--text-soft);
+      font-size: 0.9375rem;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      transition: color 0.25s ease;
+    }
+    .nav__links a:hover { color: var(--text); }
+    @media (min-width: 880px) {
+      .nav__links { display: flex; }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 44px;
+      padding: 0.7rem 1.4rem;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    }
+    .btn--primary {
+      background: var(--gold);
+      color: #1A1407;
+      border: 1px solid var(--gold);
+    }
+    .btn--primary:hover { background: var(--gold-light); border-color: var(--gold-light); }
+    .btn--ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--hairline);
+    }
+    .btn--ghost:hover { border-color: var(--gold); color: var(--gold-light); }
+    .btn--nav { padding: 0.6rem 1.2rem; }
+
+    /* ===================== HERO ======================================= */
+    .hero { padding-block: clamp(3.5rem, 8vw, 7.5rem) var(--section-y); }
+    .hero__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(2.5rem, 6vw, 5rem);
+      align-items: center;
+    }
+    @media (min-width: 960px) {
+      .hero__grid { grid-template-columns: 1.05fr 0.95fr; }
+    }
+    .hero__eyebrow { margin-bottom: 1.5rem; }
+    .hero__title {
+      font-size: clamp(2.75rem, 1.6rem + 6vw, 6rem);
+      font-weight: 500;
+      max-width: 16ch;
+    }
+    .hero__title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero__lede {
+      margin-top: 1.75rem;
+      max-width: 46ch;
+      color: var(--text-soft);
+      font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+      line-height: 1.7;
+    }
+    .hero__actions {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.25rem 1.75rem;
+    }
+    .ghost-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 44px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .ghost-link span.line {
+      width: 1.75rem; height: 1px; background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    .ghost-link:hover span.line { width: 2.75rem; }
+
+    /* Hero-Visual: CSS-Motiv-Platzhalter */
+    .hero__visual {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      background:
+        radial-gradient(120% 90% at 70% 15%, rgba(200,168,106,0.18), transparent 55%),
+        linear-gradient(155deg, #1A1A20 0%, #101015 60%, #0C0C10 100%);
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    /* schlanker Ring als ruhiges Schmuck-Motiv */
+    .hero__visual::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 42%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -56%);
+      border-radius: 50%;
+      border: 2px solid var(--gold-deep);
+      box-shadow:
+        0 0 0 1px rgba(224,196,140,0.18) inset,
+        0 18px 60px rgba(0,0,0,0.55);
+      background:
+        conic-gradient(from 210deg, var(--gold-deep), var(--gold-light) 40%, var(--gold) 60%, var(--gold-deep));
+      -webkit-mask: radial-gradient(transparent 60%, #000 61%);
+              mask: radial-gradient(transparent 60%, #000 61%);
+    }
+    .hero__visual::after {
+      content: "";
+      position: absolute;
+      top: 34%; left: 56%;
+      width: 9%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) rotate(45deg);
+      background: linear-gradient(135deg, var(--gold-light), #fff 50%, var(--gold));
+      box-shadow: 0 0 24px rgba(224,196,140,0.5);
+    }
+    .visual-tag {
+      position: relative;
+      z-index: 2;
+      margin: 1rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      background: rgba(11,11,13,0.55);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+    }
+
+    /* ===================== DESIGNSYSTEM-KACHEL ======================== */
+    .ds {
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 4px;
+      padding: clamp(1.75rem, 4vw, 3rem);
+    }
+    .ds__head { margin-bottom: 2.25rem; }
+    .ds__head h2 {
+      font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
+      margin-top: 0.6rem;
+    }
+    .ds__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(2rem, 5vw, 3.5rem);
+    }
+    @media (min-width: 820px) {
+      .ds__grid { grid-template-columns: 1fr 1fr; }
+    }
+    .ds__label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin: 0 0 1.1rem;
+    }
+
+    /* Swatches */
+    .swatches { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+    @media (min-width: 480px) { .swatches { grid-template-columns: repeat(4, 1fr); } }
+    .swatch {
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .swatch__chip { height: 3.25rem; }
+    .swatch__meta { padding: 0.55rem 0.6rem 0.65rem; }
+    .swatch__name { display: block; font-size: 0.8125rem; font-weight: 500; }
+    .swatch__hex {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      letter-spacing: 0.03em;
+      margin-top: 0.1rem;
+    }
+
+    /* Typo-Specimen */
+    .specimen__display {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(2.5rem, 1.8rem + 3vw, 4rem);
+      line-height: 1.04;
+      margin: 0 0 0.25rem;
+    }
+    .specimen__sub {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--gold-light);
+      font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+      margin: 0 0 1.25rem;
+    }
+    .specimen__body {
+      color: var(--text-soft);
+      max-width: 42ch;
+      margin: 0 0 1.5rem;
+    }
+    .scale { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .scale li {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .scale__size {
+      flex: 0 0 4.5rem;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      letter-spacing: 0.04em;
+    }
+    .scale__sample { font-family: var(--font-display); line-height: 1; }
+    .s-xl { font-size: 2.5rem; }
+    .s-lg { font-size: 1.75rem; }
+    .s-md { font-size: 1.25rem; }
+    .s-sm { font-size: 1rem; font-family: var(--font-body); color: var(--text-soft); }
+
+    .ds__note {
+      margin-top: 2.25rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--hairline);
+      color: var(--text-soft);
+      max-width: 70ch;
+      font-size: 0.9375rem;
+    }
+    .ds__note strong { color: var(--text); font-weight: 600; }
+
+    /* ===================== KOLLEKTIONS-CARDS ========================== */
+    .collections__head { margin-bottom: clamp(2rem, 4vw, 3rem); max-width: 52ch; }
+    .collections__head h2 {
+      font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+      margin-top: 0.7rem;
+    }
+    .collections__head p { color: var(--text-soft); margin: 1rem 0 0; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(1.5rem, 3vw, 2rem);
+    }
+    @media (min-width: 720px) {
+      .cards { grid-template-columns: repeat(3, 1fr); }
+    }
+    .card {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+    .card:hover { border-color: var(--gold); transform: translateY(-4px); }
+    .card__media {
+      aspect-ratio: 4 / 5;
+      position: relative;
+      background: linear-gradient(160deg, #1A1A20, #0E0E12);
+      overflow: hidden;
+    }
+    .card__media::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(80% 60% at 50% 35%, rgba(200,168,106,0.16), transparent 60%);
+      opacity: 0.7;
+      transition: opacity 0.4s ease;
+    }
+    .card:hover .card__media::before { opacity: 1; }
+    .card__motif {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 46%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border: 1.5px solid var(--gold-deep);
+      border-radius: 50%;
+    }
+    .card__motif--watch { border-radius: 50%; border-width: 6px; }
+    .card__motif--ring  { -webkit-mask: radial-gradient(transparent 58%, #000 59%); mask: radial-gradient(transparent 58%, #000 59%); border-width: 3px; }
+    .card__motif--gem {
+      border-radius: 0;
+      width: 30%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      background: linear-gradient(135deg, rgba(224,196,140,0.25), transparent);
+    }
+    .card__tag {
+      position: absolute; left: 0.85rem; bottom: 0.85rem;
+      font-size: 0.625rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-soft);
+      background: rgba(11,11,13,0.6);
+      border: 1px solid var(--hairline);
+      padding: 0.3rem 0.55rem; border-radius: 2px;
+    }
+    .card__body { padding: 1.25rem 1.35rem 1.5rem; }
+    .card__title { font-size: 1.5rem; }
+    .card__desc { color: var(--text-soft); font-size: 0.9375rem; margin: 0.5rem 0 1rem; }
+    .card__meta {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.8125rem; color: var(--text-soft);
+      padding-top: 0.85rem; border-top: 1px solid var(--hairline);
+    }
+    .card__cta { color: var(--gold-light); font-weight: 500; }
+
+    /* ===================== FOOTER ===================================== */
+    .footer { border-top: 1px solid var(--hairline); padding-block: clamp(2.5rem, 5vw, 4rem); }
+    .footer__grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem 2.5rem;
+    }
+    .footer__brand {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 1.15rem;
+    }
+    .footer__nap { color: var(--text-soft); font-size: 0.9375rem; margin-top: 0.5rem; }
+    .footer__legal { list-style: none; display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0; padding: 0; }
+    .footer__legal a {
+      text-decoration: none; color: var(--text-soft); font-size: 0.875rem;
+      display: inline-flex; align-items: center; min-height: 44px;
+      transition: color 0.25s ease;
+    }
+    .footer__legal a:hover { color: var(--text); }
+    .footer__fine { color: var(--text-soft); font-size: 0.8125rem; margin-top: 2rem; opacity: 0.8; }
+
+    /* ===================== REVEAL ===================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.is-in { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="wordmark" href="#top" aria-label="MAISON AURÉLIE, zur Startseite">Maison Aurélie</a>
+      <nav aria-label="Hauptnavigation">
+        <ul class="nav__links">
+          <li><a href="#kollektionen">Trauringe</a></li>
+          <li><a href="#kollektionen">Uhren</a></li>
+          <li><a href="#kollektionen">Schmuck</a></li>
+          <li><a href="#kollektionen">Manufaktur</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--nav" href="#beratung">Termin</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <span id="top"></span>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero__grid">
+        <div>
+          <p class="eyebrow hero__eyebrow">Konzessionär in Düsseldorf seit 1924</p>
+          <h1 class="hero__title" id="hero-title">
+            Ein Ring, der das Versprechen <em>überdauert</em>.
+          </h1>
+          <p class="hero__lede">
+            Wir begleiten Sie ruhig und persönlich von der Verlobung bis zum Trauring.
+            Zeit für ein Gespräch, geschultes Auge, ehrliche Beratung in unseren Räumen
+            an der Königsallee.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#beratung">Trauring-Beratung</a>
+            <a class="ghost-link" href="#kollektionen">
+              <span class="line" aria-hidden="true"></span>
+              Kollektionen ansehen
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__visual" role="img" aria-label="Gestaltete Visual-Flaeche: Platzhalter fuer ein Makrofoto eines Traurings.">
+          <span class="visual-tag">Platzhalter · PROD: Makrofoto</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="hairline" />
+
+    <!-- ===================== DESIGNSYSTEM-KACHEL ===================== -->
+    <section class="hero" aria-labelledby="ds-title" style="padding-block: var(--section-y);">
+      <div class="wrap">
+        <div class="ds reveal">
+          <div class="ds__head">
+            <p class="eyebrow">Designsystem</p>
+            <h2 id="ds-title">Auf einen Blick</h2>
+          </div>
+
+          <div class="ds__grid">
+            <!-- Farben -->
+            <div>
+              <p class="ds__label">Farbpalette</p>
+              <div class="swatches">
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#0B0B0D"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Hintergrund</span><span class="swatch__hex tnum">#0B0B0D</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#15151A"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Panel</span><span class="swatch__hex tnum">#15151A</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#F3EFE7"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Text</span><span class="swatch__hex tnum">#F3EFE7</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#ADA697"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Text sekundär</span><span class="swatch__hex tnum">#ADA697</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#C8A86A"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Gold Champagner</span><span class="swatch__hex tnum">#C8A86A</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#E0C48C"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Gold hell</span><span class="swatch__hex tnum">#E0C48C</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:#8C6F3E"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Gold tief</span><span class="swatch__hex tnum">#8C6F3E</span></div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch__chip" style="background:linear-gradient(135deg,#1a1a20,rgba(255,255,255,0.12))"></div>
+                  <div class="swatch__meta"><span class="swatch__name">Hairline</span><span class="swatch__hex tnum">rgba 255·12%</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typografie -->
+            <div>
+              <p class="ds__label">Typografie</p>
+              <p class="specimen__display">Aa Bb Cc</p>
+              <p class="specimen__sub">Cormorant Garamond · Inter</p>
+              <p class="specimen__body">
+                Editoriale Serife für Statements, ruhige Grotesk für Fließtext und
+                Bedienung. Ziffern laufen tabellarisch: <span class="tnum">1.890&nbsp;€</span>.
+              </p>
+              <ul class="scale" aria-label="Groessen-Skala">
+                <li><span class="scale__size tnum">64 px</span><span class="scale__sample s-xl">Statement</span></li>
+                <li><span class="scale__size tnum">28 px</span><span class="scale__sample s-lg">Überschrift</span></li>
+                <li><span class="scale__size tnum">20 px</span><span class="scale__sample s-md">Lede-Satz</span></li>
+                <li><span class="scale__size tnum">16 px</span><span class="scale__sample s-sm">Fließtext und Bedienelemente</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="ds__note">
+            <strong>Akzent-Nutzung:</strong> Champagner-Gold bleibt sparsam. Es markiert
+            genau eine primäre Handlung pro Ansicht, kurze Eyebrows und feine Linien.
+            Flächen und Text tragen die Ruhe, das Gold setzt nur Lichtpunkte.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="hairline" />
+
+    <!-- ===================== KOLLEKTIONS-CARDS ===================== -->
+    <section class="hero" id="kollektionen" aria-labelledby="coll-title" style="padding-block: var(--section-y);">
+      <div class="wrap">
+        <div class="collections__head reveal">
+          <p class="eyebrow">Kollektionen</p>
+          <h2 id="coll-title">Drei ruhige Welten, ein Anspruch</h2>
+          <p>
+            Vom ersten Blick bis zur Übergabe bleiben wir an Ihrer Seite. Jede Auswahl
+            ist kuratiert, geprüft und für die lange Sicht gedacht.
+          </p>
+        </div>
+
+        <div class="cards">
+          <a class="card reveal" href="#beratung">
+            <div class="card__media">
+              <span class="card__motif card__motif--watch" aria-hidden="true"></span>
+              <span class="card__tag">Platzhalter · PROD: Makrofoto</span>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">Uhren</h3>
+              <p class="card__desc">Mechanik von Häusern, für die wir Konzessionär sind. Beratung, Service, Vertrauen.</p>
+              <div class="card__meta"><span class="tnum">ab 2.400&nbsp;€</span><span class="card__cta">Ansehen</span></div>
+            </div>
+          </a>
+
+          <a class="card reveal" href="#beratung">
+            <div class="card__media">
+              <span class="card__motif card__motif--gem" aria-hidden="true"></span>
+              <span class="card__tag">Platzhalter · PROD: Makrofoto</span>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">Schmuck</h3>
+              <p class="card__desc">Klare Linien und ausgesuchte Steine. Stücke, die im Alltag bestehen und festlich glänzen.</p>
+              <div class="card__meta"><span class="tnum">ab 690&nbsp;€</span><span class="card__cta">Ansehen</span></div>
+            </div>
+          </a>
+
+          <a class="card reveal" href="#beratung">
+            <div class="card__media">
+              <span class="card__motif card__motif--ring" aria-hidden="true"></span>
+              <span class="card__tag">Platzhalter · PROD: Makrofoto</span>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">Trauringe</h3>
+              <p class="card__desc">Gemeinsam anprobiert, in Ruhe gewählt, präzise angepasst. Ihr Paar Ringe, das bleibt.</p>
+              <div class="card__meta"><span class="tnum">ab 1.190&nbsp;€</span><span class="card__cta">Ansehen</span></div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <hr class="hairline" />
+
+    <!-- ===================== BERATUNGS-ANKER ===================== -->
+    <section class="hero" id="beratung" aria-labelledby="ber-title" style="padding-block: var(--section-y);">
+      <div class="wrap" style="text-align:center;">
+        <p class="eyebrow" style="margin-bottom:1.25rem;">Persönlich in Düsseldorf</p>
+        <h2 id="ber-title" style="font-size:clamp(2rem,1.4rem + 2.6vw,3.5rem);max-width:18ch;margin-inline:auto;">
+          Vereinbaren Sie Ihre <em style="font-style:italic;color:var(--gold-light);">Trauring-Beratung</em>.
+        </h2>
+        <div class="hero__actions" style="justify-content:center;margin-top:2.25rem;">
+          <a class="btn btn--primary" href="#beratung">Termin anfragen</a>
+          <a class="ghost-link" href="tel:+49000000000">
+            <span class="line" aria-hidden="true"></span>
+            Telefonisch erreichen
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__grid">
+        <div>
+          <p class="footer__brand">Maison Aurélie</p>
+          <p class="footer__nap">MAISON AURÉLIE · Königsallee 1 · 40212 Düsseldorf</p>
+        </div>
+        <nav aria-label="Rechtliches">
+          <ul class="footer__legal">
+            <li><a href="#impressum">Impressum</a></li>
+            <li><a href="#datenschutz">Datenschutz</a></li>
+            <li><a href="#agb">AGB</a></li>
+          </ul>
+        </nav>
+      </div>
+      <p class="footer__fine">Platzhalter-Angaben. Visuals sind Platzhalter, in Produktion ersetzt durch Makrofotografie.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Dezenter Reveal beim Scrollen. Respektiert prefers-reduced-motion.
+    (function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var items = document.querySelectorAll(".reveal");
+      if (reduce || !("IntersectionObserver" in window)) {
+        items.forEach(function (el) { el.classList.add("is-in"); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-in");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>

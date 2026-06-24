@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 6 — Service · v4 "Bento-Layout"
+  TRAGENDE IDEE: Asymmetrisches Bento-Raster. Goldankauf ist das große Feature-Tile mit
+                 eigener Schwellen-Infobox (GwG), die übrigen Leistungen umlaufen es in
+                 kleineren Kacheln. Hierarchie ohne Lärm.
+  TECHNIK: CSS Grid mit benannten Spalten/Reihen, grid-column/row-span auf dem Feature.
+           Mobile: einspaltiger Stapel (auto-flow). Hover-Hebung degradiert auf focus-within.
+           prefers-reduced-motion: keine Transition.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Kacheln/Inhalte aus CMS, Feature-Tile per Flag.
+           GwG-Schwellen serverseitig, Termin an echtes Booking-Modul.
+-->
+<title>MAISON AURÉLIE · Service im Überblick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem)}
+.shell{max-width:1600px;margin:0 auto}
+.intro{max-width:62ch;margin:0 auto clamp(2.5rem,5vw,3.5rem);text-align:center}
+.kicker{font-size:clamp(0.72rem,1.6vw,0.82rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.08;color:var(--offwhite)}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+
+.bento{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:clamp(0.9rem,2vw,1.25rem);
+}
+@media (min-width:680px){
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .feature{grid-column:1 / -1}
+}
+@media (min-width:1000px){
+  .bento{grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr}
+  .feature{grid-column:1 / 2;grid-row:1 / 3}
+}
+.tile{
+  background:var(--ink);border:1px solid var(--hairline);border-radius:16px;
+  padding:clamp(1.4rem,2.8vw,2rem);
+  display:flex;flex-direction:column;gap:0.7rem;
+  transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease;
+}
+.tile:hover,.tile:focus-within{
+  transform:translateY(-5px);
+  border-color:color-mix(in oklch,var(--gold),transparent 45%);
+  box-shadow:0 16px 40px -24px oklch(0 0 0 / 0.8);
+}
+.ey{font-size:0.74rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold)}
+.tile h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.35rem,2.8vw,1.8rem);line-height:1.12;color:var(--offwhite)}
+.tile p{color:var(--muted);font-size:clamp(0.92rem,1.9vw,1rem)}
+
+.feature{
+  background:linear-gradient(160deg,var(--ink),color-mix(in oklch,var(--obsidian),var(--gold-deep) 8%));
+  border-color:color-mix(in oklch,var(--gold),transparent 55%);
+}
+.feature h3{font-size:clamp(1.8rem,4vw,2.8rem)}
+.feature .ey{color:var(--gold-bright)}
+
+.thresholds{
+  margin-top:0.4rem;border:1px solid color-mix(in oklch,var(--gold),transparent 60%);
+  border-radius:12px;overflow:hidden;
+}
+.thresholds figcaption{
+  font-size:0.78rem;letter-spacing:0.04em;color:var(--gold-bright);font-weight:600;
+  padding:0.7rem 1rem;background:color-mix(in oklch,var(--gold),transparent 92%);
+  border-bottom:1px solid color-mix(in oklch,var(--gold),transparent 70%);
+}
+.thresholds dl{display:grid;grid-template-columns:1fr auto;gap:0.1rem 1rem;padding:0.85rem 1rem}
+.thresholds dt{color:var(--platinum);font-size:0.9rem;padding:0.35rem 0}
+.thresholds dd{color:var(--gold-bright);font-size:0.95rem;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;padding:0.35rem 0}
+.thresholds .row{display:contents}
+.thresholds dt,.thresholds dd{border-top:1px solid var(--hairline)}
+.thresholds .row:first-child dt,.thresholds .row:first-child dd{border-top:none}
+.fineprint{font-size:0.82rem;color:var(--muted);line-height:1.5;margin-top:0.2rem}
+
+.note{font-size:0.82rem;color:var(--muted);line-height:1.5;border-top:1px solid var(--hairline);padding-top:0.75rem;margin-top:auto}
+.cta{margin-top:0.5rem;display:inline-flex;align-items:center;gap:0.5rem;min-height:44px;color:var(--gold-bright);text-decoration:none;font-size:0.92rem;font-weight:500;width:fit-content}
+.cta::after{content:"\2192";transition:transform .3s ease}
+.cta:hover::after,.cta:focus-visible::after{transform:translateX(4px)}
+.cta:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:4px}
+.tile:focus-within{outline:2px solid var(--focus);outline-offset:3px;border-radius:16px}
+
+@media (prefers-reduced-motion: reduce){
+  .tile,.cta::after{transition:none}
+  .tile:hover,.tile:focus-within{transform:none}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s6-title">
+  <div class="shell">
+    <div class="intro">
+      <p class="kicker">Atelier &amp; Service in Düsseldorf</p>
+      <h2 id="s6-title">Service im Überblick</h2>
+      <p class="lede">Fünf Leistungen, eine Adresse. Unser Goldankauf steht dabei besonders im Fokus.</p>
+    </div>
+
+    <div class="bento">
+      <!-- COMPLIANCE: Goldankauf nur mit Identifizierung nach GwG. Kein anonymer Ankauf.
+           Identifizierungspflicht ab Bargeld-Schwelle: Edelmetall/Altgold ab 2.000 EUR,
+           Schmuck/Uhren ab 10.000 EUR. Schwellen serverseitig pflegen. -->
+      <article class="tile feature">
+        <span class="ey">Im Fokus</span>
+        <h3>Goldankauf</h3>
+        <p>Altgold, Bruchgold und Edelmetall bewerten wir tagesaktuell und transparent, mit nachvollziehbarer Feingehalt-Prüfung vor Ort.</p>
+        <figure class="thresholds">
+          <figcaption>Identifizierung nach dem Geldwäschegesetz</figcaption>
+          <dl>
+            <div class="row"><dt>Edelmetall, Altgold (bar)</dt><dd>ab 2.000 €</dd></div>
+            <div class="row"><dt>Schmuck, Uhren (bar)</dt><dd>ab 10.000 €</dd></div>
+          </dl>
+        </figure>
+        <p class="fineprint">Ab diesen Bargeld-Schwellen weisen wir Sie per amtlichem Lichtbildausweis aus. Einen anonymen Ankauf bieten wir nicht an.</p>
+        <a class="cta" href="#termin">Bewertung anfragen</a>
+      </article>
+
+      <article class="tile">
+        <span class="ey">Atelier</span>
+        <h3>Reparatur</h3>
+        <p>Werkrevision, Dichtigkeitsprüfung und feine Schmuckreparatur im Haus, mit Kostenvoranschlag vor Beginn.</p>
+        <a class="cta" href="#termin">Reparatur anfragen</a>
+      </article>
+
+      <article class="tile">
+        <span class="ey">Goldschmiede</span>
+        <h3>Anfertigung</h3>
+        <p>Individuelle Stücke von der Skizze über das 3D-Modell bis zur Handfassung.</p>
+        <a class="cta" href="#termin">Beratung vereinbaren</a>
+      </article>
+
+      <article class="tile">
+        <span class="ey">Expertise</span>
+        <h3>Wertgutachten</h3>
+        <p>Sachliche, dokumentierte Einschätzung für Versicherung, Nachlass oder Verkauf.</p>
+        <p class="note">Ein Gutachten gibt eine fachliche Einschätzung zum Prüfzeitpunkt wieder, keine Garantie künftiger Marktpreise.</p>
+        <a class="cta" href="#termin">Gutachten anfragen</a>
+      </article>
+
+      <article class="tile">
+        <span class="ey">Kollektion</span>
+        <h3>Pre-Owned &amp; Vintage</h3>
+        <p>Geprüfte Uhren und Schmuckstücke aus zweiter Hand, fair bewertet und aufbereitet.</p>
+        <a class="cta" href="#termin">Sammlung ansehen</a>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+</body>
+</html>

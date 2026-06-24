@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 8 — Standort / Öffnungszeiten / Kontakt · v1 "Consent-Karte + Zeitentabelle + NAP"
+  TRAGENDE IDEE: Ruhiger Drei-Block-Aufbau. Datensparsamer Karten-Platzhalter (Consent-Gate),
+                 klare Öffnungszeiten-Tabelle, konsistente NAP-Kontaktspalte als Vertrauensanker.
+  TECHNIK: CSS-Karten-Platzhalter (kein Tracking vor Klick). Consent-Gate per JS: Klick ersetzt
+           Platzhalter durch leichtes OSM-Embed. Semantische <table>, <address>, JSON-LD JewelryStore.
+           prefers-reduced-motion respektiert, Fokus sichtbar, Touch-Ziele >= 44px.
+  PRODUKTIONSPFAD: PROD -> next/font lokal statt Google-Fonts-<link>. NAP zentral aus CMS (eine Quelle
+           fuer Footer/Schema/Google Business). Consent ueber zentralen Consent-Manager (TCF) verdrahten.
+-->
+<title>MAISON AURÉLIE · Standort &amp; Öffnungszeiten in Düsseldorf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  NAP-KONSISTENZ (Name/Adresse/Telefon) — identisch in Schema, Adresse und Footer.
+  JSON-LD JewelryStore als Beispiel fuer lokale SEO. In PROD aus einer Datenquelle generieren.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "JewelryStore",
+  "name": "MAISON AURÉLIE",
+  "image": "https://www.maison-aurelie-demo.example/storefront.jpg",
+  "url": "https://www.maison-aurelie-demo.example/",
+  "telephone": "+49 211 1234567",
+  "priceRange": "€€€€",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Königsallee 24",
+    "addressLocality": "Düsseldorf",
+    "postalCode": "40212",
+    "addressRegion": "Nordrhein-Westfalen",
+    "addressCountry": "DE"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 51.2243, "longitude": 6.7793 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "10:00", "closes": "19:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "18:00" }
+  ]
+}
+</script>
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem);max-width:100%}
+.shell{max-width:1600px;margin:0 auto}
+.intro{max-width:62ch;margin:0 auto clamp(2.25rem,5vw,3.5rem);text-align:center}
+.kicker{
+  font-size:clamp(0.72rem,1.6vw,0.82rem);
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1rem;
+}
+h2{
+  font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;
+  font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.08;letter-spacing:0.01em;
+}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+.grid{
+  display:grid;gap:clamp(1.25rem,3vw,2.25rem);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));
+  align-items:start;
+}
+.card{
+  border:1px solid var(--hairline);
+  border-radius:14px;
+  padding:clamp(1.4rem,3vw,2.1rem);
+  background:var(--ink);
+}
+.card h3{
+  font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;
+  font-size:clamp(1.35rem,3vw,1.8rem);margin-bottom:1rem;
+}
+/* Karten-Platzhalter */
+.mapcard{grid-column:1/-1}
+@media (min-width:60rem){.mapcard{grid-column:auto}}
+.mapwrap{
+  position:relative;aspect-ratio:16/10;border-radius:10px;overflow:hidden;
+  border:1px solid var(--hairline);
+}
+.mapplaceholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1rem;text-align:center;
+  padding:1.5rem;
+  background:
+    radial-gradient(circle at 30% 40%, oklch(0.30 0.02 90 / 0.45), transparent 55%),
+    repeating-linear-gradient(0deg, var(--hairline) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, var(--hairline) 0 1px, transparent 1px 48px),
+    linear-gradient(160deg, var(--ink), var(--obsidian));
+}
+.pin{
+  width:18px;height:18px;border-radius:50% 50% 50% 0;
+  background:var(--gold-bright);transform:rotate(-45deg);
+  box-shadow:0 0 0 6px oklch(0.82 0.09 82 / 0.18);
+}
+.maphint{color:var(--muted);font-size:0.92rem;max-width:34ch}
+.mapframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5ch;
+  min-height:44px;padding:.7rem 1.3rem;border-radius:999px;
+  font:inherit;font-weight:600;cursor:pointer;
+  background:var(--gold-bright);color:var(--obsidian);
+  border:1px solid transparent;text-decoration:none;
+}
+.btn.secondary{background:transparent;color:var(--gold-bright);border-color:var(--hairline)}
+.maplink{
+  display:inline-flex;align-items:center;min-height:44px;
+  color:var(--gold-bright);text-decoration:none;font-weight:500;
+  border-bottom:1px solid color-mix(in oklch,var(--gold-bright),transparent 60%);
+}
+.privacy{margin-top:.9rem;color:var(--muted);font-size:0.82rem;max-width:40ch}
+/* Tabelle */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+caption{text-align:left;color:var(--muted);font-size:0.88rem;margin-bottom:.6rem}
+th,td{padding:.7rem .25rem;text-align:left;border-bottom:1px solid var(--hairline)}
+th{font-weight:500;color:var(--platinum)}
+td{color:var(--offwhite)}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.closed{color:var(--muted)}
+/* NAP */
+address{font-style:normal;display:grid;gap:.85rem}
+.naprow{display:flex;flex-direction:column;gap:.15rem}
+.naprow .label{font-size:0.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+address a{color:var(--gold-bright);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.4rem}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<section class="section" id="standort" aria-labelledby="s8-title">
+  <div class="shell">
+    <div class="intro">
+      <p class="kicker">Besuchen Sie uns in Düsseldorf</p>
+      <h2 id="s8-title">Standort &amp; Öffnungszeiten</h2>
+      <p class="lede">Wir empfangen Sie an der Königsallee. Vereinbaren Sie gern vorab einen Termin, dann ist die Beratung ganz Ihnen gewidmet.</p>
+    </div>
+
+    <div class="grid">
+      <!-- KARTE -->
+      <div class="card mapcard">
+        <h3>Anfahrt</h3>
+        <!--
+          DSGVO: Kein direktes Google-Maps-iframe ohne Consent. Vor Einwilligung wird KEINE
+          Karte und KEIN Drittanbieter geladen. Der Platzhalter ist reines CSS (kein Tracking).
+          Erst der Klick auf "Karte laden" bindet das OSM-Embed ein (datensparsamer Anbieter).
+          Alternativ jederzeit der direkte Link auf OpenStreetMap (neuer Tab, noreferrer).
+        -->
+        <div class="mapwrap">
+          <div class="mapplaceholder" id="mapPlaceholder">
+            <span class="pin" aria-hidden="true"></span>
+            <p class="maphint">Aus Datenschutzgründen wird die interaktive Karte erst nach Ihrer Einwilligung geladen.</p>
+            <button class="btn" type="button" id="loadMap" aria-controls="mapMount">Karte laden</button>
+            <a class="maplink" href="https://www.openstreetmap.org/?mlat=51.2243&amp;mlon=6.7793#map=17/51.2243/6.7793" target="_blank" rel="noopener noreferrer">Auf OpenStreetMap öffnen</a>
+          </div>
+          <div id="mapMount" aria-live="polite"></div>
+        </div>
+        <p class="privacy">Beim Laden der Karte werden Daten an OpenStreetMap übertragen. Details in der Datenschutzerklärung.</p>
+      </div>
+
+      <!-- ÖFFNUNGSZEITEN -->
+      <div class="card">
+        <h3>Öffnungszeiten</h3>
+        <table>
+          <caption>Persönliche Beratung, Termin empfohlen.</caption>
+          <tbody>
+            <tr><th scope="row">Montag bis Freitag</th><td>10:00 bis 19:00 Uhr</td></tr>
+            <tr><th scope="row">Samstag</th><td>10:00 bis 18:00 Uhr</td></tr>
+            <tr><th scope="row">Sonn- und Feiertage</th><td class="closed">Geschlossen</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- NAP / KONTAKT -->
+      <div class="card">
+        <h3>Kontakt</h3>
+        <address>
+          <div class="naprow">
+            <span class="label">Haus</span>
+            <span>MAISON AURÉLIE</span>
+          </div>
+          <div class="naprow">
+            <span class="label">Adresse</span>
+            <span>Königsallee 24<br>40212 Düsseldorf</span>
+          </div>
+          <div class="naprow">
+            <span class="label">Telefon</span>
+            <a href="tel:+492111234567">+49 211 1234567</a>
+          </div>
+          <div class="naprow">
+            <span class="label">E-Mail</span>
+            <a href="mailto:salon@maison-aurelie-demo.example">salon@maison-aurelie-demo.example</a>
+          </div>
+        </address>
+        <div class="actions">
+          <a class="btn" href="#termin">Termin vereinbaren</a>
+          <a class="btn secondary" href="tel:+492111234567">Anrufen</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+/* Consent-Gate: erst nach Klick wird ein datensparsames OSM-Embed nachgeladen.
+   Vor dem Klick wird KEIN Drittanbieter kontaktiert. */
+(function(){
+  var btn = document.getElementById('loadMap');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var mount = document.getElementById('mapMount');
+    var ph = document.getElementById('mapPlaceholder');
+    var f = document.createElement('iframe');
+    f.className = 'mapframe';
+    f.title = 'Karte: Standort MAISON AURÉLIE, Königsallee 24, Düsseldorf';
+    f.loading = 'lazy';
+    f.referrerPolicy = 'no-referrer';
+    f.src = 'https://www.openstreetmap.org/export/embed.html?bbox=6.770%2C51.220%2C6.789%2C51.229&layer=mapnik&marker=51.2243%2C6.7793';
+    mount.appendChild(f);
+    if(ph) ph.style.display = 'none';
+  });
+})();
+</script>
+</body>
+</html>

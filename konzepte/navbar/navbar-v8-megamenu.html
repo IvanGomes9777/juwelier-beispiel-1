@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON AURÉLIE - Navbar v8 Mega Menu</title>
+
+<!--
+  ============================================================================
+  KONZEPT v8 "Mega-Menue"  -  MAISON AURELIE (Premium-Juwelier, Duesseldorf)
+  Richtung: Bordeaux & Gold. Klassische obere Leiste mit breitem
+  Mega-Dropdown unter "Kollektionen" (3 Spalten: Uhren / Schmuck / Trauringe).
+
+  Zugaenglichkeit:
+    - Mega-Menue als Disclosure-/Menu-Muster: Trigger mit
+      aria-expanded / aria-controls.
+    - Tastatur: Enter/Space oeffnet, ESC schliesst & fokussiert Trigger,
+      Pfeil-runter springt in das Panel (optional).
+    - Hover oeffnet mit kleiner Verzoegerung; behindert Tastatur nicht.
+    - Schliesst bei Klick ausserhalb und bei Fokusverlust (focusout).
+    - Unter ~900px: zugaengliches Mobile-Menue mit Accordion-Untermenue.
+    - Skip-Link, semantisches <header><nav aria-label>, Touch-Targets >= 44px,
+      :focus-visible, Kontrast >= 4.5:1.
+    - @media (prefers-reduced-motion: reduce): Animationen aus.
+    - Keine Em-Dashes in sichtbarer Copy / <title>.
+
+  PROD: next/font lokal statt Google-Fonts-<link> (hier Demo, offline-faehig
+  mit System-Fallback falls Fonts nicht geladen werden koennen).
+  ============================================================================
+-->
+
+<!-- PROD: next/font lokal -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #21090E;
+    --panel: #2E1118;
+    --text: #F4E7DD;
+    --text-2: #C49AA0;
+    --gold: #CBA15A;
+    --gold-light: #E6C783;
+    --gold-deep: #93702F;
+    --hairline: rgba(255, 210, 180, 0.14);
+
+    --font-display: "Bodoni Moda", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --maxw: 1240px;
+    --nav-h: 76px;
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---------- Skip link ---------- */
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 200;
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--gold);
+    padding: 12px 18px;
+    border-radius: 6px;
+    transition: top 0.18s var(--ease);
+  }
+  .skip-link:focus { top: 12px; }
+
+  /* ---------- Focus visibility ---------- */
+  :focus-visible {
+    outline: 2px solid var(--gold-light);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* ============================ HEADER / NAV ============================ */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .nav {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    min-height: var(--nav-h);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  /* Wordmark */
+  .wordmark {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    padding: 8px 4px;
+  }
+  .wordmark .name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.42rem;
+    letter-spacing: 0.16em;
+    color: var(--text);
+  }
+  .wordmark .sub {
+    margin-top: 5px;
+    font-size: 0.58rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* Center nav list */
+  .nav-center {
+    display: flex;
+    align-items: center;
+  }
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-link,
+  .mega-trigger {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    padding: 0 16px;
+    position: relative;
+  }
+  .nav-link::after,
+  .mega-trigger::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.32s var(--ease);
+  }
+  .nav-link:hover::after,
+  .mega-trigger:hover::after,
+  .mega-trigger[aria-expanded="true"]::after { transform: scaleX(1); }
+
+  .mega-trigger .chev {
+    width: 9px;
+    height: 9px;
+    border-right: 1.5px solid var(--gold);
+    border-bottom: 1.5px solid var(--gold);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.3s var(--ease);
+  }
+  .mega-trigger[aria-expanded="true"] .chev {
+    transform: rotate(225deg) translateY(-2px);
+  }
+
+  /* Right action */
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-appointment {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    border: 1px solid var(--gold-deep);
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: filter 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .btn-appointment:hover { filter: brightness(1.07); }
+  .btn-appointment:active { transform: translateY(1px); }
+
+  /* ============================ MEGA MENU ============================ */
+  .has-mega { position: static; }
+
+  .mega-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: var(--panel);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.26s var(--ease), transform 0.26s var(--ease),
+      visibility 0s linear 0.26s;
+  }
+  .mega-panel[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.26s var(--ease), transform 0.26s var(--ease),
+      visibility 0s;
+  }
+
+  .mega-inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 38px 24px 44px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) 1.15fr;
+    gap: 40px;
+  }
+
+  .mega-col h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.06rem;
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    margin: 0 0 6px;
+  }
+  .mega-col .col-meta {
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin: 0 0 16px;
+  }
+  .mega-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mega-col a {
+    display: block;
+    padding: 9px 10px;
+    margin-left: -10px;
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 0.92rem;
+    min-height: 40px;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .mega-col a:hover,
+  .mega-col a:focus-visible {
+    background: rgba(203, 161, 90, 0.12);
+    color: var(--gold-light);
+  }
+  .mega-col a .sub {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--text-2);
+    letter-spacing: 0.01em;
+    margin-top: 1px;
+  }
+
+  /* Teaser */
+  .mega-teaser {
+    border-left: 1px solid var(--hairline);
+    padding-left: 36px;
+  }
+  .teaser-media {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    border-radius: 4px;
+    background:
+      radial-gradient(120% 90% at 70% 10%, rgba(230, 199, 131, 0.22), transparent 60%),
+      linear-gradient(150deg, #3a1620, #1c070c);
+    border: 1px solid var(--hairline);
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .teaser-media::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(135deg, transparent 46%, rgba(230, 199, 131, 0.25) 50%, transparent 54%);
+    background-size: 220% 220%;
+    background-position: 0% 0%;
+  }
+  .teaser-tag {
+    position: relative;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+  }
+  .teaser-title {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    margin: 14px 0 6px;
+    color: var(--text);
+  }
+  .teaser-copy {
+    font-size: 0.82rem;
+    color: var(--text-2);
+    margin: 0 0 14px;
+  }
+  .teaser-link {
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 44px;
+  }
+  .teaser-link .arr { transition: transform 0.25s var(--ease); }
+  .teaser-link:hover .arr { transform: translateX(5px); }
+
+  /* ============================ MOBILE ============================ */
+  .burger {
+    display: none;
+    width: 46px;
+    height: 46px;
+    background: none;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .burger span {
+    display: block;
+    width: 22px;
+    height: 1.6px;
+    background: var(--text);
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+  }
+  .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.6px) rotate(45deg); }
+  .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.6px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    border-top: 1px solid var(--hairline);
+    background: var(--panel);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.34s var(--ease);
+  }
+  .mobile-menu[data-open="true"] { max-height: 85vh; overflow-y: auto; }
+  .mobile-inner { padding: 8px 18px 26px; }
+
+  .m-item { border-bottom: 1px solid var(--hairline); }
+  .m-link,
+  .m-acc-trigger {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.96rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-height: 56px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .m-acc-trigger .chev {
+    width: 9px; height: 9px;
+    border-right: 1.5px solid var(--gold);
+    border-bottom: 1.5px solid var(--gold);
+    transform: rotate(45deg);
+    transition: transform 0.3s var(--ease);
+  }
+  .m-acc-trigger[aria-expanded="true"] .chev { transform: rotate(225deg); }
+
+  .m-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.32s var(--ease);
+  }
+  .m-panel[data-open="true"] { max-height: 700px; }
+  .m-sub {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0 14px;
+  }
+  .m-sub-group { margin-top: 6px; }
+  .m-sub-group > span {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 8px 10px 2px;
+  }
+  .m-sub a {
+    display: block;
+    padding: 11px 10px;
+    min-height: 44px;
+    color: var(--text-2);
+    font-size: 0.9rem;
+  }
+  .m-sub a:hover,
+  .m-sub a:focus-visible { color: var(--gold-light); }
+
+  .m-cta {
+    margin-top: 22px;
+    display: block;
+    text-align: center;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    color: var(--bg);
+    min-height: 52px;
+    line-height: 52px;
+    border-radius: 2px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.84rem;
+  }
+
+  /* ============================ CONTENT ============================ */
+  main { display: block; }
+
+  .hero {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 120px 24px 110px;
+    text-align: center;
+  }
+  .hero .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 26px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    line-height: 1.06;
+    margin: 0 auto 26px;
+    max-width: 14ch;
+    color: var(--text);
+  }
+  .hero p {
+    max-width: 56ch;
+    margin: 0 auto 38px;
+    color: var(--text-2);
+    font-size: 1.04rem;
+  }
+  .hero .gold { color: var(--gold-light); font-style: italic; }
+
+  .section {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 100px 24px;
+    border-top: 1px solid var(--hairline);
+    min-height: 90vh;
+  }
+  .section .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 18px;
+  }
+  .section h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    margin: 0 0 22px;
+    max-width: 18ch;
+  }
+  .section p { max-width: 60ch; color: var(--text-2); }
+  .grid-fill {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 26px;
+  }
+  .fill-card {
+    aspect-ratio: 3 / 4;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    background:
+      radial-gradient(110% 80% at 50% 0%, rgba(203, 161, 90, 0.15), transparent 60%),
+      linear-gradient(160deg, #34131c, #1b070c);
+    padding: 20px;
+    display: flex;
+    align-items: flex-end;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--text);
+  }
+
+  footer.site-footer {
+    border-top: 1px solid var(--hairline);
+    padding: 50px 24px;
+    text-align: center;
+    color: var(--text-2);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Scrim behind mega (subtle) */
+  .scrim {
+    position: fixed;
+    inset: var(--nav-h) 0 0 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.26s var(--ease), visibility 0s linear 0.26s;
+    z-index: 90;
+  }
+  .scrim[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.26s var(--ease);
+  }
+
+  /* ---------- Responsive switch ~900px ---------- */
+  @media (max-width: 900px) {
+    .nav-center,
+    .nav-right .btn-appointment { display: none; }
+    .burger { display: inline-flex; }
+    .mobile-menu { display: block; }
+    .mega-panel { display: none; }
+    .scrim { display: none; }
+    .wordmark .name { font-size: 1.25rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Hauptnavigation">
+      <!-- Wordmark -->
+      <a class="wordmark" href="#" aria-label="MAISON AURELIE Startseite">
+        <span class="name">MAISON AURÉLIE</span>
+        <span class="sub">Joaillier Düsseldorf</span>
+      </a>
+
+      <!-- Center links -->
+      <div class="nav-center">
+        <ul class="nav-list">
+          <li class="has-mega">
+            <button
+              type="button"
+              class="mega-trigger"
+              id="mega-trigger"
+              aria-expanded="false"
+              aria-controls="mega-panel"
+              aria-haspopup="true"
+            >
+              Kollektionen
+              <span class="chev" aria-hidden="true"></span>
+            </button>
+
+            <!-- Mega panel -->
+            <div class="mega-panel" id="mega-panel" data-open="false" role="region" aria-label="Kollektionen Untermenue">
+              <div class="mega-inner">
+                <div class="mega-col">
+                  <h3>Uhren</h3>
+                  <p class="col-meta">Zeitmesser</p>
+                  <ul>
+                    <li><a href="#">Manufaktur Automatik<span class="sub">Hauseigene Werke</span></a></li>
+                    <li><a href="#">Klassische Dresswatches<span class="sub">Schlicht und fein</span></a></li>
+                    <li><a href="#">Damen Zeitmesser<span class="sub">Perlmutt und Diamant</span></a></li>
+                    <li><a href="#">Vintage Selektion<span class="sub">Kuratierte Stuecke</span></a></li>
+                  </ul>
+                </div>
+
+                <div class="mega-col">
+                  <h3>Schmuck</h3>
+                  <p class="col-meta">Haute Joaillerie</p>
+                  <ul>
+                    <li><a href="#">Colliers<span class="sub">Gold und Edelstein</span></a></li>
+                    <li><a href="#">Ohrschmuck<span class="sub">Creolen und Stecker</span></a></li>
+                    <li><a href="#">Ringe<span class="sub">Solitaer und Pavé</span></a></li>
+                    <li><a href="#">Armbaender<span class="sub">Tennis und Glieder</span></a></li>
+                  </ul>
+                </div>
+
+                <div class="mega-col">
+                  <h3>Trauringe</h3>
+                  <p class="col-meta">Fuer immer</p>
+                  <ul>
+                    <li><a href="#">Klassisch Gold<span class="sub">Gelb, Rosé, Weiss</span></a></li>
+                    <li><a href="#">Mit Brillant<span class="sub">Funkelnde Akzente</span></a></li>
+                    <li><a href="#">Platin Linie<span class="sub">Edel und robust</span></a></li>
+                    <li><a href="#">Manufaktur nach Mass<span class="sub">Individuell gefertigt</span></a></li>
+                  </ul>
+                </div>
+
+                <div class="mega-teaser">
+                  <div class="teaser-media" aria-hidden="true">
+                    <span class="teaser-tag">Neue Saison</span>
+                  </div>
+                  <p class="teaser-title">Collection Bordeaux</p>
+                  <p class="teaser-copy">Tiefe Rottoene treffen auf warmes Gold. Entdecken Sie die Signaturlinie des Hauses.</p>
+                  <a class="teaser-link" href="#">Zur Kollektion <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li><a class="nav-link" href="#atelier">Atelier</a></li>
+          <li><a class="nav-link" href="#service">Service</a></li>
+          <li><a class="nav-link" href="#maison">Das Haus</a></li>
+        </ul>
+      </div>
+
+      <!-- Right action -->
+      <div class="nav-right">
+        <a class="btn-appointment" href="#termin">Termin vereinbaren</a>
+        <button
+          type="button"
+          class="burger"
+          id="burger"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+          aria-label="Menue oeffnen"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobile-menu" data-open="false">
+      <div class="mobile-inner">
+        <ul style="list-style:none;margin:0;padding:0;">
+          <li class="m-item">
+            <button
+              type="button"
+              class="m-acc-trigger"
+              id="m-acc-trigger"
+              aria-expanded="false"
+              aria-controls="m-acc-panel"
+            >
+              Kollektionen
+              <span class="chev" aria-hidden="true"></span>
+            </button>
+            <div class="m-panel" id="m-acc-panel" data-open="false">
+              <ul class="m-sub">
+                <li class="m-sub-group"><span>Uhren</span></li>
+                <li><a href="#">Manufaktur Automatik</a></li>
+                <li><a href="#">Klassische Dresswatches</a></li>
+                <li><a href="#">Damen Zeitmesser</a></li>
+                <li class="m-sub-group"><span>Schmuck</span></li>
+                <li><a href="#">Colliers</a></li>
+                <li><a href="#">Ohrschmuck</a></li>
+                <li><a href="#">Ringe</a></li>
+                <li class="m-sub-group"><span>Trauringe</span></li>
+                <li><a href="#">Klassisch Gold</a></li>
+                <li><a href="#">Mit Brillant</a></li>
+                <li><a href="#">Platin Linie</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="m-item"><a class="m-link" href="#atelier">Atelier</a></li>
+          <li class="m-item"><a class="m-link" href="#service">Service</a></li>
+          <li class="m-item"><a class="m-link" href="#maison">Das Haus</a></li>
+        </ul>
+        <a class="m-cta" href="#termin">Termin vereinbaren</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="scrim" id="scrim" data-open="false"></div>
+
+  <main id="main">
+    <!-- Hero stub -->
+    <section class="hero">
+      <p class="eyebrow">Joaillier seit 1924</p>
+      <h1>Wo Bordeaux auf <span class="gold">Gold</span> trifft</h1>
+      <p>
+        In unserem Salon an der Koenigsallee fertigen Meister ihres Fachs
+        Schmuck und Zeitmesser von bleibender Schoenheit. Treten Sie ein in
+        die Welt von Maison Aurélie.
+      </p>
+      <a class="btn-appointment" href="#termin">Privattermin anfragen</a>
+    </section>
+
+    <!-- Fueller 1 -->
+    <section class="section" id="atelier">
+      <p class="eyebrow">Atelier</p>
+      <h2>Handwerk, das die Zeit ueberdauert</h2>
+      <p>
+        Jedes Stueck entsteht in sorgfaeltiger Handarbeit. Vom ersten Entwurf
+        bis zur finalen Politur begleiten unsere Goldschmiede den Weg eines
+        Schmuckstuecks mit Hingabe und Praezision.
+      </p>
+      <div class="grid-fill">
+        <div class="fill-card">Entwurf</div>
+        <div class="fill-card">Fassung</div>
+        <div class="fill-card">Politur</div>
+        <div class="fill-card">Gravur</div>
+      </div>
+    </section>
+
+    <!-- Fueller 2 -->
+    <section class="section" id="maison">
+      <p class="eyebrow">Das Haus</p>
+      <h2>Eine Familie, eine Leidenschaft</h2>
+      <p>
+        Seit vier Generationen steht der Name Aurélie fuer Eleganz und
+        Bestaendigkeit. Was 1924 in einer kleinen Werkstatt begann, ist heute
+        eine Adresse fuer Kenner aus ganz Europa.
+      </p>
+      <div class="grid-fill">
+        <div class="fill-card">1924</div>
+        <div class="fill-card">1958</div>
+        <div class="fill-card">1991</div>
+        <div class="fill-card">Heute</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    MAISON AURÉLIE &middot; Königsallee, Düsseldorf &middot; Konzept v8 Mega Menu
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var OPEN_DELAY = 120;   // Hover-Oeffnen
+      var CLOSE_DELAY = 180;  // Hover-Schliessen
+
+      /* ===================== Mega menu (Desktop) ===================== */
+      var trigger = document.getElementById("mega-trigger");
+      var panel = document.getElementById("mega-panel");
+      var scrim = document.getElementById("scrim");
+      var wrap = trigger ? trigger.closest(".has-mega") : null;
+      var hoverTimer = null;
+
+      function megaOpen() {
+        clearTimeout(hoverTimer);
+        trigger.setAttribute("aria-expanded", "true");
+        panel.setAttribute("data-open", "true");
+        scrim.setAttribute("data-open", "true");
+      }
+      function megaClose() {
+        clearTimeout(hoverTimer);
+        trigger.setAttribute("aria-expanded", "false");
+        panel.setAttribute("data-open", "false");
+        scrim.setAttribute("data-open", "false");
+      }
+      function megaIsOpen() {
+        return trigger.getAttribute("aria-expanded") === "true";
+      }
+
+      if (trigger && panel && wrap) {
+        // Klick / Tastatur (Enter, Space) togglen via nativem button
+        trigger.addEventListener("click", function () {
+          if (megaIsOpen()) { megaClose(); } else { megaOpen(); }
+        });
+
+        // Hover mit Verzoegerung (oeffnen)
+        wrap.addEventListener("mouseenter", function () {
+          clearTimeout(hoverTimer);
+          hoverTimer = setTimeout(megaOpen, OPEN_DELAY);
+        });
+        wrap.addEventListener("mouseleave", function () {
+          clearTimeout(hoverTimer);
+          hoverTimer = setTimeout(megaClose, CLOSE_DELAY);
+        });
+
+        // ESC schliesst + Fokus zurueck zum Trigger
+        panel.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            megaClose();
+            trigger.focus();
+          }
+        });
+        trigger.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && megaIsOpen()) {
+            megaClose();
+          }
+          // Pfeil runter: in das Panel springen (optional)
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (!megaIsOpen()) { megaOpen(); }
+            var first = panel.querySelector("a");
+            if (first) { first.focus(); }
+          }
+        });
+
+        // Schliessen bei Fokusverlust aus dem ganzen Block
+        wrap.addEventListener("focusout", function (e) {
+          if (!wrap.contains(e.relatedTarget)) {
+            megaClose();
+          }
+        });
+
+        // Schliessen bei Klick ausserhalb
+        document.addEventListener("click", function (e) {
+          if (megaIsOpen() && !wrap.contains(e.target)) {
+            megaClose();
+          }
+        });
+
+        // Scrim-Klick schliesst
+        scrim.addEventListener("click", megaClose);
+      }
+
+      /* ===================== Mobile menu + Accordion ===================== */
+      var burger = document.getElementById("burger");
+      var mobile = document.getElementById("mobile-menu");
+
+      function mobileOpen() {
+        burger.setAttribute("aria-expanded", "true");
+        burger.setAttribute("aria-label", "Menue schliessen");
+        mobile.setAttribute("data-open", "true");
+      }
+      function mobileClose() {
+        burger.setAttribute("aria-expanded", "false");
+        burger.setAttribute("aria-label", "Menue oeffnen");
+        mobile.setAttribute("data-open", "false");
+      }
+
+      if (burger && mobile) {
+        burger.addEventListener("click", function () {
+          if (burger.getAttribute("aria-expanded") === "true") {
+            mobileClose();
+          } else {
+            mobileOpen();
+          }
+        });
+      }
+
+      var accTrigger = document.getElementById("m-acc-trigger");
+      var accPanel = document.getElementById("m-acc-panel");
+      if (accTrigger && accPanel) {
+        accTrigger.addEventListener("click", function () {
+          var open = accTrigger.getAttribute("aria-expanded") === "true";
+          accTrigger.setAttribute("aria-expanded", String(!open));
+          accPanel.setAttribute("data-open", String(!open));
+        });
+      }
+
+      /* ESC schliesst Mobile-Menue global */
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && burger &&
+            burger.getAttribute("aria-expanded") === "true") {
+          mobileClose();
+          burger.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

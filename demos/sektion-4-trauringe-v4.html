@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trauring-Konfigurator · MAISON AURÉLIE</title>
+<!--
+  VARIANTE: sektion-4-trauringe-v4 – "Configurator-Lite + Buchung"
+  IDEE: Vier Metall-Swatches (Gelbgold, Weißgold, Roségold, Platin) wechseln in
+        Echtzeit die Ring-Darstellung. Darunter die Terminbuchung, vorbelegt mit
+        dem gewählten Metall.
+  TECHNIK: Ring auf 2D-Canvas gezeichnet (radiale Verläufe je Metall) mit
+        try/catch + CSS-Fallback (conic-gradient). Swatches als radiogroup
+        (Pfeiltasten), reduced-motion: kein Glanz-Sweep. Clientseitige Demo.
+  PRODUKTIONSPFAD: PROD -> Canvas durch echtes 3D/PBR ersetzen oder gerenderte
+        Material-Assets, Konfiguration + Buchung an Backend, Felder serverseitig
+        validieren, Fonts lokal (next/font).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-Link -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:oklch(0.16 0.006 270);--ink:oklch(0.21 0.008 270);
+  --offwhite:oklch(0.96 0.004 90);--muted:oklch(0.72 0.01 90);
+  --gold:oklch(0.72 0.10 85);--gold-bright:oklch(0.82 0.09 82);
+  --gold-deep:oklch(0.58 0.09 78);--platinum:oklch(0.80 0.008 250);
+  --hairline:oklch(0.30 0.01 270 / 0.6);--focus:oklch(0.82 0.09 82);
+  --error:oklch(0.72 0.16 25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin-inline:auto;padding:clamp(1.25rem,4vw,4rem)}
+.head{max-width:46rem}
+.kicker{font-size:clamp(0.74rem,1.6vw,0.84rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:1.25rem}
+h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;line-height:1.05;letter-spacing:-0.01em;font-size:clamp(2.4rem,6.5vw,4.6rem)}
+h1 em{font-style:italic;color:var(--gold-bright)}
+.lede{margin-top:1.25rem;color:var(--muted);font-size:clamp(1rem,1.6vw,1.15rem);max-width:44ch}
+
+.config{display:grid;gap:clamp(2rem,5vw,4rem);grid-template-columns:1fr;margin-top:clamp(2rem,5vw,3.5rem);align-items:start}
+@media(min-width:60rem){.config{grid-template-columns:1fr 1fr}}
+
+.stage{position:relative;width:100%;max-width:34rem;aspect-ratio:1/1;margin-inline:auto;border-radius:1.25rem;background:radial-gradient(circle at 50% 38%,oklch(0.24 0.01 270),var(--obsidian) 74%);display:grid;place-items:center}
+.stage canvas{width:86%;height:86%;display:block}
+.ring-fallback{display:none;width:55%;aspect-ratio:1/1;border-radius:50%;border:clamp(12px,3.5vw,22px) solid transparent}
+.ring-fallback[data-show="true"]{display:block}
+
+.swatches{margin-top:1.75rem}
+.swatches legend{font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:0.75rem}
+.swatch-row{display:flex;flex-wrap:wrap;gap:0.75rem}
+.swatch{display:flex;align-items:center;gap:0.6rem;min-height:48px;padding:0.4rem 0.9rem 0.4rem 0.4rem;background:var(--ink);border:1px solid var(--hairline);border-radius:999px;cursor:pointer;font:inherit;font-size:0.9rem;color:var(--offwhite)}
+.swatch:hover{border-color:var(--gold)}
+.swatch[aria-checked="true"]{border-color:var(--gold-bright);background:oklch(0.72 0.10 85 / 0.12)}
+.swatch:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.dot{width:1.7rem;height:1.7rem;border-radius:50%;flex:none;border:1px solid oklch(1 0 0 / 0.25)}
+.dot.yellow{background:radial-gradient(circle at 35% 30%,#f6e2a8,#caa53c 70%)}
+.dot.white{background:radial-gradient(circle at 35% 30%,#fbfbfe,#c4c8d4 70%)}
+.dot.rose{background:radial-gradient(circle at 35% 30%,#f3cdbf,#c98a72 70%)}
+.dot.platinum{background:radial-gradient(circle at 35% 30%,#eef0f3,#aab0bb 70%)}
+
+/* booking */
+.panel{background:var(--ink);border:1px solid var(--hairline);border-radius:clamp(0.75rem,2vw,1.25rem);padding:clamp(1.5rem,4vw,2.5rem)}
+.panel h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.1}
+.panel .sub{color:var(--muted);margin-top:0.4rem}
+.chosen{margin-top:1rem;font-size:0.9rem;color:var(--muted)}
+.chosen strong{color:var(--gold-bright);font-weight:500}
+form{margin-top:1.5rem;display:grid;gap:1.5rem}
+fieldset{border:0;display:grid;gap:0.7rem}
+.fl{font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:0.3rem}
+.req{color:var(--gold-bright)}
+.slot-grid{display:grid;gap:0.55rem;grid-template-columns:repeat(auto-fit,minmax(4.5rem,1fr))}
+.slot{min-height:48px;display:grid;place-items:center;text-align:center;background:var(--obsidian);border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;cursor:pointer;font:inherit;font-size:0.88rem;padding:0.3rem}
+.slot small{display:block;color:var(--muted);font-size:0.7rem}
+.slot:hover{border-color:var(--gold)}
+.slot[aria-pressed="true"]{border-color:var(--gold-bright);background:oklch(0.72 0.10 85 / 0.16);color:var(--gold-bright)}
+.slot[aria-pressed="true"] small{color:var(--gold-bright)}
+.slot:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.grid-2{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:30rem){.grid-2{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-size:0.9rem;margin-bottom:0.4rem}
+.field input{width:100%;min-height:48px;background:var(--obsidian);border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;padding:0 0.9rem;font:inherit;font-size:1rem}
+.field input::placeholder{color:oklch(0.55 0.01 90)}
+.field input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.field input[aria-invalid="true"]{border-color:var(--error)}
+.err{color:var(--error);font-size:0.82rem;min-height:1.1em;margin-top:0.3rem}
+.submit{min-height:52px;width:100%;background:var(--gold-bright);color:var(--obsidian);border:0;border-radius:0.6rem;font:inherit;font-weight:600;font-size:1.02rem;cursor:pointer;transition:filter .15s}
+.submit:hover{filter:brightness(1.06)}
+.submit:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.note{color:var(--muted);font-size:0.8rem;border-top:1px solid var(--hairline);padding-top:0.9rem}
+.note strong{color:var(--offwhite);font-weight:500}
+.confirm{display:none}
+.confirm[data-show="true"]{display:block}
+.confirm .tick{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--gold-bright);color:var(--gold-bright);font-size:1.4rem;margin-bottom:1rem}
+.confirm h3{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(1.6rem,4vw,2.2rem)}
+.confirm dl{margin-top:1.25rem;display:grid;gap:0.5rem}
+.confirm dt{font-size:0.76rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-bright)}
+.confirm dd{margin-bottom:0.5rem}
+.confirm button{margin-top:1.5rem;min-height:48px;padding-inline:1.4rem;background:transparent;border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;font:inherit;cursor:pointer}
+.confirm button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="head">
+    <p class="kicker">Trauringe konfigurieren</p>
+    <h1>Ihr Metall, Ihr <em>Versprechen</em>.</h1>
+    <p class="lede">Wählen Sie die Legierung und sehen Sie den Ring sofort. Im Atelier in Düsseldorf verfeinern wir gemeinsam Profil, Breite und Gravur.</p>
+  </div>
+
+  <div class="config">
+    <div>
+      <div class="stage">
+        <canvas id="ring-canvas" width="600" height="600" role="img" aria-label="Vorschau des Traurings"></canvas>
+        <div class="ring-fallback" id="ring-fallback" role="img" aria-label="Stilisierter Trauring"></div>
+      </div>
+      <fieldset class="swatches">
+        <legend>Legierung wählen</legend>
+        <div class="swatch-row" role="radiogroup" aria-label="Metall wählen" id="swatch-row">
+          <button type="button" class="swatch" role="radio" aria-checked="true" data-metal="Gelbgold 750" data-key="yellow" tabindex="0"><span class="dot yellow" aria-hidden="true"></span>Gelbgold</button>
+          <button type="button" class="swatch" role="radio" aria-checked="false" data-metal="Weißgold 750" data-key="white" tabindex="-1"><span class="dot white" aria-hidden="true"></span>Weißgold</button>
+          <button type="button" class="swatch" role="radio" aria-checked="false" data-metal="Roségold 750" data-key="rose" tabindex="-1"><span class="dot rose" aria-hidden="true"></span>Roségold</button>
+          <button type="button" class="swatch" role="radio" aria-checked="false" data-metal="Platin 950" data-key="platinum" tabindex="-1"><span class="dot platinum" aria-hidden="true"></span>Platin</button>
+        </div>
+      </fieldset>
+    </div>
+
+    <section class="panel" aria-labelledby="v4-book">
+      <div id="form-view">
+        <h2 id="v4-book">Beratungstermin</h2>
+        <p class="sub">Wir bringen Muster Ihrer gewählten Legierung mit.</p>
+        <p class="chosen">Gewählt: <strong id="chosen-metal">Gelbgold 750</strong></p>
+        <form id="booking-form" novalidate>
+          <fieldset>
+            <p class="fl">1 · Wunschtag</p>
+            <div class="slot-grid" id="date-grid" role="group" aria-label="Datum auswählen"></div>
+            <p class="err" id="date-err" aria-live="polite"></p>
+          </fieldset>
+          <fieldset>
+            <p class="fl">2 · Uhrzeit</p>
+            <div class="slot-grid" id="time-grid" role="group" aria-label="Uhrzeit auswählen"></div>
+            <p class="err" id="time-err" aria-live="polite"></p>
+          </fieldset>
+          <fieldset>
+            <p class="fl">3 · Kontakt</p>
+            <div class="grid-2">
+              <div class="field">
+                <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
+                <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" aria-describedby="name-err" placeholder="Vor- und Nachname">
+                <p class="err" id="name-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="contact">E-Mail oder Telefon <span class="req" aria-hidden="true">*</span></label>
+                <input id="contact" name="contact" type="text" inputmode="email" autocomplete="email" required aria-required="true" aria-describedby="contact-err" placeholder="So erreichen wir Sie">
+                <p class="err" id="contact-err" aria-live="polite"></p>
+              </div>
+            </div>
+          </fieldset>
+          <p class="note">
+            Pflichtfelder mit <span class="req" aria-hidden="true">*</span>. Datensparsam: nur das Nötige für die Terminbestätigung.
+            <!-- COMPLIANCE: Kein Widerrufsrecht bei nach Kundenwunsch gefertigten/gravierten Stücken, § 312g Abs. 2 Nr. 1 BGB. -->
+            <br><br><strong>Hinweis:</strong> Nach Ihren Wünschen gefertigte oder gravierte Trauringe sind vom Widerrufsrecht ausgenommen (§ 312g BGB).
+          </p>
+          <button type="submit" class="submit">Termin anfragen</button>
+        </form>
+      </div>
+
+      <div class="confirm" id="confirm-view" role="status" aria-live="polite" tabindex="-1">
+        <div class="tick" aria-hidden="true">✓</div>
+        <h3>Anfrage erhalten</h3>
+        <p class="sub">Wir bestätigen Ihren Termin in Kürze. Diese Demo speichert keine Daten.</p>
+        <dl>
+          <dt>Legierung</dt><dd id="c-metal"></dd>
+          <dt>Termin</dt><dd id="c-when"></dd>
+          <dt>Name</dt><dd id="c-name"></dd>
+          <dt>Kontakt</dt><dd id="c-contact"></dd>
+        </dl>
+        <button type="button" id="reset-btn">Neue Anfrage</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ---- Canvas ring rendering ---- */
+const METALS={
+  yellow:{inner:"#f7e6ad",mid:"#d8b24a",deep:"#9c7a26",fb:"conic-gradient(from 210deg,#9c7a26,#f7e6ad,#d8b24a,#9c7a26)"},
+  white:{inner:"#fcfcff",mid:"#cdd1dc",deep:"#9aa0ad",fb:"conic-gradient(from 210deg,#9aa0ad,#fcfcff,#cdd1dc,#9aa0ad)"},
+  rose:{inner:"#f6d2c4",mid:"#cf9079",deep:"#a06650",fb:"conic-gradient(from 210deg,#a06650,#f6d2c4,#cf9079,#a06650)"},
+  platinum:{inner:"#f1f3f6",mid:"#b6bcc7",deep:"#878e9b",fb:"conic-gradient(from 210deg,#878e9b,#f1f3f6,#b6bcc7,#878e9b)"}
+};
+const canvas=document.getElementById("ring-canvas");
+const fb=document.getElementById("ring-fallback");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let ctx=null;
+try{ctx=canvas.getContext("2d");if(!ctx)throw new Error("no 2d");}catch(e){canvas.style.display="none";fb.dataset.show="true";}
+
+function drawRing(key){
+  const m=METALS[key];
+  if(!ctx){fb.style.background=m.fb;return;}
+  const w=canvas.width,h=canvas.height,cx=w/2,cy=h/2,R=w*0.34,band=w*0.085;
+  ctx.clearRect(0,0,w,h);
+  // outer ring band with angular shading
+  for(let a=0;a<360;a+=1){
+    const rad=a*Math.PI/180;
+    // shade by angle to fake metallic anisotropy
+    const t=(Math.sin(rad*2-0.6)+1)/2;
+    const col=mix(m.deep,m.inner,t);
+    ctx.strokeStyle=col;ctx.lineWidth=band;
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,rad,rad+0.02);
+    ctx.stroke();
+  }
+  // inner shadow edge
+  ctx.strokeStyle="rgba(0,0,0,0.35)";ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(cx,cy,R-band/2,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+band/2,0,Math.PI*2);ctx.stroke();
+  // specular highlight
+  const grd=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+  grd.addColorStop(0.0,"rgba(255,255,255,0)");
+  grd.addColorStop(0.42,"rgba(255,255,255,0.55)");
+  grd.addColorStop(0.5,"rgba(255,255,255,0)");
+  ctx.save();ctx.globalCompositeOperation="lighter";
+  ctx.strokeStyle=grd;ctx.lineWidth=band;
+  ctx.beginPath();ctx.arc(cx,cy,R,-0.9,0.2);ctx.stroke();ctx.restore();
+}
+function hexToRgb(h){const n=parseInt(h.slice(1),16);return[n>>16&255,n>>8&255,n&255];}
+function mix(a,b,t){const ca=hexToRgb(a),cb=hexToRgb(b);return`rgb(${Math.round(ca[0]+(cb[0]-ca[0])*t)},${Math.round(ca[1]+(cb[1]-ca[1])*t)},${Math.round(ca[2]+(cb[2]-ca[2])*t)})`;}
+
+let currentMetal="Gelbgold 750";
+function setMetal(btn){
+  document.querySelectorAll(".swatch").forEach(s=>{s.setAttribute("aria-checked","false");s.tabIndex=-1;});
+  btn.setAttribute("aria-checked","true");btn.tabIndex=0;
+  currentMetal=btn.dataset.metal;
+  document.getElementById("chosen-metal").textContent=currentMetal;
+  drawRing(btn.dataset.key);
+}
+const swatches=[...document.querySelectorAll(".swatch")];
+swatches.forEach((s,i)=>{
+  s.addEventListener("click",()=>setMetal(s));
+  s.addEventListener("keydown",e=>{
+    let idx=null;
+    if(e.key==="ArrowRight"||e.key==="ArrowDown")idx=(i+1)%swatches.length;
+    if(e.key==="ArrowLeft"||e.key==="ArrowUp")idx=(i-1+swatches.length)%swatches.length;
+    if(idx!==null){e.preventDefault();setMetal(swatches[idx]);swatches[idx].focus();}
+  });
+});
+drawRing("yellow");
+
+/* ---- Booking ---- */
+const DAYS=["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MON=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const state={date:null,time:null};
+function buildDates(){const grid=document.getElementById("date-grid");const today=new Date();let added=0,off=1;
+  while(added<6){const d=new Date(today);d.setDate(today.getDate()+off);off++;if(d.getDay()===0)continue;
+    const b=document.createElement("button");b.type="button";b.className="slot";b.setAttribute("aria-pressed","false");
+    b.dataset.value=d.toISOString().slice(0,10);b.dataset.label=`${DAYS[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}`;
+    b.innerHTML=`${d.getDate()}.${d.getMonth()+1}.<small>${DAYS[d.getDay()]}</small>`;
+    b.addEventListener("click",()=>sel("date",b,"date-grid"));grid.appendChild(b);added++;}}
+function buildTimes(){const grid=document.getElementById("time-grid");["10:00","11:30","14:00","15:30","17:00"].forEach(t=>{
+  const b=document.createElement("button");b.type="button";b.className="slot";b.setAttribute("aria-pressed","false");
+  b.dataset.value=t;b.dataset.label=t+" Uhr";b.textContent=t;b.addEventListener("click",()=>sel("time",b,"time-grid"));grid.appendChild(b);});}
+function sel(kind,btn,gridId){document.querySelectorAll(`#${gridId} .slot`).forEach(s=>s.setAttribute("aria-pressed","false"));btn.setAttribute("aria-pressed","true");state[kind]={value:btn.dataset.value,label:btn.dataset.label};document.getElementById(kind+"-err").textContent="";}
+buildDates();buildTimes();
+function showErr(id,msg,inputId){document.getElementById(id).textContent=msg;if(inputId)document.getElementById(inputId).setAttribute("aria-invalid","true");}
+const form=document.getElementById("booking-form");
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  document.querySelectorAll('[aria-invalid="true"]').forEach(i=>i.removeAttribute("aria-invalid"));
+  ["date-err","time-err","name-err","contact-err"].forEach(i=>document.getElementById(i).textContent="");
+  let ok=true,focusEl=null;
+  const name=document.getElementById("name").value.trim();
+  const contact=document.getElementById("contact").value.trim();
+  if(!contact){showErr("contact-err","Bitte eine Kontaktmöglichkeit angeben.","contact");ok=false;focusEl=document.getElementById("contact");}
+  if(!name){showErr("name-err","Bitte Ihren Namen eintragen.","name");ok=false;focusEl=document.getElementById("name");}
+  if(!state.time){showErr("time-err","Bitte eine Uhrzeit wählen.");ok=false;}
+  if(!state.date){showErr("date-err","Bitte einen Tag wählen.");ok=false;}
+  if(!ok){if(focusEl)focusEl.focus();return;}
+  document.getElementById("c-metal").textContent=currentMetal;
+  document.getElementById("c-when").textContent=`${state.date.label} um ${state.time.label}`;
+  document.getElementById("c-name").textContent=name;
+  document.getElementById("c-contact").textContent=contact;
+  document.getElementById("form-view").style.display="none";
+  const cv=document.getElementById("confirm-view");cv.dataset.show="true";cv.focus();
+});
+document.getElementById("reset-btn").addEventListener("click",()=>{
+  form.reset();state.date=null;state.time=null;
+  document.querySelectorAll(".slot").forEach(s=>s.setAttribute("aria-pressed","false"));
+  document.getElementById("confirm-view").dataset.show="false";
+  document.getElementById("form-view").style.display="block";
+  document.getElementById("name").focus();
+});
+</script>
+</body>
+</html>

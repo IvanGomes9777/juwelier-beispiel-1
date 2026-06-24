@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 7 — Bewertungen / Trust · v1 "Testimonial-Karussell + Trust-Plaketten"
+  TRAGENDE IDEE: Ruhige, snap-scrollende Karte von Kundenstimmen als persoenliche Naehe,
+                 darunter eine Reihe sachlicher Trust-Plaketten (Konzessionaer, Innung,
+                 Jahre) als verifizierbare Anker. Vertrauen entsteht aus Belegen, nicht Lob.
+  TECHNIK: CSS Scroll-Snap-Karussell + leichtes JS (Prev/Next, Dot-Status, Tastatur).
+           Trust-Badges als reine CSS-Plaketten mit Hairline-Rahmen. ARIA: roledescription
+           carousel, aria-live fuer aktuelle Position. prefers-reduced-motion: smooth->auto.
+  PRODUKTIONSPFAD: PROD -> next/font lokal statt Google-Fonts-<link>. Bewertungen aus
+           verifizierter Quelle (z. B. Google/eigene Erhebung) ueber CMS, mit Datum/Quelle.
+           Innungs-/Konzessionaer-Status nur mit gueltigem Nachweis ausweisen.
+-->
+<title>MAISON AURÉLIE · Was unsere Kundschaft sagt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--obsidian);
+  color:var(--offwhite);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem);max-width:100%}
+.shell{max-width:1280px;margin:0 auto}
+.intro{text-align:center;max-width:60ch;margin:0 auto clamp(2.25rem,5vw,3.5rem)}
+.kicker{
+  font-size:clamp(0.72rem,1.6vw,0.82rem);
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1rem;
+}
+h2{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:500;
+  font-size:clamp(1.9rem,5vw,3.2rem);
+  line-height:1.08;
+  color:var(--offwhite);
+}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+
+/* Karussell */
+.carousel{position:relative}
+.viewport{
+  display:flex;
+  gap:clamp(1rem,2.5vw,1.5rem);
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  padding-bottom:1rem;
+  scrollbar-width:none;
+}
+.viewport::-webkit-scrollbar{display:none}
+.quote-card{
+  scroll-snap-align:center;
+  flex:0 0 min(100%,42rem);
+  background:var(--ink);
+  border:1px solid var(--hairline);
+  border-radius:4px;
+  padding:clamp(1.75rem,4vw,2.75rem);
+  display:flex;
+  flex-direction:column;
+}
+.mark{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:3rem;
+  line-height:0.6;
+  color:var(--gold-deep);
+  margin-bottom:0.75rem;
+}
+blockquote{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:400;
+  font-size:clamp(1.25rem,3vw,1.7rem);
+  line-height:1.4;
+  color:var(--offwhite);
+}
+.attrib{margin-top:1.5rem;display:flex;align-items:center;gap:0.85rem}
+.avatar{
+  inline-size:2.75rem;block-size:2.75rem;flex:0 0 auto;
+  border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--gold-deep),var(--ink));
+  border:1px solid var(--hairline);
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:1.15rem;color:var(--offwhite);
+}
+.who{font-size:clamp(0.92rem,2vw,1rem);color:var(--platinum);font-weight:600}
+.context{font-size:clamp(0.8rem,1.7vw,0.88rem);color:var(--muted)}
+
+.controls{
+  display:flex;align-items:center;justify-content:center;
+  gap:1rem;margin-top:1.25rem;
+}
+.nav-btn{
+  min-inline-size:44px;min-block-size:44px;
+  display:grid;place-items:center;
+  background:transparent;
+  border:1px solid var(--hairline);
+  border-radius:50%;
+  color:var(--offwhite);
+  cursor:pointer;
+  font-size:1.1rem;
+  transition:border-color .2s,color .2s;
+}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold-bright)}
+.dots{display:flex;gap:0.5rem}
+.dot{
+  inline-size:44px;min-block-size:44px;
+  display:grid;place-items:center;
+  background:none;border:none;cursor:pointer;padding:0;
+}
+.dot::before{
+  content:"";inline-size:8px;block-size:8px;border-radius:50%;
+  background:var(--hairline);transition:background .2s,transform .2s;
+}
+.dot[aria-current="true"]::before{background:var(--gold-bright);transform:scale(1.4)}
+
+/* Trust-Plaketten */
+.badges{
+  margin-top:clamp(2.5rem,6vw,4rem);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));
+  gap:clamp(0.9rem,2vw,1.25rem);
+  border-top:1px solid var(--hairline);
+  padding-top:clamp(2rem,5vw,3rem);
+}
+.badge{
+  border:1px solid var(--hairline);
+  border-radius:4px;
+  padding:clamp(1.1rem,3vw,1.5rem);
+  display:flex;gap:0.9rem;align-items:flex-start;
+  background:linear-gradient(180deg,oklch(0.21 0.008 270 / 0.6),transparent);
+}
+.seal{
+  inline-size:2.5rem;block-size:2.5rem;flex:0 0 auto;
+  border-radius:50%;
+  border:1.5px solid var(--gold-deep);
+  display:grid;place-items:center;
+  color:var(--gold-bright);
+}
+.seal svg{inline-size:1.3rem;block-size:1.3rem;fill:none;stroke:currentColor;stroke-width:1.6}
+.badge h3{
+  font-family:"Inter",sans-serif;
+  font-size:clamp(0.95rem,2vw,1.05rem);
+  font-weight:600;color:var(--platinum);margin-bottom:0.25rem;
+}
+.badge p{font-size:clamp(0.82rem,1.7vw,0.9rem);color:var(--muted);line-height:1.5}
+.badge .num{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(1.6rem,4vw,2.1rem);color:var(--gold-bright);
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+
+:where(button,a,.viewport):focus-visible{
+  outline:2px solid var(--focus);outline-offset:3px;border-radius:4px;
+}
+.foot{margin-top:clamp(1.5rem,4vw,2.25rem);text-align:center;color:var(--muted);font-size:clamp(0.8rem,1.7vw,0.88rem)}
+
+@media (prefers-reduced-motion: reduce){
+  .viewport{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s7-title">
+  <div class="shell">
+    <div class="intro">
+      <p class="kicker">Stimmen aus Düsseldorf</p>
+      <h2 id="s7-title">Vertrauen, das über Jahre gewachsen ist</h2>
+      <p class="lede">
+        Persönliche Beratung lässt sich schwer in Worte fassen. Diese Kundinnen und
+        Kunden haben es dennoch versucht.
+      </p>
+    </div>
+
+    <div class="carousel" role="group" aria-roledescription="Karussell" aria-label="Kundenstimmen">
+      <div class="viewport" id="viewport" tabindex="0" aria-live="polite">
+
+        <article class="quote-card" role="group" aria-roledescription="Folie" aria-label="1 von 4">
+          <span class="mark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Wir wurden in Ruhe begleitet, nicht verkauft. Beim Anstecken der Ringe
+            war das ganze Team genauso aufgeregt wie wir.</blockquote>
+          <div class="attrib">
+            <span class="avatar" aria-hidden="true">L</span>
+            <span><span class="who">Lena &amp; Jonas&nbsp;R.</span><br>
+            <span class="context">Trauringe, Frühjahr 2025</span></span>
+          </div>
+        </article>
+
+        <article class="quote-card" role="group" aria-roledescription="Folie" aria-label="2 von 4">
+          <span class="mark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Meine geerbte Uhr wurde offen und ehrlich eingeschätzt. Die Revision
+            hat genau das gekostet, was vorher besprochen war.</blockquote>
+          <div class="attrib">
+            <span class="avatar" aria-hidden="true">M</span>
+            <span><span class="who">Markus&nbsp;T.</span><br>
+            <span class="context">Uhrenrevision, 2024</span></span>
+          </div>
+        </article>
+
+        <article class="quote-card" role="group" aria-roledescription="Folie" aria-label="3 von 4">
+          <span class="mark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Ein Stein aus dem Anhänger meiner Großmutter wurde neu gefasst.
+            Die Goldschmiedin hat sich Zeit für jede Frage genommen.</blockquote>
+          <div class="attrib">
+            <span class="avatar" aria-hidden="true">S</span>
+            <span><span class="who">Sophie&nbsp;K.</span><br>
+            <span class="context">Anfertigung, 2025</span></span>
+          </div>
+        </article>
+
+        <article class="quote-card" role="group" aria-roledescription="Folie" aria-label="4 von 4">
+          <span class="mark" aria-hidden="true">&ldquo;</span>
+          <blockquote>Seit Jahren unser Haus für besondere Anlässe. Man kennt uns beim Namen,
+            und das spürt man in jedem Gespräch.</blockquote>
+          <div class="attrib">
+            <span class="avatar" aria-hidden="true">A</span>
+            <span><span class="who">Familie&nbsp;Almeida</span><br>
+            <span class="context">Stammkundschaft seit 2016</span></span>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="controls">
+        <button class="nav-btn" id="prev" aria-label="Vorherige Stimme">&#8249;</button>
+        <div class="dots" role="tablist" aria-label="Stimme auswählen">
+          <button class="dot" role="tab" aria-current="true" aria-label="Stimme 1"></button>
+          <button class="dot" role="tab" aria-current="false" aria-label="Stimme 2"></button>
+          <button class="dot" role="tab" aria-current="false" aria-label="Stimme 3"></button>
+          <button class="dot" role="tab" aria-current="false" aria-label="Stimme 4"></button>
+        </div>
+        <button class="nav-btn" id="next" aria-label="Nächste Stimme">&#8250;</button>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE: Konzessionaer-/Innungs-Status nur mit gueltigem Nachweis ausweisen. -->
+    <div class="badges">
+      <div class="badge">
+        <span class="seal" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.5L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.7z"/></svg>
+        </span>
+        <div><h3>Offizieller Konzessionär</h3>
+        <p>Originalware direkt vom Hersteller, mit voller Herstellergarantie und Papieren.</p></div>
+      </div>
+      <div class="badge">
+        <span class="seal" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5"/></svg>
+        </span>
+        <div><h3>Mitglied der Goldschmiede-Innung</h3>
+        <p>Eingetragen in der Innung des Handwerks, geprüfte Meisterqualität in der eigenen Werkstatt.</p></div>
+      </div>
+      <div class="badge">
+        <span class="seal" aria-hidden="true"><span class="num">57</span></span>
+        <div><h3>Jahre am Ort</h3>
+        <p>Seit 1968 in Familienhand. Drei Generationen, ein gleichbleibender Anspruch.</p></div>
+      </div>
+    </div>
+
+    <p class="foot">Zitate sinngemäß wiedergegeben, Namen auf Wunsch gekürzt. Erhebung im eigenen Haus.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+  var vp = document.getElementById('viewport');
+  var cards = vp.querySelectorAll('.quote-card');
+  var dots = document.querySelectorAll('.dot');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var current = 0;
+
+  function go(i){
+    current = Math.max(0, Math.min(cards.length-1, i));
+    var card = cards[current];
+    vp.scrollTo({left: card.offsetLeft - (vp.clientWidth-card.clientWidth)/2, behavior:'smooth'});
+    update();
+  }
+  function update(){
+    dots.forEach(function(d,idx){d.setAttribute('aria-current', idx===current ? 'true':'false');});
+  }
+  prev.addEventListener('click', function(){go(current-1);});
+  next.addEventListener('click', function(){go(current+1);});
+  dots.forEach(function(d,idx){d.addEventListener('click', function(){go(idx);});});
+
+  // Sync dots on manual scroll
+  var t;
+  vp.addEventListener('scroll', function(){
+    clearTimeout(t);
+    t = setTimeout(function(){
+      var center = vp.scrollLeft + vp.clientWidth/2;
+      var best=0, bestD=Infinity;
+      cards.forEach(function(c,idx){
+        var c2 = c.offsetLeft + c.clientWidth/2;
+        var d = Math.abs(c2-center);
+        if(d<bestD){bestD=d;best=idx;}
+      });
+      current=best;update();
+    },120);
+  });
+  vp.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'){e.preventDefault();go(current+1);}
+    if(e.key==='ArrowLeft'){e.preventDefault();go(current-1);}
+  });
+})();
+</script>
+</body>
+</html>

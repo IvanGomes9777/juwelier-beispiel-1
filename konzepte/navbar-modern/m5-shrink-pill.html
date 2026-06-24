@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  ============================================================================
+  MAISON AURELIE  -  Duesseldorf
+  Konzept: "Bordeaux & Gold"  /  Moderne Ausfuehrung 2025
+  Navbar-Konzept M5: "Transparent zu Glas-Pille (Morph beim Scrollen)"
+
+  Idee:
+    Am screenfuellenden Hero liegt die Navbar als breite, transparente Leiste
+    (volle Breite, kein Hintergrund). Beim Scrollen morpht sie sanft in eine
+    kompakte, schwebende Frosted-Glass-Pille: Breite schrumpft, Rundung waechst
+    zur Pill, backdrop-blur + weicher Schatten erscheinen, sie rueckt leicht
+    nach innen.
+
+  Technik:
+    - Scroll-Zustand via IntersectionObserver-Sentinel (kein Scroll-Spam),
+      ergaenzt durch rAF-gedrosselten Fallback-Listener.
+    - Lesbarkeit im transparenten Zustand: heller Text + dezenter Top-Scrim.
+    - Mobile-Menue (< ~860px): aria-expanded/controls, ESC, Schliessen-Button,
+      Fokus-Trap, Skip-Link.
+    - prefers-reduced-motion: Morph aus, direkt kompakter Glas-Zustand.
+
+  PROD-Hinweis: Fonts via next/font lokal einbinden (statt Google-Fonts-CDN).
+  Standalone, offline lauffaehig (CDN-Fonts degradieren auf System-Stack).
+  ============================================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON AURELIE  -  Bordeaux & Gold</title>
+
+<!-- PROD: next/font lokal -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg:#1A0A0E;
+    --bg2:#240D13;
+    --panel:rgba(255,255,255,0.05);
+    --text:#F6ECE6;
+    --text-2:#C9A7AD;
+    --gold:#E6C07A;
+    --gold-2:#C99A4E;
+    --line:rgba(255,220,190,0.12);
+
+    --ease:cubic-bezier(0.22,1,0.36,1);
+    --t:200ms;
+    --font-ui:"Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-body:"Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-display:"Fraunces", Georgia, "Times New Roman", serif;
+
+    --maxw:1200px;
+    --nav-h:74px;
+    --radius-pill:999px;
+    --radius-2xl:28px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(230,192,122,0.10), transparent 60%),
+      radial-gradient(900px 600px at 0% 10%, rgba(201,154,78,0.08), transparent 55%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  img,svg{display:block;max-width:100%;}
+
+  ::selection{background:rgba(230,192,122,0.30);color:var(--text);}
+
+  /* ---------- Skip Link ---------- */
+  .skip-link{
+    position:fixed;
+    top:10px;left:50%;
+    transform:translate(-50%,-160%);
+    z-index:1000;
+    background:var(--gold);
+    color:#2a1206;
+    font-family:var(--font-ui);
+    font-weight:600;
+    padding:12px 20px;
+    border-radius:var(--radius-pill);
+    transition:transform var(--t) var(--ease);
+  }
+  .skip-link:focus{transform:translate(-50%,0);}
+
+  /* ---------- Focus visibility ---------- */
+  :focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  /* ============================================================
+     HEADER / NAVBAR  -  M5 Transparent -> Glas-Pille
+     ============================================================ */
+  .site-header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:900;
+    display:flex;
+    justify-content:center;
+    /* Padding aussen steuert das "Einruecken" beim Morph */
+    padding:14px clamp(12px,4vw,40px);
+    transition:padding var(--t) var(--ease);
+    pointer-events:none;
+  }
+  .site-header > *{pointer-events:auto;}
+
+  /* dezenter Scrim fuer Lesbarkeit im transparenten Zustand */
+  .nav-scrim{
+    position:fixed;
+    top:0;left:0;right:0;
+    height:160px;
+    z-index:850;
+    pointer-events:none;
+    background:linear-gradient(180deg, rgba(15,5,8,0.55) 0%, rgba(15,5,8,0) 100%);
+    opacity:1;
+    transition:opacity var(--t) var(--ease);
+  }
+
+  .nav-shell{
+    width:100%;
+    max-width:var(--maxw);
+    height:var(--nav-h);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:0 clamp(16px,2.4vw,28px);
+    border-radius:var(--radius-2xl);
+    border:1px solid transparent;
+    background:transparent;
+    backdrop-filter:blur(0px);
+    -webkit-backdrop-filter:blur(0px);
+    box-shadow:0 0 0 rgba(0,0,0,0);
+    transition:
+      max-width var(--t) var(--ease),
+      height var(--t) var(--ease),
+      border-radius var(--t) var(--ease),
+      border-color var(--t) var(--ease),
+      background var(--t) var(--ease),
+      box-shadow var(--t) var(--ease),
+      backdrop-filter var(--t) var(--ease),
+      -webkit-backdrop-filter var(--t) var(--ease);
+  }
+
+  /* === Geschrumpfter Glas-Pillen-Zustand === */
+  .site-header.is-shrunk{
+    padding-top:12px;
+  }
+  .site-header.is-shrunk .nav-shell{
+    max-width:920px;
+    height:62px;
+    border-radius:var(--radius-pill);
+    border-color:var(--line);
+    background:rgba(36,13,19,0.55);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    box-shadow:
+      0 18px 50px -20px rgba(0,0,0,0.65),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .site-header.is-shrunk + .nav-scrim,
+  .site-header.is-shrunk ~ .nav-scrim{opacity:0;}
+
+  /* Wordmark */
+  .wordmark{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:1.05rem;
+    letter-spacing:0.14em;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
+    transition:opacity var(--t) var(--ease);
+  }
+  .wordmark .mark{
+    width:12px;height:12px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, var(--gold), var(--gold-2));
+    box-shadow:0 0 16px rgba(230,192,122,0.55);
+    flex:0 0 auto;
+  }
+  .wordmark .sub{
+    font-size:0.62rem;
+    color:var(--text-2);
+    letter-spacing:0.22em;
+    font-weight:500;
+  }
+
+  /* Desktop Nav */
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    list-style:none;
+    margin:0;padding:0;
+  }
+  .nav-links a{
+    font-family:var(--font-ui);
+    font-size:0.92rem;
+    font-weight:500;
+    color:var(--text);
+    padding:10px 16px;
+    border-radius:var(--radius-pill);
+    position:relative;
+    transition:color var(--t) var(--ease), background var(--t) var(--ease);
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;
+    left:16px;right:16px;bottom:6px;
+    height:1.5px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-2));
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform var(--t) var(--ease);
+  }
+  .nav-links a:hover{color:var(--gold);}
+  .nav-links a:hover::after{transform:scaleX(1);}
+
+  .nav-cta-wrap{display:flex;align-items:center;gap:14px;}
+
+  /* Magnetischer CTA */
+  .btn-cta{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:0.92rem;
+    color:#2a1206;
+    background:linear-gradient(135deg,var(--gold),var(--gold-2));
+    border:none;
+    cursor:pointer;
+    padding:12px 22px;
+    border-radius:var(--radius-pill);
+    min-height:44px;
+    white-space:nowrap;
+    box-shadow:0 8px 24px -10px rgba(230,192,122,0.6);
+    transition:transform 120ms var(--ease), box-shadow var(--t) var(--ease), filter var(--t) var(--ease);
+    will-change:transform;
+  }
+  .btn-cta:hover{
+    filter:brightness(1.05);
+    box-shadow:0 12px 34px -10px rgba(230,192,122,0.75);
+  }
+  .btn-cta:active{transform:scale(0.97);}
+
+  /* Burger */
+  .nav-toggle{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:46px;height:46px;
+    border-radius:var(--radius-pill);
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    cursor:pointer;
+    transition:background var(--t) var(--ease), border-color var(--t) var(--ease);
+  }
+  .nav-toggle:hover{background:rgba(255,255,255,0.10);border-color:var(--gold);}
+  .nav-toggle svg{width:22px;height:22px;}
+
+  /* ============================================================
+     MOBILE MENU
+     ============================================================ */
+  .mobile-menu{
+    position:fixed;
+    inset:0;
+    z-index:950;
+    display:none;
+    flex-direction:column;
+    padding:22px clamp(16px,5vw,32px) 40px;
+    background:rgba(20,8,11,0.78);
+    backdrop-filter:blur(22px) saturate(140%);
+    -webkit-backdrop-filter:blur(22px) saturate(140%);
+    opacity:0;
+    transition:opacity var(--t) var(--ease);
+  }
+  .mobile-menu.is-open{display:flex;opacity:1;}
+
+  .mobile-menu__top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:30px;
+  }
+  .mobile-close{
+    width:46px;height:46px;
+    min-width:44px;min-height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:var(--radius-pill);
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.05);
+    color:var(--text);
+    cursor:pointer;
+    transition:background var(--t) var(--ease), border-color var(--t) var(--ease);
+  }
+  .mobile-close:hover{background:rgba(255,255,255,0.10);border-color:var(--gold);}
+  .mobile-close svg{width:24px;height:24px;}
+
+  .mobile-nav{
+    list-style:none;
+    margin:0;padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .mobile-nav a{
+    font-family:var(--font-ui);
+    font-size:1.5rem;
+    font-weight:500;
+    padding:16px 8px;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    transition:color var(--t) var(--ease), padding-left var(--t) var(--ease);
+  }
+  .mobile-nav a:hover{color:var(--gold);padding-left:16px;}
+
+  .mobile-menu .btn-cta{
+    margin-top:32px;
+    width:100%;
+    text-align:center;
+    justify-content:center;
+    padding:18px;
+    font-size:1.05rem;
+  }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    align-items:center;
+    padding:120px clamp(16px,4vw,40px) 80px;
+    overflow:hidden;
+  }
+  .hero__glow{
+    position:absolute;
+    top:-10%;left:50%;
+    transform:translateX(-50%);
+    width:min(1100px,120vw);
+    height:900px;
+    background:
+      radial-gradient(closest-side, rgba(230,192,122,0.22), transparent 70%),
+      radial-gradient(closest-side, rgba(140,30,60,0.30), transparent 72%);
+    filter:blur(20px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .hero__inner{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:var(--maxw);
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:clamp(28px,5vw,64px);
+    align-items:center;
+  }
+  .hero__eyebrow{
+    font-family:var(--font-ui);
+    font-size:0.78rem;
+    letter-spacing:0.26em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 20px;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+  }
+  .hero__eyebrow::before{
+    content:"";
+    width:34px;height:1px;
+    background:linear-gradient(90deg,var(--gold),transparent);
+  }
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:clamp(2.6rem,7vw,5rem);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+    margin:0 0 24px;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--gold);
+  }
+  .hero p.lede{
+    color:var(--text-2);
+    font-size:clamp(1rem,1.4vw,1.18rem);
+    max-width:46ch;
+    margin:0 0 36px;
+  }
+  .hero__actions{display:flex;gap:16px;flex-wrap:wrap;}
+  .btn-ghost{
+    font-family:var(--font-ui);
+    font-weight:500;
+    font-size:0.95rem;
+    color:var(--text);
+    background:transparent;
+    border:1px solid var(--line);
+    padding:13px 24px;
+    min-height:44px;
+    border-radius:var(--radius-pill);
+    cursor:pointer;
+    transition:border-color var(--t) var(--ease), background var(--t) var(--ease), color var(--t) var(--ease);
+  }
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(230,192,122,0.06);}
+
+  /* Medien-Platzhalter */
+  .hero__media{
+    position:relative;
+    aspect-ratio:4/5;
+    border-radius:var(--radius-2xl);
+    border:1px solid var(--line);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01)),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0 14px, transparent 14px 28px);
+    box-shadow:0 30px 80px -40px rgba(0,0,0,0.8);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .hero__media::after{
+    content:"BILDPLATZHALTER  -  Produktaufnahme";
+    font-family:var(--font-ui);
+    font-size:0.72rem;
+    letter-spacing:0.2em;
+    color:var(--text-2);
+    text-transform:uppercase;
+    padding:8px 14px;
+    border:1px dashed var(--line);
+    border-radius:var(--radius-pill);
+  }
+
+  .scroll-hint{
+    position:absolute;
+    bottom:26px;left:50%;
+    transform:translateX(-50%);
+    z-index:1;
+    font-family:var(--font-ui);
+    font-size:0.7rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--text-2);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .scroll-hint span{
+    width:1px;height:34px;
+    background:linear-gradient(180deg,var(--gold),transparent);
+    animation:pulse 2.2s var(--ease) infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:0.4;transform:scaleY(0.7);}
+    50%{opacity:1;transform:scaleY(1);}
+  }
+
+  /* ============================================================
+     SECTIONS / BENTO
+     ============================================================ */
+  section.block{
+    position:relative;
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:clamp(70px,10vw,130px) clamp(16px,4vw,40px);
+  }
+  .block__head{margin-bottom:48px;max-width:60ch;}
+  .block__head .eyebrow{
+    font-family:var(--font-ui);
+    font-size:0.74rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 0 16px;
+  }
+  .block__head h2{
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:clamp(2rem,4.5vw,3.2rem);
+    line-height:1.08;
+    margin:0 0 14px;
+  }
+  .block__head p{color:var(--text-2);margin:0;}
+
+  .bento{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:18px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius-2xl);
+    padding:30px;
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:10px;
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    transition:transform var(--t) var(--ease), border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+    will-change:transform;
+  }
+  .card:hover{
+    transform:translateY(-5px);
+    border-color:rgba(230,192,122,0.35);
+    box-shadow:0 24px 60px -30px rgba(0,0,0,0.7);
+  }
+  .card .tag{
+    font-family:var(--font-ui);
+    font-size:0.68rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--gold);
+  }
+  .card h3{
+    font-family:var(--font-ui);
+    font-weight:600;
+    font-size:1.3rem;
+    margin:0;
+  }
+  .card p{color:var(--text-2);margin:0;font-size:0.95rem;}
+  .card .ph{
+    align-self:flex-start;
+    width:46px;height:46px;
+    border-radius:14px;
+    background:linear-gradient(135deg, rgba(230,192,122,0.25), rgba(201,154,78,0.08));
+    border:1px solid var(--line);
+    margin-bottom:auto;
+  }
+  .card.span-3{grid-column:span 3;}
+  .card.span-2{grid-column:span 2;}
+  .card.span-4{grid-column:span 4;}
+  .card.tall{min-height:320px;}
+  .card.feature{
+    background:
+      linear-gradient(135deg, rgba(140,30,60,0.30), rgba(36,13,19,0.2)),
+      var(--panel);
+  }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  footer.site-footer{
+    border-top:1px solid var(--line);
+    padding:48px clamp(16px,4vw,40px);
+    text-align:center;
+    color:var(--text-2);
+    font-size:0.85rem;
+  }
+  footer .wordmark{justify-content:center;margin-bottom:14px;}
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width:860px){
+    .nav-links,.nav-cta-wrap .btn-cta{display:none;}
+    .nav-toggle{display:inline-flex;}
+    .hero__inner{grid-template-columns:1fr;}
+    .hero__media{max-width:440px;}
+    .bento{grid-template-columns:repeat(2,1fr);}
+    .card.span-3,.card.span-2,.card.span-4{grid-column:span 2;}
+  }
+
+  @media (max-width:520px){
+    .bento{grid-template-columns:1fr;}
+    .card.span-3,.card.span-2,.card.span-4{grid-column:span 1;}
+    .wordmark .sub{display:none;}
+  }
+
+  /* ============================================================
+     REDUCED MOTION  -  Morph aus, direkt kompakter Glas-Zustand
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      transition-duration:0.01ms !important;
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      scroll-behavior:auto !important;
+    }
+    .nav-shell{
+      max-width:920px;
+      height:62px;
+      border-radius:var(--radius-pill);
+      border-color:var(--line);
+      background:rgba(36,13,19,0.65);
+      backdrop-filter:blur(18px) saturate(140%);
+      -webkit-backdrop-filter:blur(18px) saturate(140%);
+      box-shadow:0 18px 50px -20px rgba(0,0,0,0.65);
+    }
+    .nav-scrim{display:none;}
+    .scroll-hint span{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<!-- ===================== HEADER / NAVBAR ===================== -->
+<header class="site-header" id="siteHeader">
+  <nav class="nav-shell" aria-label="Hauptnavigation">
+    <a class="wordmark" href="#top" aria-label="MAISON AURELIE Startseite">
+      <span class="mark" aria-hidden="true"></span>
+      MAISON AURELIE
+      <span class="sub">DUESSELDORF</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#kollektion">Kollektion</a></li>
+      <li><a href="#atelier">Atelier</a></li>
+      <li><a href="#service">Service</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+
+    <div class="nav-cta-wrap">
+      <a class="btn-cta" href="#termin" id="ctaDesktop">Termin anfragen</a>
+      <button
+        class="nav-toggle"
+        id="navToggle"
+        aria-label="Menue oeffnen"
+        aria-expanded="false"
+        aria-controls="mobileMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <line x1="3" y1="7" x2="21" y2="7"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="17" x2="21" y2="17"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- dezenter Scrim fuer Lesbarkeit im transparenten Zustand -->
+<div class="nav-scrim" aria-hidden="true"></div>
+
+<!-- Sentinel fuer IntersectionObserver (Scroll-Morph) -->
+<div id="navSentinel" aria-hidden="true" style="position:absolute;top:8px;height:1px;width:1px;"></div>
+
+<!-- ===================== MOBILE MENU ===================== -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Hauptmenue">
+  <div class="mobile-menu__top">
+    <a class="wordmark" href="#top">
+      <span class="mark" aria-hidden="true"></span>
+      MAISON AURELIE
+    </a>
+    <button class="mobile-close" id="mobileClose" aria-label="Menue schliessen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <ul class="mobile-nav">
+    <li><a href="#kollektion">Kollektion</a></li>
+    <li><a href="#atelier">Atelier</a></li>
+    <li><a href="#service">Service</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+  <a class="btn-cta" href="#termin">Termin anfragen</a>
+</div>
+
+<!-- ===================== MAIN ===================== -->
+<main id="main">
+  <span id="top"></span>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="hero__eyebrow">Hochjuwelier seit 1924</p>
+        <h1 id="heroTitle">Bordeaux<br>und <em>Gold</em>,<br>von Hand gefasst.</h1>
+        <p class="lede">
+          Feinste Goldschmiedekunst aus dem Herzen von Duesseldorf.
+          Einzelstuecke, die Tiefe und Waerme tragen wie ein edler Wein.
+        </p>
+        <div class="hero__actions">
+          <a class="btn-cta" href="#kollektion">Kollektion entdecken</a>
+          <a class="btn-ghost" href="#atelier">Das Atelier</a>
+        </div>
+      </div>
+      <div class="hero__media" role="img" aria-label="Platzhalter fuer Produktaufnahme eines Schmuckstuecks"></div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      Scrollen
+      <span></span>
+    </div>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="block" id="kollektion" aria-labelledby="s1">
+    <div class="block__head">
+      <p class="eyebrow">Die Kollektion</p>
+      <h2 id="s1">Stuecke mit Charakter</h2>
+      <p>Jedes Schmuckstueck erzaehlt eine eigene Geschichte aus Material, Licht und Handwerk.</p>
+    </div>
+    <div class="bento">
+      <article class="card span-3 tall feature">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Signature</span>
+        <h3>Aurelie Solitaire</h3>
+        <p>Der Klassiker des Hauses, neu interpretiert in warmem Roségold.</p>
+      </article>
+      <article class="card span-3">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Ringe</span>
+        <h3>Bordeaux Linie</h3>
+        <p>Tiefe Granate gefasst in feinem Gelbgold.</p>
+      </article>
+      <article class="card span-2">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Ketten</span>
+        <h3>Lumière</h3>
+        <p>Filigrane Gliederketten.</p>
+      </article>
+      <article class="card span-2">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Ohrschmuck</span>
+        <h3>Étoile</h3>
+        <p>Funkelnde Begleiter fuer jeden Anlass.</p>
+      </article>
+      <article class="card span-2">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Armschmuck</span>
+        <h3>Velours</h3>
+        <p>Weich fliessende Formen.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="block" id="atelier" aria-labelledby="s2">
+    <div class="block__head">
+      <p class="eyebrow">Das Atelier</p>
+      <h2 id="s2">Handwerk in Duesseldorf</h2>
+      <p>In unserer Werkstatt verbinden sich Tradition und moderne Praezision zu zeitlosen Objekten.</p>
+    </div>
+    <div class="bento">
+      <article class="card span-4 tall feature">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Manufaktur</span>
+        <h3>Vom Entwurf bis zur Fassung</h3>
+        <p>Jeder Schritt entsteht unter einem Dach, von Hand und mit Geduld.</p>
+      </article>
+      <article class="card span-2 tall">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Beratung</span>
+        <h3>Persoenlich</h3>
+        <p>Wir nehmen uns Zeit fuer Ihr Stueck.</p>
+      </article>
+      <article class="card span-3">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Material</span>
+        <h3>Verantwortungsvolles Gold</h3>
+        <p>Recyceltes Edelmetall und zertifizierte Steine.</p>
+      </article>
+      <article class="card span-3">
+        <span class="ph" aria-hidden="true"></span>
+        <span class="tag">Service</span>
+        <h3>Pflege und Restauration</h3>
+        <p>Damit Ihr Schmuck ein Leben lang strahlt.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer" id="kontakt">
+  <a class="wordmark" href="#top">
+    <span class="mark" aria-hidden="true"></span>
+    MAISON AURELIE
+    <span class="sub">DUESSELDORF</span>
+  </a>
+  <p>Koenigsallee, Duesseldorf &nbsp;&middot;&nbsp; Termine nach Vereinbarung</p>
+  <p>&copy; 2025 Maison Aurelie. Konzept "Bordeaux & Gold".</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var header   = document.getElementById("siteHeader");
+  var sentinel = document.getElementById("navSentinel");
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Scroll-Morph: Transparent -> Glas-Pille ---------- */
+  /* Bei reduced motion: dauerhaft kompakter Zustand (per CSS), JS uebersprungen. */
+  if(!reduceMotion){
+    function setShrunk(on){
+      header.classList.toggle("is-shrunk", on);
+    }
+
+    if("IntersectionObserver" in window){
+      var io = new IntersectionObserver(function(entries){
+        // Sentinel sichtbar (oben) -> transparent; raus -> Pille
+        setShrunk(!entries[0].isIntersecting);
+      }, { threshold:0, rootMargin:"-12px 0px 0px 0px" });
+      io.observe(sentinel);
+    } else {
+      // Fallback: rAF-gedrosselter Scroll-Listener
+      var ticking = false;
+      function onScroll(){
+        if(ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function(){
+          setShrunk(window.scrollY > 24);
+          ticking = false;
+        });
+      }
+      window.addEventListener("scroll", onScroll, { passive:true });
+      onScroll();
+    }
+  }
+
+  /* ---------- Magnetischer CTA (<= 6px) ---------- */
+  if(!reduceMotion && window.matchMedia("(pointer:fine)").matches){
+    document.querySelectorAll(".btn-cta").forEach(function(btn){
+      btn.addEventListener("pointermove", function(e){
+        var r = btn.getBoundingClientRect();
+        var mx = e.clientX - (r.left + r.width/2);
+        var my = e.clientY - (r.top + r.height/2);
+        var dx = Math.max(-6, Math.min(6, mx * 0.25));
+        var dy = Math.max(-6, Math.min(6, my * 0.25));
+        btn.style.transform = "translate(" + dx + "px," + dy + "px)";
+      });
+      btn.addEventListener("pointerleave", function(){
+        btn.style.transform = "";
+      });
+    });
+  }
+
+  /* ---------- Mobile Menu ---------- */
+  var toggle   = document.getElementById("navToggle");
+  var menu     = document.getElementById("mobileMenu");
+  var closeBtn = document.getElementById("mobileClose");
+  var lastFocus = null;
+
+  function focusables(){
+    return menu.querySelectorAll('a[href], button:not([disabled])');
+  }
+
+  function openMenu(){
+    lastFocus = document.activeElement;
+    menu.classList.add("is-open");
+    toggle.setAttribute("aria-expanded","true");
+    document.body.style.overflow = "hidden";
+    var f = focusables();
+    if(f.length) f[0].focus();
+    document.addEventListener("keydown", onKeydown);
+  }
+
+  function closeMenu(){
+    menu.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded","false");
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", onKeydown);
+    if(lastFocus) lastFocus.focus();
+  }
+
+  function onKeydown(e){
+    if(e.key === "Escape"){ closeMenu(); return; }
+    if(e.key === "Tab"){
+      var f = focusables();
+      if(!f.length) return;
+      var first = f[0], last = f[f.length-1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault(); last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault(); first.focus();
+      }
+    }
+  }
+
+  toggle.addEventListener("click", openMenu);
+  closeBtn.addEventListener("click", closeMenu);
+
+  // Klick auf Link schliesst Menue
+  menu.querySelectorAll(".mobile-nav a, .btn-cta").forEach(function(a){
+    a.addEventListener("click", closeMenu);
+  });
+
+  // Bei Resize ueber Breakpoint Menue schliessen
+  window.addEventListener("resize", function(){
+    if(window.innerWidth > 860 && menu.classList.contains("is-open")){
+      closeMenu();
+    }
+  });
+})();
+</script>
+</body>
+</html>

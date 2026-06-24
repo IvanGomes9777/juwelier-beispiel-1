@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Verlobung & Trauringe · MAISON AURÉLIE</title>
+<!--
+  VARIANTE: sektion-4-trauringe-v5 – "Zwei Karten + gemeinsames Buchungs-Panel"
+  IDEE: Zwei gleichwertige Karten "Verlobung" und "Trauringe" nebeneinander.
+        Die Auswahl einer Karte setzt den Anlass im gemeinsamen Buchungs-Panel
+        darunter (eine Buchung, zwei Einstiege).
+  TECHNIK: Karten als radiogroup (Pfeiltasten), gemeinsames Formular mit
+        Datum/Uhrzeit-Grid und Kontaktfeldern, aria-live Fehler, Bestätigung
+        ersetzt das Panel. Kein WebGL nötig, CSS-only Ring-Ornamente.
+  PRODUKTIONSPFAD: PROD -> Anlass als versteckter Form-State an Booking-API,
+        Felder serverseitig validieren, Fonts lokal (next/font), Termin-Mail
+        DSGVO-konform (Double-Opt-in).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-Link -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:oklch(0.16 0.006 270);--ink:oklch(0.21 0.008 270);
+  --offwhite:oklch(0.96 0.004 90);--muted:oklch(0.72 0.01 90);
+  --gold:oklch(0.72 0.10 85);--gold-bright:oklch(0.82 0.09 82);
+  --gold-deep:oklch(0.58 0.09 78);--platinum:oklch(0.80 0.008 250);
+  --hairline:oklch(0.30 0.01 270 / 0.6);--focus:oklch(0.82 0.09 82);
+  --error:oklch(0.72 0.16 25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin-inline:auto;padding:clamp(1.25rem,4vw,4rem)}
+.head{text-align:center;max-width:46rem;margin-inline:auto}
+.kicker{font-size:clamp(0.74rem,1.6vw,0.84rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:1.25rem}
+h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;line-height:1.05;letter-spacing:-0.01em;font-size:clamp(2.4rem,6.5vw,4.6rem)}
+h1 em{font-style:italic;color:var(--gold-bright)}
+.lede{margin-top:1.25rem;color:var(--muted);font-size:clamp(1rem,1.6vw,1.15rem)}
+
+.cards{display:grid;gap:1.25rem;grid-template-columns:1fr;margin:clamp(2.5rem,6vw,3.5rem) 0;max-width:62rem;margin-inline:auto}
+@media(min-width:44rem){.cards{grid-template-columns:1fr 1fr}}
+.card{position:relative;text-align:left;background:var(--ink);border:1px solid var(--hairline);border-radius:1.25rem;padding:clamp(1.5rem,4vw,2.25rem);cursor:pointer;font:inherit;color:var(--offwhite);display:flex;flex-direction:column;gap:0.75rem;min-height:44px}
+.card:hover{border-color:var(--gold)}
+.card[aria-checked="true"]{border-color:var(--gold-bright);background:oklch(0.72 0.10 85 / 0.10)}
+.card:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.card .mark{width:3rem;height:3rem;border-radius:50%;border:2px solid transparent;background:linear-gradient(var(--ink),var(--ink)) padding-box,conic-gradient(from 200deg,var(--gold-deep),var(--gold-bright),var(--gold)) border-box}
+.card h2{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(1.6rem,4vw,2.1rem);line-height:1.1}
+.card p{color:var(--muted);font-size:0.95rem}
+.card .pick{margin-top:auto;font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-bright);display:flex;align-items:center;gap:0.4rem}
+.card .pick::before{content:"○";font-size:1rem}
+.card[aria-checked="true"] .pick::before{content:"●"}
+
+.panel{max-width:60rem;margin-inline:auto;background:var(--ink);border:1px solid var(--hairline);border-radius:clamp(0.75rem,2vw,1.25rem);padding:clamp(1.5rem,4vw,2.75rem)}
+.panel h3{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1.1}
+.panel .sub{color:var(--muted);margin-top:0.4rem}
+.chosen{margin-top:0.9rem;font-size:0.9rem;color:var(--muted)}
+.chosen strong{color:var(--gold-bright);font-weight:500}
+form{margin-top:1.5rem;display:grid;gap:1.5rem}
+fieldset{border:0;display:grid;gap:0.7rem}
+.fl{font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:0.3rem}
+.req{color:var(--gold-bright)}
+.slot-grid{display:grid;gap:0.55rem;grid-template-columns:repeat(auto-fit,minmax(4.5rem,1fr))}
+.slot{min-height:48px;display:grid;place-items:center;text-align:center;background:var(--obsidian);border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;cursor:pointer;font:inherit;font-size:0.88rem;padding:0.3rem}
+.slot small{display:block;color:var(--muted);font-size:0.7rem}
+.slot:hover{border-color:var(--gold)}
+.slot[aria-pressed="true"]{border-color:var(--gold-bright);background:oklch(0.72 0.10 85 / 0.16);color:var(--gold-bright)}
+.slot[aria-pressed="true"] small{color:var(--gold-bright)}
+.slot:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.grid-2{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:30rem){.grid-2{grid-template-columns:1fr 1fr}}
+.field label{display:block;font-size:0.9rem;margin-bottom:0.4rem}
+.field input{width:100%;min-height:48px;background:var(--obsidian);border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;padding:0 0.9rem;font:inherit;font-size:1rem}
+.field input::placeholder{color:oklch(0.55 0.01 90)}
+.field input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.field input[aria-invalid="true"]{border-color:var(--error)}
+.err{color:var(--error);font-size:0.82rem;min-height:1.1em;margin-top:0.3rem}
+.submit{min-height:52px;width:100%;background:var(--gold-bright);color:var(--obsidian);border:0;border-radius:0.6rem;font:inherit;font-weight:600;font-size:1.02rem;cursor:pointer;transition:filter .15s}
+.submit:hover{filter:brightness(1.06)}
+.submit:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.note{color:var(--muted);font-size:0.8rem;border-top:1px solid var(--hairline);padding-top:0.9rem}
+.note strong{color:var(--offwhite);font-weight:500}
+.confirm{display:none}
+.confirm[data-show="true"]{display:block}
+.confirm .tick{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--gold-bright);color:var(--gold-bright);font-size:1.4rem;margin-bottom:1rem}
+.confirm h3{font-family:"Cormorant Garamond",serif;font-weight:500}
+.confirm dl{margin-top:1.25rem;display:grid;gap:0.5rem}
+.confirm dt{font-size:0.76rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-bright)}
+.confirm dd{margin-bottom:0.5rem}
+.confirm button{margin-top:1.5rem;min-height:48px;padding-inline:1.4rem;background:transparent;border:1px solid var(--hairline);color:var(--offwhite);border-radius:0.6rem;font:inherit;cursor:pointer}
+.confirm button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="head">
+    <p class="kicker">Verlobung & Trauringe</p>
+    <h1>Welcher Moment führt Sie zu <em>uns</em>?</h1>
+    <p class="lede">Ob die erste Frage oder das gemeinsame Ja: Wählen Sie Ihren Anlass und buchen Sie eine persönliche Beratung in Düsseldorf.</p>
+  </header>
+
+  <div class="cards" role="radiogroup" aria-label="Anlass wählen" id="card-group">
+    <button type="button" class="card" role="radio" aria-checked="true" data-occasion="Verlobung" tabindex="0">
+      <span class="mark" aria-hidden="true"></span>
+      <h2>Verlobung</h2>
+      <p>Der Antragsring, diskret beraten. Solitär, Fassung, Karat, alles in Ruhe und vertraulich.</p>
+      <span class="pick">Diesen Anlass wählen</span>
+    </button>
+    <button type="button" class="card" role="radio" aria-checked="false" data-occasion="Trauringe" tabindex="-1">
+      <span class="mark" aria-hidden="true"></span>
+      <h2>Trauringe</h2>
+      <p>Zwei Ringe, ein Paar. Legierung, Profil und Gravur, gemeinsam abgestimmt und in Handarbeit gefertigt.</p>
+      <span class="pick">Diesen Anlass wählen</span>
+    </button>
+  </div>
+
+  <section class="panel" aria-labelledby="v5-book">
+    <div id="form-view">
+      <h3 id="v5-book">Beratungstermin buchen</h3>
+      <p class="sub">Ein gemeinsames Panel für beide Anlässe.</p>
+      <p class="chosen">Anlass: <strong id="chosen-occasion">Verlobung</strong></p>
+      <form id="booking-form" novalidate>
+        <fieldset>
+          <p class="fl">1 · Wunschtag</p>
+          <div class="slot-grid" id="date-grid" role="group" aria-label="Datum auswählen"></div>
+          <p class="err" id="date-err" aria-live="polite"></p>
+        </fieldset>
+        <fieldset>
+          <p class="fl">2 · Uhrzeit</p>
+          <div class="slot-grid" id="time-grid" role="group" aria-label="Uhrzeit auswählen"></div>
+          <p class="err" id="time-err" aria-live="polite"></p>
+        </fieldset>
+        <fieldset>
+          <p class="fl">3 · Kontakt</p>
+          <div class="grid-2">
+            <div class="field">
+              <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
+              <input id="name" name="name" type="text" autocomplete="name" required aria-required="true" aria-describedby="name-err" placeholder="Vor- und Nachname">
+              <p class="err" id="name-err" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="contact">E-Mail oder Telefon <span class="req" aria-hidden="true">*</span></label>
+              <input id="contact" name="contact" type="text" inputmode="email" autocomplete="email" required aria-required="true" aria-describedby="contact-err" placeholder="So erreichen wir Sie">
+              <p class="err" id="contact-err" aria-live="polite"></p>
+            </div>
+          </div>
+        </fieldset>
+        <p class="note">
+          Pflichtfelder mit <span class="req" aria-hidden="true">*</span>. Datensparsam: nur das Nötige für die Terminbestätigung.
+          <!-- COMPLIANCE: Kein Widerrufsrecht bei nach Kundenwunsch gefertigten/gravierten Stücken, § 312g Abs. 2 Nr. 1 BGB. -->
+          <br><br><strong>Hinweis:</strong> Nach Ihren Wünschen angefertigte oder gravierte Ringe sind vom Widerrufsrecht ausgenommen (§ 312g BGB).
+        </p>
+        <button type="submit" class="submit">Termin anfragen</button>
+      </form>
+    </div>
+
+    <div class="confirm" id="confirm-view" role="status" aria-live="polite" tabindex="-1">
+      <div class="tick" aria-hidden="true">✓</div>
+      <h3>Anfrage erhalten</h3>
+      <p class="sub">Wir bestätigen Ihren Termin in Kürze. Diese Demo speichert keine Daten.</p>
+      <dl>
+        <dt>Anlass</dt><dd id="c-occasion"></dd>
+        <dt>Termin</dt><dd id="c-when"></dd>
+        <dt>Name</dt><dd id="c-name"></dd>
+        <dt>Kontakt</dt><dd id="c-contact"></dd>
+      </dl>
+      <button type="button" id="reset-btn">Neue Anfrage</button>
+    </div>
+  </section>
+</main>
+
+<script>
+let occasion="Verlobung";
+const cards=[...document.querySelectorAll(".card")];
+function setCard(card){
+  cards.forEach(c=>{c.setAttribute("aria-checked","false");c.tabIndex=-1;});
+  card.setAttribute("aria-checked","true");card.tabIndex=0;
+  occasion=card.dataset.occasion;
+  document.getElementById("chosen-occasion").textContent=occasion;
+}
+cards.forEach((c,i)=>{
+  c.addEventListener("click",()=>setCard(c));
+  c.addEventListener("keydown",e=>{
+    let idx=null;
+    if(e.key==="ArrowRight"||e.key==="ArrowDown")idx=(i+1)%cards.length;
+    if(e.key==="ArrowLeft"||e.key==="ArrowUp")idx=(i-1+cards.length)%cards.length;
+    if(idx!==null){e.preventDefault();setCard(cards[idx]);cards[idx].focus();}
+  });
+});
+
+const DAYS=["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MON=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const state={date:null,time:null};
+function buildDates(){const grid=document.getElementById("date-grid");const today=new Date();let added=0,off=1;
+  while(added<6){const d=new Date(today);d.setDate(today.getDate()+off);off++;if(d.getDay()===0)continue;
+    const b=document.createElement("button");b.type="button";b.className="slot";b.setAttribute("aria-pressed","false");
+    b.dataset.value=d.toISOString().slice(0,10);b.dataset.label=`${DAYS[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}`;
+    b.innerHTML=`${d.getDate()}.${d.getMonth()+1}.<small>${DAYS[d.getDay()]}</small>`;
+    b.addEventListener("click",()=>sel("date",b,"date-grid"));grid.appendChild(b);added++;}}
+function buildTimes(){const grid=document.getElementById("time-grid");["10:00","11:30","14:00","15:30","17:00"].forEach(t=>{
+  const b=document.createElement("button");b.type="button";b.className="slot";b.setAttribute("aria-pressed","false");
+  b.dataset.value=t;b.dataset.label=t+" Uhr";b.textContent=t;b.addEventListener("click",()=>sel("time",b,"time-grid"));grid.appendChild(b);});}
+function sel(kind,btn,gridId){document.querySelectorAll(`#${gridId} .slot`).forEach(s=>s.setAttribute("aria-pressed","false"));btn.setAttribute("aria-pressed","true");state[kind]={value:btn.dataset.value,label:btn.dataset.label};document.getElementById(kind+"-err").textContent="";}
+buildDates();buildTimes();
+function showErr(id,msg,inputId){document.getElementById(id).textContent=msg;if(inputId)document.getElementById(inputId).setAttribute("aria-invalid","true");}
+const form=document.getElementById("booking-form");
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  document.querySelectorAll('[aria-invalid="true"]').forEach(i=>i.removeAttribute("aria-invalid"));
+  ["date-err","time-err","name-err","contact-err"].forEach(i=>document.getElementById(i).textContent="");
+  let ok=true,focusEl=null;
+  const name=document.getElementById("name").value.trim();
+  const contact=document.getElementById("contact").value.trim();
+  if(!contact){showErr("contact-err","Bitte eine Kontaktmöglichkeit angeben.","contact");ok=false;focusEl=document.getElementById("contact");}
+  if(!name){showErr("name-err","Bitte Ihren Namen eintragen.","name");ok=false;focusEl=document.getElementById("name");}
+  if(!state.time){showErr("time-err","Bitte eine Uhrzeit wählen.");ok=false;}
+  if(!state.date){showErr("date-err","Bitte einen Tag wählen.");ok=false;}
+  if(!ok){if(focusEl)focusEl.focus();return;}
+  document.getElementById("c-occasion").textContent=occasion;
+  document.getElementById("c-when").textContent=`${state.date.label} um ${state.time.label}`;
+  document.getElementById("c-name").textContent=name;
+  document.getElementById("c-contact").textContent=contact;
+  document.getElementById("form-view").style.display="none";
+  const cv=document.getElementById("confirm-view");cv.dataset.show="true";cv.focus();
+});
+document.getElementById("reset-btn").addEventListener("click",()=>{
+  form.reset();state.date=null;state.time=null;
+  document.querySelectorAll(".slot").forEach(s=>s.setAttribute("aria-pressed","false"));
+  document.getElementById("confirm-view").dataset.show="false";
+  document.getElementById("form-view").style.display="block";
+  document.getElementById("name").focus();
+});
+</script>
+</body>
+</html>

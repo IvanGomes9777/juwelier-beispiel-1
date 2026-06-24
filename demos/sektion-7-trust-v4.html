@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 7 — Bewertungen / Trust · v4 "Grosse rotierende Zitat-Buehne + Trust-Badges"
+  TRAGENDE IDEE: Eine einzige, ruhige Buehne fuer jeweils ein Zitat, das langsam per
+                 Crossfade wechselt. Konzentration statt Reizflut. Darunter eine sachliche,
+                 unbewegte Reihe von Trust-Belegen als bleibendes Fundament.
+  TECHNIK: Stapel absolut positionierter Zitate, opacity-Crossfade per JS-Timer.
+           Punkt-Steuerung + Pause-Button, aria-live=polite. prefers-reduced-motion:
+           Auto-Rotation aus, erstes Zitat statisch sichtbar, manuelle Steuerung bleibt.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Zitate aus CMS mit Quelle/Datum. Konzessionaer-/
+           Innungs-Belege nur mit gueltigem Nachweis; Logos nicht nachbauen, Textnennung.
+-->
+<title>MAISON AURÉLIE · Stimmen unserer Kundschaft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem);max-width:100%}
+.shell{max-width:1100px;margin:0 auto}
+.kicker{text-align:center;font-size:clamp(0.72rem,1.6vw,0.82rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:clamp(1.5rem,4vw,2.5rem)}
+
+/* Buehne */
+.stage{
+  position:relative;
+  min-block-size:clamp(15rem,34vw,18rem);
+  display:grid;
+}
+.slide{
+  grid-area:1/1;
+  opacity:0;visibility:hidden;
+  transition:opacity .9s ease;
+  text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-inline:clamp(0,2vw,2rem);
+}
+.slide.active{opacity:1;visibility:visible}
+.slide .mark{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(2.5rem,7vw,4rem);line-height:0.5;color:var(--gold-deep);margin-bottom:1rem}
+.slide blockquote{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-weight:400;
+  font-size:clamp(1.5rem,4.5vw,2.6rem);
+  line-height:1.32;color:var(--offwhite);max-width:24ch;
+}
+.slide .by{margin-top:clamp(1.25rem,3vw,1.75rem);font-size:clamp(0.9rem,2vw,1rem);color:var(--platinum);font-weight:600}
+.slide .ct{color:var(--muted);font-weight:400}
+
+/* Steuerung */
+.ctrl{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:clamp(1.5rem,4vw,2.25rem)}
+.pause{
+  min-inline-size:44px;min-block-size:44px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--hairline);border-radius:50%;
+  color:var(--offwhite);cursor:pointer;transition:border-color .2s,color .2s;
+}
+.pause:hover{border-color:var(--gold);color:var(--gold-bright)}
+.pause svg{inline-size:1rem;block-size:1rem;fill:currentColor}
+.dots{display:flex;gap:0.4rem}
+.dot{inline-size:44px;min-block-size:44px;display:grid;place-items:center;background:none;border:none;cursor:pointer;padding:0}
+.dot::before{content:"";inline-size:8px;block-size:8px;border-radius:50%;background:var(--hairline);transition:background .25s,transform .25s}
+.dot[aria-current="true"]::before{background:var(--gold-bright);transform:scale(1.4)}
+
+/* Trust-Badges */
+.badges{
+  margin-top:clamp(3rem,7vw,5rem);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));
+  gap:clamp(0.9rem,2vw,1.25rem);
+  border-top:1px solid var(--hairline);
+  padding-top:clamp(2rem,5vw,3rem);
+}
+.badge{text-align:center;padding:clamp(1rem,3vw,1.5rem) 0.75rem}
+.seal{
+  inline-size:2.75rem;block-size:2.75rem;margin:0 auto 0.85rem;border-radius:50%;
+  border:1.5px solid var(--gold-deep);display:grid;place-items:center;color:var(--gold-bright);
+}
+.seal svg{inline-size:1.4rem;block-size:1.4rem;fill:none;stroke:currentColor;stroke-width:1.5}
+.seal .yr{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.5rem;color:var(--gold-bright);font-variant-numeric:tabular-nums}
+.badge h3{font-size:clamp(0.92rem,2vw,1.02rem);font-weight:600;color:var(--platinum);margin-bottom:0.3rem}
+.badge p{font-size:clamp(0.8rem,1.7vw,0.88rem);color:var(--muted);line-height:1.5;max-width:30ch;margin:0 auto}
+.foot{margin-top:clamp(1.75rem,4vw,2.5rem);text-align:center;color:var(--muted);font-size:clamp(0.8rem,1.7vw,0.88rem)}
+:where(button):focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+
+@media (prefers-reduced-motion: reduce){
+  .slide{transition:none}
+}
+</style>
+</head>
+<body>
+<main>
+<section class="section" aria-labelledby="s7-title">
+  <div class="shell">
+    <h2 id="s7-title" class="kicker">Stimmen aus Düsseldorf</h2>
+
+    <div class="stage" id="stage" aria-roledescription="Zitat-Bühne" aria-live="polite">
+      <figure class="slide active">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>Beraten, als wären wir Familie. Ohne Druck, ohne Eile, mit echtem Interesse an uns.</blockquote>
+        <figcaption class="by">Lena &amp; Jonas&nbsp;R. <span class="ct">· Trauringe, 2025</span></figcaption>
+      </figure>
+      <figure class="slide">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>Die Revision meiner Uhr war transparent kalkuliert und tadellos ausgeführt.</blockquote>
+        <figcaption class="by">Markus&nbsp;T. <span class="ct">· Uhrenrevision, 2024</span></figcaption>
+      </figure>
+      <figure class="slide">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>Ein Erbstück wurde mit so viel Sorgfalt neu gefasst, dass mir die Tränen kamen.</blockquote>
+        <figcaption class="by">Sophie&nbsp;K. <span class="ct">· Anfertigung, 2025</span></figcaption>
+      </figure>
+      <figure class="slide">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <blockquote>Seit Jahren unser Haus für die wichtigen Momente. Man fühlt sich gesehen.</blockquote>
+        <figcaption class="by">Familie&nbsp;Almeida <span class="ct">· Stammkundschaft seit 2016</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="ctrl">
+      <button class="pause" id="pause" aria-label="Wechsel pausieren">
+        <svg id="pic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+      </button>
+      <div class="dots" role="tablist" aria-label="Zitat auswählen">
+        <button class="dot" role="tab" aria-current="true" aria-label="Zitat 1"></button>
+        <button class="dot" role="tab" aria-current="false" aria-label="Zitat 2"></button>
+        <button class="dot" role="tab" aria-current="false" aria-label="Zitat 3"></button>
+        <button class="dot" role="tab" aria-current="false" aria-label="Zitat 4"></button>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE: Konzessionaer-/Innungs-Belege nur mit gueltigem Nachweis; keine Logos nachbauen. -->
+    <div class="badges">
+      <div class="badge">
+        <span class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.5L19 8.2l-3.5 3.4.8 4.9L12 14.2 7.7 16.5l.8-4.9L5 8.2l4.8-.7z"/></svg></span>
+        <h3>Offizieller Konzessionär</h3>
+        <p>Originalware direkt vom Hersteller, mit voller Herstellergarantie.</p>
+      </div>
+      <div class="badge">
+        <span class="seal" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V9l6-5 6 5v11M10 20v-5h4v5"/></svg></span>
+        <h3>Goldschmiede-Innung</h3>
+        <p>Eingetragenes Mitglied der Innung, Meisterwerkstatt im Haus.</p>
+      </div>
+      <div class="badge">
+        <span class="seal" aria-hidden="true"><span class="yr">1968</span></span>
+        <h3>Seit 1968</h3>
+        <p>Drei Generationen, ein gleichbleibender Anspruch an Handwerk.</p>
+      </div>
+    </div>
+
+    <p class="foot">Zitate sinngemäß wiedergegeben, Namen auf Wunsch gekürzt. Erhebung im eigenen Haus.</p>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slides = document.querySelectorAll('.slide');
+  var dots = document.querySelectorAll('.dot');
+  var pause = document.getElementById('pause');
+  var pic = document.getElementById('pic');
+  var i = 0, timer = null, playing = !reduce;
+  var DUR = 6000;
+
+  function show(n){
+    i = (n + slides.length) % slides.length;
+    slides.forEach(function(s,idx){ s.classList.toggle('active', idx===i); });
+    dots.forEach(function(d,idx){ d.setAttribute('aria-current', idx===i ? 'true':'false'); });
+  }
+  function next(){ show(i+1); }
+  function start(){
+    if(reduce) return;
+    stop();
+    timer = setInterval(next, DUR);
+    playing = true; setIcon();
+  }
+  function stop(){
+    if(timer){ clearInterval(timer); timer=null; }
+    playing = false; setIcon();
+  }
+  function setIcon(){
+    pause.setAttribute('aria-label', playing ? 'Wechsel pausieren' : 'Wechsel starten');
+    pic.innerHTML = playing
+      ? '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>'
+      : '<path d="M7 4l13 8-13 8z"/>';
+  }
+
+  dots.forEach(function(d,idx){ d.addEventListener('click', function(){ show(idx); if(playing) start(); }); });
+  pause.addEventListener('click', function(){ playing ? stop() : start(); });
+
+  if(reduce){ pause.style.display='none'; setIcon(); }
+  else { start(); }
+
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ if(timer){clearInterval(timer);timer=null;} }
+    else if(playing && !reduce){ start(); }
+  });
+})();
+</script>
+</body>
+</html>

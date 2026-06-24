@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  VARIANTE: Sektion 8 — Standort / Öffnungszeiten / Kontakt · v5 "NAP/Anfahrt + Live-Status jetzt geöffnet"
+  TRAGENDE IDEE: Zwei Spalten. Links NAP und Anfahrtshinweise (ÖPNV/Parken), rechts interaktive
+                 Öffnungszeiten: heutiger Tag hervorgehoben plus Live-Status "jetzt geöffnet/geschlossen".
+  TECHNIK: JS berechnet aus Wochentag + Uhrzeit den Live-Status (offen/gleich geschlossen/geschlossen)
+           und markiert den heutigen Tag (aria-current). Karten-Platzhalter als Consent-Gate (OSM).
+           Status-Punkt nutzt Form + Text, nicht nur Farbe (Kontrast >= 4.5:1). reduced-motion.
+  PRODUKTIONSPFAD: PROD -> next/font lokal. Status serverseitig in Zeitzone Europe/Berlin + Feiertage
+           aus Kalender-API berechnen (kein Client-Flicker). NAP aus zentralem CMS. Consent-Manager.
+-->
+<title>MAISON AURÉLIE · Anfahrt &amp; aktueller Status in Düsseldorf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- PROD: next/font lokal statt Google-Fonts-<link> -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- NAP-KONSISTENZ: identisch in Schema, Adresse, Footer. JSON-LD JewelryStore (lokale SEO). -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "JewelryStore",
+  "name": "MAISON AURÉLIE",
+  "url": "https://www.maison-aurelie-demo.example/",
+  "telephone": "+49 211 1234567",
+  "priceRange": "€€€€",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Königsallee 24",
+    "addressLocality": "Düsseldorf",
+    "postalCode": "40212",
+    "addressRegion": "Nordrhein-Westfalen",
+    "addressCountry": "DE"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 51.2243, "longitude": 6.7793 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "10:00", "closes": "19:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "18:00" }
+  ]
+}
+</script>
+<style>
+:root{
+  --obsidian:    oklch(0.16 0.006 270);
+  --ink:         oklch(0.21 0.008 270);
+  --offwhite:    oklch(0.96 0.004 90);
+  --muted:       oklch(0.72 0.01 90);
+  --gold:        oklch(0.72 0.10 85);
+  --gold-bright: oklch(0.82 0.09 82);
+  --gold-deep:   oklch(0.58 0.09 78);
+  --platinum:    oklch(0.80 0.008 250);
+  --hairline:    oklch(0.30 0.01 270 / 0.6);
+  --focus:       oklch(0.82 0.09 82);
+  --open:        oklch(0.80 0.14 150);
+  --closed:      oklch(0.74 0.13 30);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--obsidian);color:var(--offwhite);font-family:"Inter",system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+.section{padding:clamp(3rem,8vw,7rem) clamp(1.25rem,5vw,4rem)}
+.shell{max-width:1500px;margin:0 auto}
+.head{max-width:62ch;margin:0 auto clamp(2rem,5vw,3rem);text-align:center}
+.kicker{font-size:clamp(0.72rem,1.6vw,0.82rem);letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.9rem,5vw,3.2rem);line-height:1.08}
+.lede{margin-top:1rem;color:var(--muted);font-size:clamp(0.98rem,2.1vw,1.12rem)}
+.cols{display:grid;gap:clamp(1.25rem,3vw,2.25rem);grid-template-columns:1fr}
+@media (min-width:60rem){.cols{grid-template-columns:1fr 1fr}}
+.panel{border:1px solid var(--hairline);border-radius:14px;background:var(--ink);padding:clamp(1.5rem,3vw,2.4rem)}
+.panel h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.35rem,3vw,1.85rem);margin-bottom:1.1rem}
+/* NAP + Anfahrt */
+.nap{font-style:normal;display:grid;gap:.85rem;margin-bottom:1.5rem}
+.naprow{display:flex;flex-direction:column;gap:.15rem}
+.naprow .label{font-size:0.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.nap a{color:var(--gold-bright);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.directions{list-style:none;display:grid;gap:.9rem;border-top:1px solid var(--hairline);padding-top:1.25rem}
+.directions li{display:grid;gap:.15rem}
+.directions .label{font-size:0.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.directions span:last-child{color:var(--offwhite)}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5ch;min-height:44px;padding:.7rem 1.3rem;border-radius:999px;font:inherit;font-weight:600;cursor:pointer;background:var(--gold-bright);color:var(--obsidian);border:1px solid transparent;text-decoration:none}
+.btn.secondary{background:transparent;color:var(--gold-bright);border-color:var(--hairline)}
+/* Status */
+.statusbar{
+  display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;
+  padding:.85rem 1.1rem;border-radius:12px;margin-bottom:1.25rem;
+  border:1px solid var(--hairline);background:var(--obsidian);
+}
+.dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto;background:var(--muted)}
+.statusbar[data-open="yes"] .dot{background:var(--open)}
+.statusbar[data-open="soon"] .dot{background:var(--gold-bright)}
+.statusbar[data-open="no"] .dot{background:var(--closed)}
+.statustext{font-weight:600;color:var(--offwhite)}
+.statussub{color:var(--muted);font-size:0.9rem}
+.hours{list-style:none;display:grid;gap:.4rem}
+.hours li{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding:.7rem .9rem;border-radius:10px;font-variant-numeric:tabular-nums;border:1px solid transparent}
+.hours .day{color:var(--platinum)}
+.hours .time{color:var(--offwhite)}
+.hours .time.closed{color:var(--muted)}
+.hours li[aria-current="date"]{background:oklch(0.82 0.09 82 / 0.12);border-color:color-mix(in oklch,var(--gold-bright),transparent 55%)}
+.hours li[aria-current="date"] .day{color:var(--gold-bright);font-weight:600}
+.todaytag{margin-left:.6ch;font-size:0.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--obsidian);background:var(--gold-bright);padding:.1rem .5rem;border-radius:999px;white-space:nowrap}
+.note{margin-top:1.1rem;color:var(--muted);font-size:0.84rem}
+/* Karte (kompakt, unter NAP) */
+.mapwrap{position:relative;aspect-ratio:16/9;margin-top:1.5rem;border-radius:12px;overflow:hidden;border:1px solid var(--hairline)}
+.mapplaceholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;text-align:center;padding:1.25rem;
+  background:
+    radial-gradient(circle at 40% 45%, oklch(0.32 0.02 90 / 0.4), transparent 55%),
+    repeating-linear-gradient(0deg, var(--hairline) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, var(--hairline) 0 1px, transparent 1px 48px),
+    linear-gradient(160deg, var(--ink), var(--obsidian));
+}
+.pin{width:18px;height:18px;border-radius:50% 50% 50% 0;background:var(--gold-bright);transform:rotate(-45deg);box-shadow:0 0 0 6px oklch(0.82 0.09 82 / 0.18)}
+.maphint{color:var(--muted);font-size:0.9rem;max-width:32ch}
+.mapframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.maplink{display:inline-flex;align-items:center;min-height:44px;color:var(--gold-bright);text-decoration:none;font-weight:500;border-bottom:1px solid color-mix(in oklch,var(--gold-bright),transparent 60%)}
+.privacy{margin-top:.8rem;color:var(--muted);font-size:0.8rem}
+a:focus-visible,button:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<section class="section" id="standort" aria-labelledby="s8-title">
+  <div class="shell">
+    <div class="head">
+      <p class="kicker">Anfahrt &amp; Öffnung</p>
+      <h2 id="s8-title">Hier finden Sie uns</h2>
+      <p class="lede">Adresse, Anfahrt und der aktuelle Status auf einen Blick. Den heutigen Tag heben wir für Sie hervor.</p>
+    </div>
+
+    <div class="cols">
+      <!-- SPALTE 1: NAP + Anfahrt + Karte -->
+      <div class="panel">
+        <h3>Adresse &amp; Anfahrt</h3>
+        <address class="nap">
+          <div class="naprow"><span class="label">Haus</span><span>MAISON AURÉLIE</span></div>
+          <div class="naprow"><span class="label">Adresse</span><span>Königsallee 24<br>40212 Düsseldorf</span></div>
+          <div class="naprow"><span class="label">Telefon</span><a href="tel:+492111234567">+49 211 1234567</a></div>
+          <div class="naprow"><span class="label">E-Mail</span><a href="mailto:salon@maison-aurelie-demo.example">salon@maison-aurelie-demo.example</a></div>
+        </address>
+        <ul class="directions">
+          <li><span class="label">ÖPNV</span><span>U-Bahn bis Heinrich-Heine-Allee, rund 4 Minuten zu Fuß.</span></li>
+          <li><span class="label">Parken</span><span>Parkhaus Kö-Galerie, fußläufig zum Salon.</span></li>
+        </ul>
+        <div class="actions">
+          <a class="btn" href="#termin">Termin vereinbaren</a>
+          <a class="btn secondary" href="tel:+492111234567">Anrufen</a>
+        </div>
+
+        <!--
+          DSGVO: Consent-Gate. Vor dem Klick wird KEIN Drittanbieter geladen, kein Tracking.
+          Platzhalter ist reines CSS. Erst "Karte laden" bindet OSM (datensparsam, no-referrer) ein.
+        -->
+        <div class="mapwrap">
+          <div class="mapplaceholder" id="mapPlaceholder">
+            <span class="pin" aria-hidden="true"></span>
+            <p class="maphint">Karte erst nach Ihrer Einwilligung.</p>
+            <button class="btn secondary" type="button" id="loadMap" aria-controls="mapMount">Karte laden</button>
+            <a class="maplink" href="https://www.openstreetmap.org/?mlat=51.2243&amp;mlon=6.7793#map=17/51.2243/6.7793" target="_blank" rel="noopener noreferrer">Auf OpenStreetMap öffnen</a>
+          </div>
+          <div id="mapMount" aria-live="polite"></div>
+        </div>
+        <p class="privacy">Beim Laden werden Daten an OpenStreetMap übertragen.</p>
+      </div>
+
+      <!-- SPALTE 2: Live-Status + Öffnungszeiten -->
+      <div class="panel">
+        <h3>Aktueller Status</h3>
+        <div class="statusbar" id="statusBar" data-open="unknown" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span>
+            <span class="statustext" id="statusText">Status wird geprüft</span><br>
+            <span class="statussub" id="statusSub">Bitte Öffnungszeiten beachten.</span>
+          </span>
+        </div>
+        <ul class="hours" id="hours" aria-label="Öffnungszeiten der Woche">
+          <li data-day="1"><span class="day">Montag</span><span class="time">10:00 bis 19:00</span></li>
+          <li data-day="2"><span class="day">Dienstag</span><span class="time">10:00 bis 19:00</span></li>
+          <li data-day="3"><span class="day">Mittwoch</span><span class="time">10:00 bis 19:00</span></li>
+          <li data-day="4"><span class="day">Donnerstag</span><span class="time">10:00 bis 19:00</span></li>
+          <li data-day="5"><span class="day">Freitag</span><span class="time">10:00 bis 19:00</span></li>
+          <li data-day="6"><span class="day">Samstag</span><span class="time">10:00 bis 18:00</span></li>
+          <li data-day="0"><span class="day">Sonntag</span><span class="time closed">Geschlossen</span></li>
+        </ul>
+        <p class="note">An Feiertagen geschlossen. Der Status wird in der Demo aus Ihrer lokalen Uhrzeit berechnet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+/* Heutigen Tag hervorheben + Live-Status berechnen.
+   Oeffnungszeiten als Minuten ab Mitternacht. 0=So .. 6=Sa. PROD: Zeitzone Europe/Berlin serverseitig. */
+(function(){
+  var SCHED = {1:[600,1140],2:[600,1140],3:[600,1140],4:[600,1140],5:[600,1140],6:[600,1080],0:null};
+  function fmt(min){var h=Math.floor(min/60),m=min%60;return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+  try{
+    var now = new Date();
+    var day = now.getDay();
+    var mins = now.getHours()*60 + now.getMinutes();
+    // Heutigen Tag markieren
+    var li = document.querySelector('#hours li[data-day="'+day+'"]');
+    if(li){
+      li.setAttribute('aria-current','date');
+      var tag=document.createElement('span');tag.className='todaytag';tag.textContent='Heute';
+      li.querySelector('.day').appendChild(tag);
+    }
+    // Status
+    var bar=document.getElementById('statusBar');
+    var t=document.getElementById('statusText');
+    var s=document.getElementById('statusSub');
+    var today=SCHED[day];
+    if(today && mins>=today[0] && mins<today[1]){
+      var leftToClose = today[1]-mins;
+      if(leftToClose<=30){
+        bar.setAttribute('data-open','soon');
+        t.textContent='Jetzt geöffnet, schließt bald';
+        s.textContent='Wir schließen um '+fmt(today[1])+' Uhr.';
+      }else{
+        bar.setAttribute('data-open','yes');
+        t.textContent='Jetzt geöffnet';
+        s.textContent='Heute bis '+fmt(today[1])+' Uhr für Sie da.';
+      }
+    }else{
+      bar.setAttribute('data-open','no');
+      t.textContent='Jetzt geschlossen';
+      // naechste Oeffnung finden
+      var nx='';
+      for(var i=1;i<=7;i++){
+        var d=(day+i)%7; var sc=SCHED[d];
+        if(sc){var names=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+          nx=' '+(i===1?'Morgen':'Am '+names[d])+' ab '+fmt(sc[0])+' Uhr.';break;}
+      }
+      if(today && mins<today[0]){ s.textContent='Heute ab '+fmt(today[0])+' Uhr geöffnet.'; }
+      else { s.textContent='Nächste Öffnung:'+nx; }
+    }
+  }catch(e){}
+})();
+/* Consent-Gate Karte */
+(function(){
+  var btn=document.getElementById('loadMap');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    var mount=document.getElementById('mapMount');
+    var ph=document.getElementById('mapPlaceholder');
+    var f=document.createElement('iframe');
+    f.className='mapframe';
+    f.title='Karte: Standort MAISON AURÉLIE, Königsallee 24, Düsseldorf';
+    f.loading='lazy';
+    f.referrerPolicy='no-referrer';
+    f.src='https://www.openstreetmap.org/export/embed.html?bbox=6.770%2C51.220%2C6.789%2C51.229&layer=mapnik&marker=51.2243%2C6.7793';
+    mount.appendChild(f);
+    if(ph) ph.style.display='none';
+  });
+})();
+</script>
+</body>
+</html>

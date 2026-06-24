@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!--
+  MAISON VEYRA · Redesign — Navbar-Option 3 "Cinématique"
+  Inspiration: smartdevicetec.com — Loading-Intro mit Zaehler, dunkle cinematische
+  Buehne, sehr reduzierte Nav (Wordmark links, 2 Links rechts), Sektions-Index
+  "№ 01 / 05", magnetischer CTA, Grotesk/Mono-Typo, Linien-Reveals.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAISON VEYRA — Navbar 3 · Cinématique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0B0B0D; --bg-2:#121216; --fg:#EFE9DF; --muted:#8A867E; --gold:#C9A45B;
+    --line:rgba(239,233,223,.16); --ease:cubic-bezier(.16,1,.3,1); --t:500ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--fg);
+    line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none} img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .mono{font-family:"JetBrains Mono",monospace}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:300;background:var(--fg);color:var(--bg);
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+
+  /* ====== Loading Intro ====== */
+  .loader{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;
+    transition:opacity .6s ease,visibility .6s}
+  .loader.done{opacity:0;visibility:hidden}
+  .loader .lc{text-align:center;width:min(80vw,420px)}
+  .loader .num{font-family:"JetBrains Mono",monospace;font-size:clamp(3rem,12vw,6rem);font-weight:500;letter-spacing:-.02em}
+  .loader .lbl{font-size:.72rem;letter-spacing:.4em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .loader .barwrap{height:1px;background:var(--line);margin-top:26px;overflow:hidden}
+  .loader .barwrap i{display:block;height:100%;width:0;background:var(--gold);transition:width .1s linear}
+
+  /* ====== Header ====== */
+  .header{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;justify-content:space-between;
+    padding:clamp(16px,2.4vw,28px) clamp(18px,4vw,46px);mix-blend-mode:difference;color:#fff}
+  .wordmark{font-weight:600;letter-spacing:.2em;font-size:1.02rem}
+  .wordmark b{color:var(--gold);mix-blend-mode:normal}
+  .header .right{display:flex;align-items:center;gap:clamp(16px,2.4vw,34px)}
+  .header .right a{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;position:relative}
+  .header .right a::after{content:"";position:absolute;left:0;bottom:-5px;width:100%;height:1px;background:currentColor;
+    transform:scaleX(0);transform-origin:left;transition:transform var(--t) var(--ease)}
+  .header .right a:hover::after{transform:scaleX(1)}
+  @media (max-width:640px){ .header .right .lnk{display:none} }
+
+  /* magnetic CTA */
+  .magnet{border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:11px 22px;cursor:pointer;
+    background:none;color:inherit;font-family:inherit;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;
+    transition:transform .2s var(--ease),background .3s,color .3s;will-change:transform}
+  .magnet:hover{background:#fff;color:#000}
+
+  /* section index, vertical right */
+  .index{position:fixed;right:clamp(14px,2vw,30px);top:50%;transform:translateY(-50%);z-index:80;
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;mix-blend-mode:difference;color:#fff}
+  .index .big{font-family:"JetBrains Mono",monospace;font-size:.84rem;letter-spacing:.1em}
+  .index .ticks{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .index .ticks i{width:22px;height:1.5px;background:currentColor;opacity:.3;transition:opacity var(--t),width var(--t)}
+  .index .ticks i.on{opacity:1;width:34px;background:var(--gold)}
+  @media (max-width:640px){ .index{display:none} }
+
+  /* ====== Slides (Kontext fuer Index) ====== */
+  .slide{position:relative;height:100vh;min-height:600px;display:flex;align-items:flex-end;overflow:hidden}
+  .slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08);
+    transition:transform 1.6s var(--ease)}
+  .slide::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(11,11,13,.5),transparent 30%,rgba(11,11,13,.85))}
+  .slide .meta{position:relative;z-index:2;padding:clamp(28px,6vw,90px);width:100%}
+  .slide .no{font-family:"JetBrains Mono",monospace;color:var(--gold);font-size:.8rem;letter-spacing:.2em;margin:0 0 14px}
+  .slide h2{font-weight:500;font-size:clamp(2.6rem,8vw,6rem);line-height:.98;margin:0;letter-spacing:-.02em;
+    text-transform:uppercase}
+  .slide .sub{color:var(--muted);max-width:46ch;margin:18px 0 0}
+  .slide:first-of-type{align-items:center;text-align:center;justify-content:center}
+  .slide:first-of-type .meta{max-width:24ch}
+  .slide:first-of-type h2{font-size:clamp(2.8rem,9vw,7rem)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.001ms !important;scroll-behavior:auto !important}
+    .slide img{transform:none}
+  }
+</style>
+</head>
+<body>
+<span class="badge">Option 3 · Cinématique</span>
+
+<!-- Loading -->
+<div class="loader" id="loader">
+  <div class="lc">
+    <div class="num mono"><span id="lnum">00</span></div>
+    <div class="lbl">Maison Veyra · lädt</div>
+    <div class="barwrap"><i id="lbar"></i></div>
+  </div>
+</div>
+
+<header class="header">
+  <a class="wordmark" href="#">MAISON <b>VEYRA</b></a>
+  <div class="right">
+    <a class="lnk" href="#">Kollektion</a>
+    <a class="lnk" href="#">Atelier</a>
+    <button class="magnet" id="magnet">Termin</button>
+  </div>
+</header>
+
+<div class="index" aria-hidden="true">
+  <span class="big mono" id="idxNum">№ 01 / 03</span>
+  <div class="ticks" id="ticks"><i class="on"></i><i></i><i></i></div>
+</div>
+
+<main>
+  <section class="slide" data-i="0">
+    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=2000&q=80&auto=format&fit=crop" alt="Feine Uhr in Szene" />
+    <div class="meta">
+      <p class="no mono">№ 01 — Ouverture</p>
+      <h2>Zeit,<br>in Form gebracht.</h2>
+    </div>
+  </section>
+  <section class="slide" data-i="1">
+    <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=2000&q=80&auto=format&fit=crop" alt="Solitär-Ring" />
+    <div class="meta">
+      <p class="no mono">№ 02 — Solitaire</p>
+      <h2>Ein Stein.<br>Ein Versprechen.</h2>
+      <p class="sub">Verlobungsringe aus dem Meisteratelier, gefasst von Hand.</p>
+    </div>
+  </section>
+  <section class="slide" data-i="2">
+    <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=2000&q=80&auto=format&fit=crop" alt="Goldschmuck" />
+    <div class="meta">
+      <p class="no mono">№ 03 — Atelier</p>
+      <h2>Handwerk,<br>das bleibt.</h2>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // loader
+  var loader=document.getElementById("loader"),lnum=document.getElementById("lnum"),lbar=document.getElementById("lbar");
+  var p=0, dur=reduce?1:1400, step=reduce?100:2;
+  var iv=setInterval(function(){
+    p=Math.min(100,p+step+Math.random()*4);
+    lnum.textContent=String(Math.floor(p)).padStart(2,"0"); lbar.style.width=p+"%";
+    if(p>=100){clearInterval(iv);setTimeout(function(){loader.classList.add("done");},reduce?0:300);}
+  },dur/(100/step));
+
+  // magnetic CTA
+  var m=document.getElementById("magnet");
+  if(!matchMedia("(pointer: coarse)").matches && !reduce){
+    m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();
+      m.style.transform="translate("+((e.clientX-(r.left+r.width/2))*.35)+"px,"+((e.clientY-(r.top+r.height/2))*.45)+"px)";});
+    m.addEventListener("pointerleave",function(){m.style.transform="";});
+  }
+
+  // section index via IntersectionObserver
+  var ticks=document.getElementById("ticks").children, idxNum=document.getElementById("idxNum");
+  var total=document.querySelectorAll(".slide").length;
+  var io=new IntersectionObserver(function(ents){
+    ents.forEach(function(en){
+      if(en.isIntersecting){
+        var i=+en.target.getAttribute("data-i");
+        for(var k=0;k<ticks.length;k++) ticks[k].classList.toggle("on",k===i);
+        idxNum.textContent="№ "+String(i+1).padStart(2,"0")+" / "+String(total).padStart(2,"0");
+      }
+    });
+  },{threshold:.5});
+  document.querySelectorAll(".slide").forEach(function(s){io.observe(s);});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- MAISON VEYRA · Hero-Option 1 "Cinématique" — Full-Bleed-Bild, grosse Serif-Headline,
+     Index-Eyebrow, sanfter Ken-Burns-Zoom, Scroll-Cue. Inspiration: smartdevicetec / Cartier. -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VEYRA — Hero 1 · Cinématique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#0D0B0A;--fg:#F4ECE1;--muted:#A89E8E;--gold:#C9A45B;--line:rgba(244,236,225,.16);--ease:cubic-bezier(.16,1,.3,1)}
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Inter",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .badge{position:fixed;left:14px;bottom:14px;z-index:50;background:var(--fg);color:var(--bg);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:999px;opacity:.85}
+  .hero{position:relative;height:100vh;min-height:600px;overflow:hidden;display:flex;align-items:flex-end}
+  .hero .bg{position:absolute;inset:0}
+  .hero .bg img{width:100%;height:100%;object-fit:cover;animation:kb 18s var(--ease) infinite alternate}
+  @keyframes kb{from{transform:scale(1.06)}to{transform:scale(1.16)}}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,11,10,.45),transparent 32%,rgba(13,11,10,.9))}
+  .inner{position:relative;z-index:2;padding:clamp(28px,6vw,86px);width:100%;max-width:1100px}
+  .eyebrow{display:flex;align-items:center;gap:14px;font-family:"JetBrains Mono",monospace;font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 22px;opacity:0;animation:rise .9s var(--ease) .1s forwards}
+  .eyebrow .ln{width:46px;height:1px;background:var(--gold);opacity:.6}
+  h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2.8rem,8vw,6.2rem);line-height:1.0;letter-spacing:-.01em;margin:0 0 26px;max-width:16ch;opacity:0;animation:rise 1s var(--ease) .22s forwards}
+  h1 em{font-style:italic;color:var(--gold)}
+  .lead{color:var(--fg);opacity:.82;max-width:46ch;font-size:clamp(1rem,1.5vw,1.18rem);margin:0 0 30px;opacity:0;animation:rise 1s var(--ease) .34s forwards}
+  .actions{display:flex;flex-wrap:wrap;gap:14px;opacity:0;animation:rise 1s var(--ease) .46s forwards}
+  .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+  .cta.solid{background:linear-gradient(150deg,var(--gold),#a87f37);color:#1c1407}
+  .cta.ghost{border:1px solid rgba(244,236,225,.5);color:var(--fg)}
+  .cta.ghost:hover{background:var(--fg);color:var(--bg)}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  .cue{position:absolute;right:clamp(20px,4vw,56px);bottom:34px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;font-family:"JetBrains Mono",monospace;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .cue .bar{width:1px;height:46px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
+  .cue .bar::after{content:"";position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--gold);animation:drop 1.8s ease-in-out infinite}
+  @keyframes drop{from{top:-50%}to{top:100%}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important}.eyebrow,h1,.lead,.actions{opacity:1 !important}}
+</style>
+</head>
+<body>
+<span class="badge">Hero 1 · Cinématique</span>
+<section class="hero">
+  <div class="bg"><img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=2200&q=80&auto=format&fit=crop" alt="Portrait mit feinem Schmuck" /></div>
+  <div class="inner">
+    <p class="eyebrow"><span class="ln"></span> № 01 — Maison Veyra · seit 1968</p>
+    <h1>Ein Versprechen, in <em>Gold</em> gefasst.</h1>
+    <p class="lead">Haute Joaillerie und feine Uhren aus Düsseldorf. Von Hand gefertigt, für einen Moment, der bleibt.</p>
+    <div class="actions">
+      <a class="cta solid" href="#">Kollektion entdecken</a>
+      <a class="cta ghost" href="#">Termin buchen</a>
+    </div>
+  </div>
+  <div class="cue">Scrollen<span class="bar"></span></div>
+</section>
+</body>
+</html>

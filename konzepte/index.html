@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!--
+  KONZEPT-INDEX — 5 Design-Richtungen zur Auswahl (Neustart).
+  Tragende Idee: neutrale Auswahlseite, je Richtung eine Karte mit Farb-Vorschau + Link.
+  Technik: statisches HTML, ohne JS-Zwang. Produktionspfad: entfällt in PROD.
+-->
+<title>MAISON AURÉLIE · 5 Design-Richtungen zur Auswahl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- PROD: next/font lokal -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0c0c0f; --panel:#16161b; --text:#f2eee6; --muted:#a8a193;
+    --line:rgba(255,255,255,.12); --focus:#e0c48c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:"Inter",system-ui,sans-serif;line-height:1.55;
+    overflow-x:hidden;padding:clamp(1.25rem,4vw,4rem);
+  }
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+
+  header{max-width:60rem;margin:0 auto clamp(2rem,5vw,3.5rem)}
+  .kicker{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--focus);margin-bottom:1rem}
+  h1{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:clamp(2.2rem,6vw,4rem);line-height:1.03;margin-bottom:.9rem}
+  .lede{color:var(--muted);max-width:52ch;font-size:clamp(1rem,2.2vw,1.1rem)}
+  .hint{color:var(--muted);font-size:.9rem;margin-top:1.1rem}
+  .hint b{color:var(--text);font-weight:600}
+
+  main{max-width:78rem;margin:0 auto;display:grid;gap:clamp(1rem,2.5vw,1.6rem);
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr))}
+  .card{
+    display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;background:var(--panel);
+    transition:transform .25s ease,border-color .25s ease
+  }
+  @media (hover:hover){.card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.28)}}
+  .swatches{display:flex;height:7.5rem}
+  .swatches span{flex:1}
+  .body{padding:1.1rem 1.2rem 1.3rem}
+  .no{font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+  .name{font-family:"Cormorant Garamond",serif;font-size:1.5rem;line-height:1.1;margin:.15rem 0 .4rem}
+  .mood{color:var(--muted);font-size:.9rem;min-height:2.6em}
+  .palette{margin-top:.9rem;display:flex;gap:.4rem;flex-wrap:wrap}
+  .palette code{font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:.15rem .4rem}
+  .open{margin-top:1rem;display:inline-flex;align-items:center;min-height:44px;font-size:.9rem;color:var(--focus)}
+  .open::after{content:" \2192";white-space:pre}
+
+  footer{max-width:78rem;margin:clamp(2.5rem,5vw,4rem) auto 0;padding-top:1.4rem;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <p class="kicker">Maison Aurélie · Auswahl</p>
+  <h1>Fünf Design-Richtungen.</h1>
+  <p class="lede">Jede Richtung steht für eine eigene Welt aus Farbe, Layout und Typografie. Öffne die Konzepte, vergleiche und sag mir, welche wir vertiefen.</p>
+  <p class="hint">Tipp: In jedem Konzept findest du eine Kachel <b>„Auf einen Blick"</b> mit Farbmustern und Schrift-Specimen. Danach: dein Kommando, welche Richtung weitergeht.</p>
+</header>
+
+<main id="grid"></main>
+
+<footer>
+  <p>Konzeptphase. Visuals sind Platzhalter, echte Makrofotografie folgt in Produktion. Marken nur als Textnennung.</p>
+</footer>
+
+<script>
+  const concepts = [
+    { no:"1", name:"Obsidian & Champagner", file:"konzept-1-obsidian-champagner.html",
+      mood:"Tiefschwarz, viel Ruhe, editoriale Serife. Zeitloses dunkles Luxus-Minimal.",
+      colors:["#0B0B0D","#15151A","#C8A86A","#E0C48C","#F3EFE7"],
+      codes:["#0B0B0D","#C8A86A","Cormorant + Inter"] },
+    { no:"2", name:"Elfenbein & Onyx", file:"konzept-2-elfenbein-onyx.html",
+      mood:"Hell, galerieartig, dünne Goldlinien. Leicht und museumshaft.",
+      colors:["#F5F1E9","#FFFFFF","#9C7A3C","#17140F","#6B6256"],
+      codes:["#F5F1E9","#9C7A3C","Fraunces + Inter"] },
+    { no:"3", name:"Heritage & Kupfer", file:"konzept-3-heritage-kupfer.html",
+      mood:"Warm, handwerklich, Manufaktur seit 1968. Traditionsbewusst und erdig-edel.",
+      colors:["#1C1A17","#262219","#C07A45","#D9A066","#EDE6D8"],
+      codes:["#1C1A17","#C07A45","Marcellus + Inter"] },
+    { no:"4", name:"Stahl & Platin", file:"konzept-4-stahl-platin.html",
+      mood:"Kühl, technisch, marken-forward. Strenges Raster für Uhren-Konzession.",
+      colors:["#0E1318","#161D24","#6E92B6","#C6CCD3","#E8EEF3"],
+      codes:["#0E1318","#6E92B6","Space Grotesk + Inter"] },
+    { no:"5", name:"Bordeaux & Gold", file:"konzept-5-bordeaux-gold.html",
+      mood:"Opulent, romantisch, Couture-Schmuckton. Stark für Verlobung und Trauringe.",
+      colors:["#21090E","#2E1118","#CBA15A","#E6C783","#F4E7DD"],
+      codes:["#21090E","#CBA15A","Bodoni Moda + Inter"] },
+  ];
+  const grid = document.getElementById("grid");
+  for (const c of concepts){
+    const a = document.createElement("a");
+    a.className = "card"; a.href = c.file;
+    a.setAttribute("aria-label", "Konzept " + c.no + ": " + c.name + " öffnen");
+    const sw = c.colors.map(col => '<span style="background:'+col+'"></span>').join("");
+    const codes = c.codes.map(x => '<code>'+x+'</code>').join("");
+    a.innerHTML =
+      '<div class="swatches" aria-hidden="true">'+sw+'</div>'+
+      '<div class="body">'+
+        '<span class="no">Richtung '+c.no+'</span>'+
+        '<span class="name">'+c.name+'</span>'+
+        '<p class="mood">'+c.mood+'</p>'+
+        '<div class="palette">'+codes+'</div>'+
+        '<span class="open">Konzept öffnen</span>'+
+      '</div>';
+    grid.appendChild(a);
+  }
+</script>
+</body>
+</html>
