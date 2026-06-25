@@ -73,15 +73,17 @@
   }
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}}
 
-  .reveal{position:fixed;inset:0;z-index:500;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}
-  .reveal .col{background:var(--panel);transform-origin:top;animation:revcol .85s var(--ease) forwards;animation-delay:calc(.55s + var(--i)*.07s)}
-  @keyframes revcol{from{transform:scaleY(1)}to{transform:scaleY(0)}}
-  .reveal .mark{position:absolute;inset:0;display:grid;place-items:center;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2rem,7vw,4.2rem);letter-spacing:.42em;color:var(--fg);padding-left:.42em;animation:revmark 1.15s var(--ease) forwards}
-  @keyframes revmark{0%{opacity:0;letter-spacing:.6em}28%{opacity:1;letter-spacing:.42em}72%{opacity:1}100%{opacity:0}}
-  .rise{opacity:0;animation:rise .9s var(--ease) forwards;animation-delay:1.15s}
-  .rise.d1{animation-delay:1.25s}.rise.d2{animation-delay:1.35s}.rise.d3{animation-delay:1.45s}
+  /* Intro: Seite bleibt blank, Inhalt erscheint ERST wenn der Ring gelandet ist (body.intro-done) */
+  .rise{opacity:0}
+  .fadein{opacity:0}
+  body.intro-done .rise{animation:rise 1s var(--ease) forwards}
+  body.intro-done .rise.d1{animation-delay:.15s}
+  body.intro-done .rise.d2{animation-delay:.3s}
+  body.intro-done .rise.d3{animation-delay:.45s}
+  body.intro-done .fadein{animation:fadein 1.1s var(--ease) forwards}
   @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.reveal{display:none}.rise{opacity:1;animation:none}}
+  @keyframes fadein{to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.rise,.fadein{opacity:1;animation:none}}
 
   .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,4vw,60px);
     padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:hidden}
@@ -99,23 +101,24 @@
   .sw button .nm{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;letter-spacing:.04em;color:var(--muted)}
   .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;background:var(--accent);color:var(--on-accent);margin-top:34px;transition:background var(--t)}
 
-  .stage{position:relative;justify-self:center;width:min(82vw,480px);aspect-ratio:1/1}
-  .card{position:relative;width:100%;height:100%;border-radius:24px;overflow:hidden;
-    background:radial-gradient(120% 100% at 50% 30%,color-mix(in srgb,var(--accent) 14%,var(--panel-2)),var(--panel-2));
-    box-shadow:0 60px 120px -50px rgba(0,0,0,.85);border:1px solid var(--line)}
-  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:none;cursor:grab}
+  /* Ring-Bühne: hoher, großer Bereich (volle Hero-Höhe) statt quadratischem Kasten,
+     damit der Ring frei groß auftauchen und fallen kann, ohne abgeschnitten zu werden */
+  .stage{pointer-events:none}
+  .hero>.stage{position:absolute;inset:0;width:auto;z-index:0}
+  /* Mobil: Canvas bleibt vollflächig über der ganzen Hero-Section, Text rückt nach oben */
+  @media(max-width:900px){.hero{align-items:start}}
+  /* Card entfernt — nur noch der frei schwebende Ring */
+  .ringstage{position:relative;width:100%;height:100%}
+  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;cursor:grab;pointer-events:auto}
   #ringcanvas:active{cursor:grabbing}
-  .card .fallback{position:absolute;inset:0;z-index:2}
-  .card .fallback img{width:100%;height:100%;object-fit:cover}
-  .card .ring-frame{position:absolute;inset:0;border-radius:24px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);pointer-events:none;z-index:3}
-  .card .floor{position:absolute;left:50%;bottom:9%;width:58%;height:9%;transform:translateX(-50%);z-index:0;pointer-events:none;
-    background:radial-gradient(closest-side,rgba(20,24,30,.28),transparent 75%);filter:blur(4px)}
-  .card .cap{position:absolute;left:18px;bottom:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.12em;color:var(--fg)}
-  .card .badge2{position:absolute;right:16px;top:16px;z-index:3;font-family:"JetBrains Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);background:rgba(255,255,255,.72);border:1px solid var(--line);padding:6px 10px;border-radius:999px}
-  .card .loadnote{position:absolute;inset:0;z-index:4;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);transition:opacity .5s}
-  .card .loadnote.hide{opacity:0;pointer-events:none}
+  .ringstage .fallback{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
+  .ringstage .fallback img{width:78%;height:78%;object-fit:contain;border-radius:18px;filter:drop-shadow(0 40px 60px rgba(20,24,30,.4))}
+  .ringstage .floor{position:absolute;left:50%;bottom:7%;width:54%;height:8%;transform:translateX(-50%);z-index:0;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(20,24,30,.26),transparent 75%);filter:blur(5px)}
+  .ringstage .loadnote{position:absolute;inset:0;z-index:4;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:transparent;transition:opacity .5s}
+  .ringstage .loadnote.hide{opacity:0;pointer-events:none}
 
-  /* ===== Hero-Hintergrund-Varianten (umschaltbar) ===== */
+  .hero-wrap{position:relative}
   .hero{position:relative;transition:background .45s ease}
   .hero>*{position:relative;z-index:1}
   .hero.bg-verlauf{background:radial-gradient(58vmin 58vmin at 70% 38%,color-mix(in srgb,var(--accent) 12%,#ffffff),transparent 60%),linear-gradient(160deg,#F8F9FB,#E6E9ED)}
@@ -171,7 +174,7 @@
   footer.site .fi{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:center}
   footer.site .wm{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;letter-spacing:.22em}
   footer.site .cp{color:var(--muted);font-size:.86rem}
-/* ===== Termin-Buchung (Dialog) ===== */
+  /* ===== Termin-Buchung (Dialog) ===== */
   .bkscrim{position:fixed;inset:0;background:var(--scrim);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:120;opacity:0;transition:opacity var(--t) var(--ease)}
   .bkscrim.show{opacity:1}
   .bk{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:20px;opacity:0;transition:opacity var(--t) var(--ease)}
@@ -206,8 +209,7 @@
 
   .ovl-cta{display:flex;align-items:center;justify-content:center;margin-top:20px;min-height:54px;padding:0 24px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-family:"Inter",sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:background var(--t)}
   .ovl-cta:hover{background:var(--accent2)}
-</style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div>
-<aside class="sidebar" id="sidebar">
+</style></head><body><aside class="sidebar fadein" id="sidebar">
   <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
   <nav aria-label="Hauptnavigation">
     <button class="navitem" data-panel="schmuck" aria-haspopup="true" aria-expanded="false">Schmuck <span class="car" aria-hidden="true">&#8594;</span></button>
@@ -264,7 +266,7 @@
   </div>
   <div class="rcol"><div class="preview"><img id="previewImg" src="" alt="Vorschau" /></div><div class="pcap"><em id="capKicker"></em><b id="capTitle"></b></div></div>
 </div>
-<header class="topbar"><a class="brand" href="#">VEYRA</a><button id="ovlOpen" aria-expanded="false" aria-controls="ovl"><span class="dot"></span> Menü</button></header>
+<header class="topbar fadein"><a class="brand" href="#">VEYRA</a><button id="ovlOpen" aria-expanded="false" aria-controls="ovl"><span class="dot"></span> Menü</button></header>
 <div class="ovl" id="ovl" aria-hidden="true">
   <div class="x"><span class="brand" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;letter-spacing:.2em;color:var(--fg)">VEYRA</span><button id="ovlClose" aria-label="Schließen">&times;</button></div>
   <div class="grp"><div class="glabel"><a href="#">Schmuck</a></div><div class="links"><a href="#">Ringe</a><a href="#">Halsketten</a><a href="#">Ohrringe</a><a href="#">Armbänder</a></div></div>
@@ -274,7 +276,7 @@
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
   <a class="ovl-cta" href="#termin" data-book role="button">Termin buchen</a>
 </div>
-<div class="main"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="card"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="ring-frame"></div><span class="badge2">3D · ziehen</span><span class="cap">Solitaire · Brillant</span><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
+<div class="main"><div class="hero-wrap"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage"><div class="ringstage"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
 <div class="bkscrim" id="bkScrim" hidden></div>
 <div class="bk" id="bkModal" role="dialog" aria-modal="true" aria-labelledby="bkTitle" aria-describedby="bkSub" hidden>
   <div class="bk-panel">
@@ -294,16 +296,16 @@
         </select>
       </div>
       <div class="bk-row"><label for="bkDate">Wunschdatum</label><input type="date" id="bkDate" name="date" required></div>
-        <div class="bk-row"><label for="bkTime">Uhrzeit</label>
-          <select id="bkTime" name="time" required>
-            <option value="" disabled selected>Bitte wählen</option>
-            <option>10:00</option><option>11:00</option><option>12:00</option>
-            <option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option>
-          </select>
-        </div>
+      <div class="bk-row"><label for="bkTime">Uhrzeit</label>
+        <select id="bkTime" name="time" required>
+          <option value="" disabled selected>Bitte wählen</option>
+          <option>10:00</option><option>11:00</option><option>12:00</option>
+          <option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option>
+        </select>
+      </div>
       <div class="bk-row"><label for="bkName">Name</label><input type="text" id="bkName" name="name" autocomplete="name" required></div>
       <div class="bk-row"><label for="bkMail">E-Mail</label><input type="email" id="bkMail" name="email" autocomplete="email" required></div>
-        <div class="bk-row"><label for="bkPhone">Telefon (optional)</label><input type="tel" id="bkPhone" name="phone" autocomplete="tel"></div>
+      <div class="bk-row"><label for="bkPhone">Telefon (optional)</label><input type="tel" id="bkPhone" name="phone" autocomplete="tel"></div>
       <div class="bk-row"><label for="bkMsg">Nachricht (optional)</label><textarea id="bkMsg" name="message" rows="3"></textarea></div>
       <label class="bk-check"><input type="checkbox" id="bkPriv" required> <span>Ich habe die Datenschutzhinweise gelesen und bin mit der Kontaktaufnahme einverstanden.</span></label>
       <p class="bk-error" id="bkError" role="alert" hidden></p>
@@ -373,7 +375,6 @@
 </script><script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const canvas=document.getElementById('ringcanvas');
@@ -388,19 +389,55 @@ try{
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
   renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0.3,4);
+  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0,4.8);
   const pmrem=new THREE.PMREMGenerator(renderer);
   scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
   const key=new THREE.PointLight(0xffffff,18,40,2); key.position.set(3,5,4); scene.add(key);
   const fill=new THREE.PointLight(0xbfe6ff,10,40,2); fill.position.set(-4,-1,3); scene.add(fill);
 
-  const controls=new OrbitControls(camera,canvas);
-  controls.enablePan=false; controls.enableZoom=true; controls.minDistance=2.4; controls.maxDistance=6;
-  controls.enableDamping=true; controls.dampingFactor=0.08;
-  controls.autoRotate=!reduce; controls.autoRotateSpeed=1.4;
-  controls.target.set(0,0,0);
+  // Kamera fix; der Ring rotiert um seine eigene Achse -> er kann außerhalb der
+  // Mitte (rechts) ruhen und trotzdem an Ort und Stelle drehen.
+  camera.lookAt(0,0,0);
 
-  function fit(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  // ===== Animations-Status: Ring fällt schräg von oben links an seinen Platz =====
+  let pivot=null, introStart=null, introDone=false;
+  const FALL_DUR=2700;           // Dauer des Falls von oben (ms) — langsamer, Ring bleibt groß
+  const SHRINK_DUR=750;          // danach: am Platz auf Originalgröße schrumpfen
+  const INTRO_SPINS=1.0;         // ganze Y-Umdrehung (links/rechts) -> landet frontal
+  const INTRO_TUMBLE=1.0;        // ganze X-Umdrehung (oben/unten) gleichzeitig -> landet eben
+  // werden in fit() formatabhängig berechnet:
+  let maxDim=1, restScale=1, bigScale=1;
+  let restX=0, restY=0.05, startX=-1, startY=2.4;
+  let curRotY=0, dragging=false, lastX=0;
+  const spinVel=reduce?0:0.0045; // sanftes Weiterdrehen im Ruhezustand
+  const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+  const easeInOut=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+  const easeOut=t=>1-Math.pow(1-t,3);
+  const stageEl=document.querySelector('.stage');
+  function revealRest(){ document.body.classList.add('intro-done'); }
+  // Sicherheits-Fallback: Inhalt erscheint auch, falls der Ring nicht lädt
+  setTimeout(revealRest,8000);
+
+  function fit(){
+    const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+    const halfH=Math.tan((42*Math.PI/180)/2)*camera.position.z; // halbe sichtbare Höhe (Weltkoord.)
+    const halfW=halfH*(w/h);
+    const wide=(w/h)>1;
+    let fitUnits;
+    if(wide){ // Desktop: prominent rechts
+      fitUnits=Math.min(halfW*2*0.78, halfH*2*0.52);
+      restX=Math.min(halfW*0.40,1.25); restY=0.05;
+    } else {  // Mobil: schmaler & tiefer, damit Text + Button oben Platz haben
+      fitUnits=Math.min(halfW*2*0.58, halfH*2*0.36);
+      restX=0; restY=-halfH*0.62;
+    }
+    restScale=fitUnits/maxDim;
+    // großer Ring beim Fall: 45% größer, aber nie breiter als 96% der Ansicht (kein Abschneiden)
+    bigScale=Math.min(restScale*1.45, (halfW*2*0.96)/maxDim);
+    startX = wide ? -halfW*0.7 : -halfW*0.6;           // aus der oberen linken Ecke
+    startY = halfH + bigScale*maxDim*0.7;              // von ganz oben, über dem Rand
+  }
   window.addEventListener('resize',fit); fit(); setTimeout(fit,150);
 
   const loader=new GLTFLoader();
@@ -408,11 +445,13 @@ try{
     const root=gltf.scene;
     const box=new THREE.Box3().setFromObject(root);
     const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
-    const maxDim=Math.max(size.x,size.y,size.z)||1;
-    const pivot=new THREE.Group();
+    maxDim=Math.max(size.x,size.y,size.z)||1;
+    pivot=new THREE.Group();
     root.position.sub(center);
     pivot.add(root);
-    pivot.scale.setScalar(2.2/maxDim);
+    fit(); // restScale/bigScale/Positionen mit echtem maxDim berechnen
+    if(!reduce){ pivot.scale.setScalar(bigScale); pivot.position.set(startX,startY,0); if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
+    else { pivot.scale.setScalar(restScale); pivot.position.set(restX,restY,0); revealRest(); }
     scene.add(pivot);
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
       ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
@@ -422,7 +461,7 @@ try{
     if(loadnote)loadnote.classList.add('hide');
     if(fallback)fallback.style.display='none';
   },(xhr)=>{ if(loadnote && xhr.total){ loadnote.textContent='Ring wird geladen … '+Math.round(xhr.loaded/xhr.total*100)+'%'; } },
-  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); /* Foto-Fallback bleibt */ });
+  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); revealRest(); /* Foto-Fallback bleibt */ });
 
   // Metall-Umschaltung
   document.querySelectorAll('#sw button').forEach(b=>b.addEventListener('click',()=>{
@@ -432,11 +471,47 @@ try{
     metals.forEach(m=>{ if(m.color)m.color.copy(tint); });
   }));
 
+  // Drag zum Drehen (Ring rotiert um eigene Achse; erst nach der Landung)
+  canvas.addEventListener('pointerdown',e=>{ if(!introDone)return; dragging=true; lastX=e.clientX; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
+  canvas.addEventListener('pointermove',e=>{ if(!dragging)return; curRotY+=(e.clientX-lastX)*0.01; lastX=e.clientX; });
+  const endDrag=()=>{ dragging=false; };
+  canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag); canvas.addEventListener('pointerleave',endDrag);
+
   let run=true,raf;
   document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run&&!raf)loop();});
-  function loop(){raf=requestAnimationFrame(loop);if(!run){raf=0;return;}controls.update();renderer.render(scene,camera);}
+  function loop(){
+    raf=requestAnimationFrame(loop);
+    if(!run){raf=0;return;}
+    if(pivot){
+      if(!reduce && introStart!==null && !introDone){
+        const el=performance.now()-introStart;
+        if(el<FALL_DUR){
+          // Phase 1 – Fall: groß aus der oberen linken Ecke, dabei taumelnd (X+Y)
+          const t=clamp(el/FALL_DUR,0,1), e=easeInOut(t);
+          pivot.position.set(startX+(restX-startX)*e, startY+(restY-startY)*e, 0);
+          pivot.scale.setScalar(bigScale);
+          curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
+          pivot.rotation.x=e*INTRO_TUMBLE*Math.PI*2;   // gleichzeitig oben/unten
+          if(stageEl)stageEl.style.opacity=String(clamp(t/0.15,0,1));
+        } else {
+          // Phase 2 – am Platz angekommen: jetzt auf Originalgröße schrumpfen
+          const t=clamp((el-FALL_DUR)/SHRINK_DUR,0,1), e=easeOut(t);
+          pivot.position.set(restX,restY,0); pivot.rotation.x=0;
+          pivot.scale.setScalar(bigScale+(restScale-bigScale)*e);
+          curRotY+=spinVel; pivot.rotation.y=curRotY;
+          if(t>=1){ introDone=true; revealRest(); } // erst jetzt erscheint der Rest
+        }
+      } else {
+        // Ruhezustand: an seinem Platz, dreht sich sanft weiter (oder per Drag)
+        pivot.position.set(restX,restY,0);
+        if(!dragging) curRotY+=spinVel;
+        pivot.rotation.y=curRotY;
+      }
+    }
+    renderer.render(scene,camera);
+  }
   loop();
-}catch(e){ if(loadnote)loadnote.classList.add('hide'); console.error(e); }
+}catch(e){ if(loadnote)loadnote.classList.add('hide'); document.body.classList.add('intro-done'); console.error(e); }
 </script><script>
 (function(){
   var modal=document.getElementById('bkModal'); if(!modal) return;
