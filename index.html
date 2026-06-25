@@ -130,7 +130,8 @@
   .ringstage{position:relative;width:100%;height:100%}
   #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;pointer-events:none}
   #ringcanvas:active{cursor:grabbing}
-  .ringstage .fallback{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
+  .ringstage .fallback{position:absolute;inset:0;z-index:2;display:none;place-items:center;pointer-events:none}
+  .ringstage .fallback.show{display:grid}
   .ringstage .fallback img{width:78%;height:78%;object-fit:contain;border-radius:18px;filter:drop-shadow(0 40px 60px rgba(20,24,30,.4))}
   .ringstage .floor{position:absolute;left:50%;bottom:7%;width:54%;height:8%;transform:translateX(-50%);z-index:0;pointer-events:none;
     background:radial-gradient(closest-side,rgba(20,24,30,.26),transparent 75%);filter:blur(5px)}
@@ -526,7 +527,7 @@ try{
     if(loadnote)loadnote.classList.add('hide');
     if(fallback)fallback.style.display='none';
   },(xhr)=>{ if(loadnote && xhr.total){ loadnote.textContent='Ring wird geladen … '+Math.round(xhr.loaded/xhr.total*100)+'%'; } },
-  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); revealRest(); /* Foto-Fallback bleibt */ });
+  (err)=>{ console.error('GLB load failed',err); if(loadnote)loadnote.classList.add('hide'); if(fallback)fallback.classList.add('show'); revealRest(); });
 
   // Metall-Umschaltung
   document.querySelectorAll('#sw button').forEach(b=>b.addEventListener('click',()=>{
@@ -580,7 +581,7 @@ try{
     renderer.render(scene,camera);
   }
   loop();
-}catch(e){ if(loadnote)loadnote.classList.add('hide'); document.body.classList.add('intro-done'); console.error(e); }
+}catch(e){ if(loadnote)loadnote.classList.add('hide'); var _fb=document.getElementById('fallback'); if(_fb)_fb.classList.add('show'); document.body.classList.add('intro-done'); console.error(e); }
 </script><script>
 (function(){
   var modal=document.getElementById('bkModal'); if(!modal) return;
