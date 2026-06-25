@@ -397,11 +397,11 @@ try{
 
   // ===== Animations-Status: Ring fliegt von oben links langsam an seinen Platz =====
   let pivot=null, baseScale=1, introStart=null, introDone=false;
-  const INTRO_DUR=3000;        // Dauer des Anflugs (ms) — langsam
-  const INTRO_SPINS=1.5;       // sanfte Umdrehungen während des Anflugs
-  const INTRO_START_SCALE=0.45;// etwas kleiner starten, an seinen Platz wachsen
-  const INTRO_FROM_X=-1.6;     // Start: links
-  const INTRO_FROM_Y=1.1;      // Start: oben
+  const INTRO_DUR=2600;        // Dauer des Anflugs (ms)
+  const INTRO_SPINS=1.0;       // sanfte Umdrehungen während des Falls
+  const INTRO_START_SCALE=2.6; // groß auftauchen -> auf Originalgröße schrumpfen
+  const INTRO_FROM_X=0;        // mittig (horizontal)
+  const INTRO_FROM_Y=1.3;      // weiter oben starten -> fällt an seinen Platz
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   const easeOutCubic=t=>1-Math.pow(1-t,3);
   function revealRest(){ document.body.classList.add('intro-done'); }
@@ -448,7 +448,7 @@ try{
     raf=requestAnimationFrame(loop);
     if(!run){raf=0;return;}
     if(pivot && !reduce && introStart!==null && !introDone){
-      // Anflug: von oben links, klein -> wächst sanft drehend an seinen Platz
+      // Anflug: groß & weiter oben -> fällt drehend an seinen Platz und schrumpft auf Originalgröße
       const t=clamp((performance.now()-introStart)/INTRO_DUR,0,1);
       const e=easeOutCubic(t);
       pivot.position.set(INTRO_FROM_X*(1-e),INTRO_FROM_Y*(1-e),0);
