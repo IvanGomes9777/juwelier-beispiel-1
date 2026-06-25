@@ -70,6 +70,7 @@
   .main{margin-left:var(--sw)}
   @media (max-width:900px){
     .sidebar{display:none} .topbar{display:flex} .main{margin-left:0} .scrim{left:0} .flyout{display:none}
+    .hero>.stage{left:0} .dragcatch{left:0;right:0;width:auto;top:auto;bottom:0;height:55%}
   }
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}}
 
@@ -86,7 +87,7 @@
   @media (prefers-reduced-motion:reduce){.rise,.fadein{opacity:1;animation:none}}
 
   .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,4vw,60px);
-    padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:hidden}
+    padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:visible}
   @media(max-width:900px){.hero{grid-template-columns:1fr}}
   .kin .eb{font-family:"JetBrains Mono",monospace;font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin:0 0 22px;transition:color var(--t)}
   .kin h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(2.6rem,6.4vw,5.4rem);line-height:.98;margin:0;letter-spacing:-.01em}
@@ -100,16 +101,33 @@
   .sw button:hover{transform:translateY(-3px)} .sw button[aria-pressed="true"]{border-color:var(--fg)}
   .sw button .nm{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;letter-spacing:.04em;color:var(--muted)}
   .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;background:var(--accent);color:var(--on-accent);margin-top:34px;transition:background var(--t)}
+  /* Hero-Detail: füllt den Raum dezent, erscheint erst nach dem Intro */
+  .meta{list-style:none;display:flex;flex-wrap:wrap;gap:14px 30px;margin:34px 0 0;padding:26px 0 0;border-top:1px solid var(--line);max-width:44ch}
+  .meta li{font-size:.8rem;color:var(--muted);line-height:1.35;letter-spacing:.01em}
+  .meta li b{display:block;font-family:"Fraunces",serif;font-weight:600;font-size:1.45rem;color:var(--fg);letter-spacing:-.01em;margin-bottom:1px}
+  .scrollcue{position:absolute;left:0;bottom:30px;display:inline-flex;align-items:center;gap:12px;font-family:"JetBrains Mono",monospace;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
+  .scrollcue i{display:block;width:38px;height:1px;background:var(--line);position:relative;overflow:hidden}
+  .scrollcue i::after{content:"";position:absolute;top:0;left:0;height:1px;width:14px;background:var(--accent);animation:cueslide 1.9s var(--ease) infinite}
+  @keyframes cueslide{0%{transform:translateX(-14px)}100%{transform:translateX(38px)}}
+  .scrollcue:hover{color:var(--fg)}
+  .herofig{position:absolute;right:clamp(18px,3vw,52px);bottom:34px;z-index:2;text-align:right;pointer-events:none}
+  .herofig .ek{font-family:"JetBrains Mono",monospace;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+  .herofig .nm{font-family:"Fraunces",serif;font-size:1.2rem;color:var(--fg);margin-top:4px}
+  @media(max-width:900px){ .meta{gap:12px 22px;margin-top:26px;padding-top:20px} .herofig,.scrollcue{display:none} }
 
   /* Ring-Bühne: hoher, großer Bereich (volle Hero-Höhe) statt quadratischem Kasten,
      damit der Ring frei groß auftauchen und fallen kann, ohne abgeschnitten zu werden */
   .stage{pointer-events:none}
-  .hero>.stage{position:absolute;inset:0;width:auto;z-index:0}
+  /* Ring-Ebene über die volle Breite (auch über die Navbar) und im Stapel davor */
+  .hero>.stage{position:absolute;top:0;bottom:0;left:calc(var(--sw)*-1);right:0;z-index:120;pointer-events:none}
+  .dragcatch{position:absolute;top:0;bottom:0;right:0;width:46%;left:auto;z-index:5;pointer-events:none;cursor:grab;touch-action:pan-y}
+  .dragcatch:active{cursor:grabbing}
+  body.intro-done .dragcatch{pointer-events:auto}
   /* Mobil: Canvas bleibt vollflächig über der ganzen Hero-Section, Text rückt nach oben */
   @media(max-width:900px){.hero{align-items:start}}
   /* Card entfernt — nur noch der frei schwebende Ring */
   .ringstage{position:relative;width:100%;height:100%}
-  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;cursor:grab;pointer-events:auto}
+  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;pointer-events:none}
   #ringcanvas:active{cursor:grabbing}
   .ringstage .fallback{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
   .ringstage .fallback img{width:78%;height:78%;object-fit:contain;border-radius:18px;filter:drop-shadow(0 40px 60px rgba(20,24,30,.4))}
@@ -276,7 +294,7 @@
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
   <a class="ovl-cta" href="#termin" data-book role="button">Termin buchen</a>
 </div>
-<div class="main"><div class="hero-wrap"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage"><div class="ringstage"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
+<div class="main"><div class="hero-wrap"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a><ul class="meta rise d3"><li><b>0,90 ct</b>Brillant · lupenrein</li><li><b>950</b>Platin &amp; 18 kt Gold</li><li><b>Königsallee</b>Atelier Düsseldorf</li></ul></div><div class="stage"><div class="ringstage"><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="loadnote" id="loadnote">Ring wird geladen …</div><div class="dragcatch" id="dragcatch" aria-hidden="true"></div></div></div><a class="scrollcue rise d3" href="#kollektionen" aria-label="Zu den Kollektionen"><span>Entdecken</span><i></i></a><figure class="herofig rise d3"><div class="ek">Modell № 01</div><div class="nm">Solitaire „Lumière“</div></figure></section></div><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
 <div class="bkscrim" id="bkScrim" hidden></div>
 <div class="bk" id="bkModal" role="dialog" aria-modal="true" aria-labelledby="bkTitle" aria-describedby="bkSub" hidden>
   <div class="bk-panel">
@@ -399,15 +417,17 @@ try{
   // Mitte (rechts) ruhen und trotzdem an Ort und Stelle drehen.
   camera.lookAt(0,0,0);
 
-  // ===== Animations-Status: Ring fällt schräg von oben links an seinen Platz =====
+  // ===== Animations-Status: Ring kommt mit der Krone voran auf die Kamera zu, richtet sich dann auf seinen Platz =====
   let pivot=null, introStart=null, introDone=false;
-  const FALL_DUR=2700;           // Dauer des Falls von oben (ms) — langsamer, Ring bleibt groß
-  const SHRINK_DUR=750;          // danach: am Platz auf Originalgröße schrumpfen
-  const INTRO_SPINS=1.0;         // ganze Y-Umdrehung (links/rechts) -> landet frontal
-  const INTRO_TUMBLE=1.0;        // ganze X-Umdrehung (oben/unten) gleichzeitig -> landet eben
+  const APPROACH_DUR=2300;       // Krone voran auf die Kamera zu (klein/fern -> groß/nah) — länger sichtbarer Einflug
+  const SETTLE_DUR=950;          // danach: aufrichten und auf seinen Platz gleiten
+  const CROWN_TILT=1.45;         // Kippung, sodass man frontal in die Krone schaut (rad)
+  const INTRO_SPINS=0.75;        // sanfte Y-Drehung währenddessen
+  const SMALL_FACTOR=0.34;       // Startgröße (klein/fern) relativ zur Ruhegröße
   // werden in fit() formatabhängig berechnet:
   let maxDim=1, restScale=1, bigScale=1;
   let restX=0, restY=0.05, startX=-1, startY=2.4;
+  let vHalfW=3, vHalfH=1.8;       // aktuelle halbe Sichtfeld-Maße (für den Anflug aus der Ecke)
   let curRotY=0, curRotX=0, dragging=false, lastX=0, lastY=0;
   const spinVel=reduce?0:0.0045; // sanftes Weiterdrehen im Ruhezustand
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
@@ -423,6 +443,7 @@ try{
     renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
     const halfH=Math.tan((42*Math.PI/180)/2)*camera.position.z; // halbe sichtbare Höhe (Weltkoord.)
     const halfW=halfH*(w/h);
+    vHalfW=halfW; vHalfH=halfH;
     const wide=(w/h)>1;
     let fitUnits;
     if(wide){ // Desktop: prominent rechts
@@ -433,8 +454,8 @@ try{
       restX=0; restY=-halfH*0.62;
     }
     restScale=fitUnits/maxDim;
-    // großer Ring beim Fall: 45% größer, aber nie breiter als 96% der Ansicht (kein Abschneiden)
-    bigScale=Math.min(restScale*1.45, (halfW*2*0.96)/maxDim);
+    // Peak im Anflug: Krone kommt nah ran (mit z-Perspektive eingerechnet), bleibt randsicher
+    bigScale=Math.min(restScale*1.55, (halfW*2*0.96)/(maxDim*1.5));
     startX = wide ? -halfW*0.7 : -halfW*0.6;           // aus der oberen linken Ecke
     startY = halfH + bigScale*maxDim*0.7;              // von ganz oben, über dem Rand
   }
@@ -450,7 +471,7 @@ try{
     root.position.sub(center);
     pivot.add(root);
     fit(); // restScale/bigScale/Positionen mit echtem maxDim berechnen
-    if(!reduce){ pivot.scale.setScalar(bigScale); pivot.position.set(startX,startY,0); if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
+    if(!reduce){ pivot.scale.setScalar(restScale*SMALL_FACTOR); pivot.position.set(0,0,-1.8); pivot.rotation.x=CROWN_TILT; if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
     else { pivot.scale.setScalar(restScale); pivot.position.set(restX,restY,0); revealRest(); }
     scene.add(pivot);
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
@@ -472,10 +493,11 @@ try{
   }));
 
   // Drag zum Drehen (Ring rotiert um eigene Achse; erst nach der Landung)
-  canvas.addEventListener('pointerdown',e=>{ if(!introDone)return; dragging=true; lastX=e.clientX; lastY=e.clientY; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
-  canvas.addEventListener('pointermove',e=>{ if(!dragging)return; curRotY+=(e.clientX-lastX)*0.01; curRotX+=(e.clientY-lastY)*0.01; lastX=e.clientX; lastY=e.clientY; });
+  const dragcatch=document.getElementById('dragcatch')||canvas;
+  dragcatch.addEventListener('pointerdown',e=>{ if(!introDone)return; dragging=true; lastX=e.clientX; lastY=e.clientY; try{dragcatch.setPointerCapture(e.pointerId);}catch(_){} });
+  dragcatch.addEventListener('pointermove',e=>{ if(!dragging)return; curRotY+=(e.clientX-lastX)*0.01; curRotX+=(e.clientY-lastY)*0.01; lastX=e.clientX; lastY=e.clientY; });
   const endDrag=()=>{ dragging=false; };
-  canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag); canvas.addEventListener('pointerleave',endDrag);
+  dragcatch.addEventListener('pointerup',endDrag); dragcatch.addEventListener('pointercancel',endDrag); dragcatch.addEventListener('pointerleave',endDrag);
 
   let run=true,raf;
   document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run&&!raf)loop();});
@@ -485,19 +507,22 @@ try{
     if(pivot){
       if(!reduce && introStart!==null && !introDone){
         const el=performance.now()-introStart;
-        if(el<FALL_DUR){
-          // Phase 1 – Fall: groß aus der oberen linken Ecke, dabei taumelnd (X+Y)
-          const t=clamp(el/FALL_DUR,0,1), e=easeInOut(t);
-          pivot.position.set(startX+(restX-startX)*e, startY+(restY-startY)*e, 0);
-          pivot.scale.setScalar(bigScale);
+        const small=restScale*SMALL_FACTOR;
+        if(el<APPROACH_DUR){
+          // Phase 1 – die Krone voran auf die Kamera zu: klein/fern -> groß/nah
+          const t=clamp(el/APPROACH_DUR,0,1), e=easeOut(t);
+          const ax=-vHalfW*3.0, ay=vHalfH*2.4;             // Start: weit außerhalb des Bildschirms (oben links, über der Navbar)
+          pivot.position.set(ax*(1-e), ay*(1-e), -1.8+3.4*e); // fliegt von außen ins Bild herein
+          pivot.scale.setScalar(small+(bigScale-small)*e);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
-          pivot.rotation.x=e*INTRO_TUMBLE*Math.PI*2;   // gleichzeitig oben/unten
+          pivot.rotation.x=CROWN_TILT;                     // man schaut frontal in die Krone
           if(stageEl)stageEl.style.opacity=String(clamp(t/0.15,0,1));
         } else {
-          // Phase 2 – am Platz angekommen: jetzt auf Originalgröße schrumpfen
-          const t=clamp((el-FALL_DUR)/SHRINK_DUR,0,1), e=easeOut(t);
-          pivot.position.set(restX,restY,0); pivot.rotation.x=0;
+          // Phase 2 – aufrichten und auf seinen Platz gleiten (frontal, rechts)
+          const t=clamp((el-APPROACH_DUR)/SETTLE_DUR,0,1), e=easeInOut(t);
+          pivot.position.set(restX*e, restY*e, 1.6*(1-e));
           pivot.scale.setScalar(bigScale+(restScale-bigScale)*e);
+          pivot.rotation.x=CROWN_TILT*(1-e);               // Krone richtet sich zur Frontale auf
           curRotY+=spinVel; pivot.rotation.y=curRotY;
           if(t>=1){ introDone=true; revealRest(); } // erst jetzt erscheint der Rest
         }
