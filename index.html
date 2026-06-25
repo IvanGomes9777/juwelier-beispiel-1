@@ -414,7 +414,7 @@ try{
 
   // ===== Animations-Status: Ring kommt mit der Krone voran auf die Kamera zu, richtet sich dann auf seinen Platz =====
   let pivot=null, introStart=null, introDone=false;
-  const APPROACH_DUR=1500;       // Krone voran auf die Kamera zu (klein/fern -> groß/nah)
+  const APPROACH_DUR=2300;       // Krone voran auf die Kamera zu (klein/fern -> groß/nah) — länger sichtbarer Einflug
   const SETTLE_DUR=950;          // danach: aufrichten und auf seinen Platz gleiten
   const CROWN_TILT=1.45;         // Kippung, sodass man frontal in die Krone schaut (rad)
   const INTRO_SPINS=0.75;        // sanfte Y-Drehung währenddessen
@@ -505,7 +505,7 @@ try{
         if(el<APPROACH_DUR){
           // Phase 1 – die Krone voran auf die Kamera zu: klein/fern -> groß/nah
           const t=clamp(el/APPROACH_DUR,0,1), e=easeOut(t);
-          const ax=-vHalfW*1.85, ay=vHalfH*1.6;            // Start: weit außerhalb des Bildschirms (oben links, über der Navbar)
+          const ax=-vHalfW*3.0, ay=vHalfH*2.4;             // Start: weit außerhalb des Bildschirms (oben links, über der Navbar)
           pivot.position.set(ax*(1-e), ay*(1-e), -1.8+3.4*e); // fliegt von außen ins Bild herein
           pivot.scale.setScalar(small+(bigScale-small)*e);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
