@@ -398,9 +398,10 @@ try{
 
   // ===== Animations-Status: Ring fällt schräg von oben links an seinen Platz =====
   let pivot=null, introStart=null, introDone=false;
-  const FALL_DUR=1500;           // Dauer des Falls von oben (ms) — Ring bleibt groß
-  const SHRINK_DUR=650;          // danach: am Platz auf Originalgröße schrumpfen
-  const INTRO_SPINS=1.0;         // ganze Umdrehung während des Falls -> landet frontal
+  const FALL_DUR=2700;           // Dauer des Falls von oben (ms) — langsamer, Ring bleibt groß
+  const SHRINK_DUR=750;          // danach: am Platz auf Originalgröße schrumpfen
+  const INTRO_SPINS=1.0;         // ganze Y-Umdrehung (links/rechts) -> landet frontal
+  const INTRO_TUMBLE=1.0;        // ganze X-Umdrehung (oben/unten) gleichzeitig -> landet eben
   // werden in fit() formatabhängig berechnet:
   let maxDim=1, restScale=1, bigScale=1;
   let restX=0, restY=0.05, startX=-1, startY=2.4;
@@ -424,15 +425,15 @@ try{
     if(wide){ // Desktop: prominent rechts
       fitUnits=Math.min(halfW*2*0.78, halfH*2*0.52);
       restX=Math.min(halfW*0.40,1.25); restY=0.05;
-    } else {  // Mobil: schmaler & in der unteren Hälfte, damit der Text oben Platz hat
-      fitUnits=Math.min(halfW*2*0.64, halfH*2*0.40);
-      restX=0; restY=-halfH*0.48;
+    } else {  // Mobil: schmaler & tiefer, damit Text + Button oben Platz haben
+      fitUnits=Math.min(halfW*2*0.58, halfH*2*0.36);
+      restX=0; restY=-halfH*0.62;
     }
     restScale=fitUnits/maxDim;
     // großer Ring beim Fall: 45% größer, aber nie breiter als 96% der Ansicht (kein Abschneiden)
     bigScale=Math.min(restScale*1.45, (halfW*2*0.96)/maxDim);
-    startX = wide ? -halfW*0.45 : -halfW*0.22;        // von oben (Navbar-Seite), leicht links
-    startY = halfH + bigScale*maxDim*0.6;             // von ganz oben, über dem Rand
+    startX = wide ? -halfW*0.7 : -halfW*0.6;           // aus der oberen linken Ecke
+    startY = halfH + bigScale*maxDim*0.7;              // von ganz oben, über dem Rand
   }
   window.addEventListener('resize',fit); fit(); setTimeout(fit,150);
 
@@ -482,16 +483,17 @@ try{
       if(!reduce && introStart!==null && !introDone){
         const el=performance.now()-introStart;
         if(el<FALL_DUR){
-          // Phase 1 – Fall: von ganz oben (Navbar-Seite) groß an seinen Platz
+          // Phase 1 – Fall: groß aus der oberen linken Ecke, dabei taumelnd (X+Y)
           const t=clamp(el/FALL_DUR,0,1), e=easeInOut(t);
           pivot.position.set(startX+(restX-startX)*e, startY+(restY-startY)*e, 0);
           pivot.scale.setScalar(bigScale);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
+          pivot.rotation.x=e*INTRO_TUMBLE*Math.PI*2;   // gleichzeitig oben/unten
           if(stageEl)stageEl.style.opacity=String(clamp(t/0.15,0,1));
         } else {
           // Phase 2 – am Platz angekommen: jetzt auf Originalgröße schrumpfen
           const t=clamp((el-FALL_DUR)/SHRINK_DUR,0,1), e=easeOut(t);
-          pivot.position.set(restX,restY,0);
+          pivot.position.set(restX,restY,0); pivot.rotation.x=0;
           pivot.scale.setScalar(bigScale+(restScale-bigScale)*e);
           curRotY+=spinVel; pivot.rotation.y=curRotY;
           if(t>=1){ introDone=true; revealRest(); } // erst jetzt erscheint der Rest
