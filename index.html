@@ -416,7 +416,7 @@ try{
   let pivot=null, introStart=null, introDone=false;
   const APPROACH_DUR=1500;       // Krone voran auf die Kamera zu (klein/fern -> groß/nah)
   const SETTLE_DUR=950;          // danach: aufrichten und auf seinen Platz gleiten
-  const CROWN_TILT=1.3;          // Kippung, sodass man frontal in die Krone schaut (rad)
+  const CROWN_TILT=1.45;         // Kippung, sodass man frontal in die Krone schaut (rad)
   const INTRO_SPINS=0.75;        // sanfte Y-Drehung währenddessen
   const SMALL_FACTOR=0.34;       // Startgröße (klein/fern) relativ zur Ruhegröße
   // werden in fit() formatabhängig berechnet:
@@ -447,8 +447,8 @@ try{
       restX=0; restY=-halfH*0.62;
     }
     restScale=fitUnits/maxDim;
-    // großer Ring beim Fall: 45% größer, aber nie breiter als 96% der Ansicht (kein Abschneiden)
-    bigScale=Math.min(restScale*1.45, (halfW*2*0.96)/maxDim);
+    // Peak im Anflug: Krone kommt nah ran (mit z-Perspektive eingerechnet), bleibt randsicher
+    bigScale=Math.min(restScale*1.55, (halfW*2*0.96)/(maxDim*1.5));
     startX = wide ? -halfW*0.7 : -halfW*0.6;           // aus der oberen linken Ecke
     startY = halfH + bigScale*maxDim*0.7;              // von ganz oben, über dem Rand
   }
@@ -464,7 +464,7 @@ try{
     root.position.sub(center);
     pivot.add(root);
     fit(); // restScale/bigScale/Positionen mit echtem maxDim berechnen
-    if(!reduce){ pivot.scale.setScalar(restScale*SMALL_FACTOR); pivot.position.set(0,0,-1.5); pivot.rotation.x=CROWN_TILT; if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
+    if(!reduce){ pivot.scale.setScalar(restScale*SMALL_FACTOR); pivot.position.set(0,0,-1.8); pivot.rotation.x=CROWN_TILT; if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
     else { pivot.scale.setScalar(restScale); pivot.position.set(restX,restY,0); revealRest(); }
     scene.add(pivot);
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
@@ -503,7 +503,7 @@ try{
         if(el<APPROACH_DUR){
           // Phase 1 – die Krone voran auf die Kamera zu: klein/fern -> groß/nah
           const t=clamp(el/APPROACH_DUR,0,1), e=easeOut(t);
-          pivot.position.set(0, 0.12*(1-e), -1.5+1.9*e);   // kommt aus der Tiefe entgegen
+          pivot.position.set(0, 0.12*(1-e), -1.8+3.4*e);   // kommt aus der Tiefe näher heran
           pivot.scale.setScalar(small+(bigScale-small)*e);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
           pivot.rotation.x=CROWN_TILT;                     // man schaut frontal in die Krone
@@ -511,7 +511,7 @@ try{
         } else {
           // Phase 2 – aufrichten und auf seinen Platz gleiten (frontal, rechts)
           const t=clamp((el-APPROACH_DUR)/SETTLE_DUR,0,1), e=easeInOut(t);
-          pivot.position.set(restX*e, restY*e, 0.4*(1-e));
+          pivot.position.set(restX*e, restY*e, 1.6*(1-e));
           pivot.scale.setScalar(bigScale+(restScale-bigScale)*e);
           pivot.rotation.x=CROWN_TILT*(1-e);               // Krone richtet sich zur Frontale auf
           curRotY+=spinVel; pivot.rotation.y=curRotY;
