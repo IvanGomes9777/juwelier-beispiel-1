@@ -422,6 +422,7 @@ try{
   // werden in fit() formatabhängig berechnet:
   let maxDim=1, restScale=1, bigScale=1;
   let restX=0, restY=0.05, startX=-1, startY=2.4;
+  let vHalfW=3, vHalfH=1.8;       // aktuelle halbe Sichtfeld-Maße (für den Anflug aus der Ecke)
   let curRotY=0, curRotX=0, dragging=false, lastX=0, lastY=0;
   const spinVel=reduce?0:0.0045; // sanftes Weiterdrehen im Ruhezustand
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
@@ -437,6 +438,7 @@ try{
     renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
     const halfH=Math.tan((42*Math.PI/180)/2)*camera.position.z; // halbe sichtbare Höhe (Weltkoord.)
     const halfW=halfH*(w/h);
+    vHalfW=halfW; vHalfH=halfH;
     const wide=(w/h)>1;
     let fitUnits;
     if(wide){ // Desktop: prominent rechts
@@ -503,7 +505,8 @@ try{
         if(el<APPROACH_DUR){
           // Phase 1 – die Krone voran auf die Kamera zu: klein/fern -> groß/nah
           const t=clamp(el/APPROACH_DUR,0,1), e=easeOut(t);
-          pivot.position.set(0, 0.12*(1-e), -1.8+3.4*e);   // kommt aus der Tiefe näher heran
+          const ax=-vHalfW*0.95, ay=vHalfH*0.75;           // Start: obere linke Ecke
+          pivot.position.set(ax*(1-e), ay*(1-e), -1.8+3.4*e); // fliegt aus der linken Ecke heran
           pivot.scale.setScalar(small+(bigScale-small)*e);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
           pivot.rotation.x=CROWN_TILT;                     // man schaut frontal in die Krone
