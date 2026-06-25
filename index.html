@@ -505,8 +505,8 @@ try{
         if(el<APPROACH_DUR){
           // Phase 1 – die Krone voran auf die Kamera zu: klein/fern -> groß/nah
           const t=clamp(el/APPROACH_DUR,0,1), e=easeOut(t);
-          const ax=-vHalfW*0.95, ay=vHalfH*0.75;           // Start: obere linke Ecke
-          pivot.position.set(ax*(1-e), ay*(1-e), -1.8+3.4*e); // fliegt aus der linken Ecke heran
+          const ax=-vHalfW*1.85, ay=vHalfH*1.6;            // Start: weit außerhalb des Bildschirms (oben links, über der Navbar)
+          pivot.position.set(ax*(1-e), ay*(1-e), -1.8+3.4*e); // fliegt von außen ins Bild herein
           pivot.scale.setScalar(small+(bigScale-small)*e);
           curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
           pivot.rotation.x=CROWN_TILT;                     // man schaut frontal in die Krone
