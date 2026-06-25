@@ -408,7 +408,7 @@ try{
   // werden in fit() formatabhängig berechnet:
   let maxDim=1, restScale=1, bigScale=1;
   let restX=0, restY=0.05, startX=-1, startY=2.4;
-  let curRotY=0, dragging=false, lastX=0;
+  let curRotY=0, curRotX=0, dragging=false, lastX=0, lastY=0;
   const spinVel=reduce?0:0.0045; // sanftes Weiterdrehen im Ruhezustand
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   const easeInOut=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
@@ -472,8 +472,8 @@ try{
   }));
 
   // Drag zum Drehen (Ring rotiert um eigene Achse; erst nach der Landung)
-  canvas.addEventListener('pointerdown',e=>{ if(!introDone)return; dragging=true; lastX=e.clientX; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
-  canvas.addEventListener('pointermove',e=>{ if(!dragging)return; curRotY+=(e.clientX-lastX)*0.01; lastX=e.clientX; });
+  canvas.addEventListener('pointerdown',e=>{ if(!introDone)return; dragging=true; lastX=e.clientX; lastY=e.clientY; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
+  canvas.addEventListener('pointermove',e=>{ if(!dragging)return; curRotY+=(e.clientX-lastX)*0.01; curRotX+=(e.clientY-lastY)*0.01; lastX=e.clientX; lastY=e.clientY; });
   const endDrag=()=>{ dragging=false; };
   canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag); canvas.addEventListener('pointerleave',endDrag);
 
@@ -502,10 +502,10 @@ try{
           if(t>=1){ introDone=true; revealRest(); } // erst jetzt erscheint der Rest
         }
       } else {
-        // Ruhezustand: an seinem Platz, dreht sich sanft weiter (oder per Drag)
+        // Ruhezustand: an seinem Platz; frei in alle Richtungen drehbar (X+Y), dreht sonst sanft weiter
         pivot.position.set(restX,restY,0);
         if(!dragging) curRotY+=spinVel;
-        pivot.rotation.y=curRotY;
+        pivot.rotation.y=curRotY; pivot.rotation.x=curRotX;
       }
     }
     renderer.render(scene,camera);
