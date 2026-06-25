@@ -102,7 +102,8 @@
      damit der Ring frei groß auftauchen und fallen kann, ohne abgeschnitten zu werden */
   .stage{pointer-events:none}
   .hero>.stage{position:absolute;inset:0;width:auto;z-index:0}
-  @media(max-width:900px){.hero>.stage{position:relative;inset:auto;width:100%;height:58vh}}
+  /* Mobil: Canvas bleibt vollflächig über der ganzen Hero-Section, Text rückt nach oben */
+  @media(max-width:900px){.hero{align-items:start}}
   /* Card entfernt — nur noch der frei schwebende Ring */
   .ringstage{position:relative;width:100%;height:100%}
   #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;cursor:grab;pointer-events:auto}
@@ -396,32 +397,42 @@ try{
   camera.lookAt(0,0,0);
 
   // ===== Animations-Status: Ring fällt schräg von oben links an seinen Platz =====
-  let pivot=null, baseScale=1, introStart=null, introDone=false;
-  const INTRO_DUR=2400;          // Dauer des Falls (ms)
-  const INTRO_SPINS=1.0;         // ganze Umdrehung -> landet frontal (Diamant nach vorn)
-  const INTRO_START_SCALE=1.3;   // etwas größer starten -> auf Originalgröße
-  // Positionen werden je nach Format in fit() gesetzt:
-  let restX=0, restY=0.05;       // Ruheplatz (Desktop: rechts)
-  let startX=-1.9, startY=2.4;   // Startpunkt: oben links, so hoch wie möglich
+  let pivot=null, introStart=null, introDone=false;
+  const FALL_DUR=1500;           // Dauer des Falls von oben (ms) — Ring bleibt groß
+  const SHRINK_DUR=650;          // danach: am Platz auf Originalgröße schrumpfen
+  const INTRO_SPINS=1.0;         // ganze Umdrehung während des Falls -> landet frontal
+  // werden in fit() formatabhängig berechnet:
+  let maxDim=1, restScale=1, bigScale=1;
+  let restX=0, restY=0.05, startX=-1, startY=2.4;
   let curRotY=0, dragging=false, lastX=0;
   const spinVel=reduce?0:0.0045; // sanftes Weiterdrehen im Ruhezustand
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   const easeInOut=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+  const easeOut=t=>1-Math.pow(1-t,3);
   const stageEl=document.querySelector('.stage');
   function revealRest(){ document.body.classList.add('intro-done'); }
   // Sicherheits-Fallback: Inhalt erscheint auch, falls der Ring nicht lädt
-  setTimeout(revealRest,7000);
+  setTimeout(revealRest,8000);
 
   function fit(){
     const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;
     renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
-    const halfH=Math.tan((42*Math.PI/180)/2)*camera.position.z; // sichtbare halbe Höhe in Weltkoordinaten
+    const halfH=Math.tan((42*Math.PI/180)/2)*camera.position.z; // halbe sichtbare Höhe (Weltkoord.)
     const halfW=halfH*(w/h);
     const wide=(w/h)>1;
-    restX = wide ? Math.min(halfW*0.38,1.2) : 0;   // Desktop: rechts, Mobil: mittig
-    restY = 0.05;
-    startX = wide ? -halfW*0.85 : -halfW*0.5;       // schräg von links
-    startY = halfH + 0.8;                            // so weit oben wie möglich (über dem Rand)
+    let fitUnits;
+    if(wide){ // Desktop: prominent rechts
+      fitUnits=Math.min(halfW*2*0.78, halfH*2*0.52);
+      restX=Math.min(halfW*0.40,1.25); restY=0.05;
+    } else {  // Mobil: schmaler & in der unteren Hälfte, damit der Text oben Platz hat
+      fitUnits=Math.min(halfW*2*0.64, halfH*2*0.40);
+      restX=0; restY=-halfH*0.48;
+    }
+    restScale=fitUnits/maxDim;
+    // großer Ring beim Fall: 45% größer, aber nie breiter als 96% der Ansicht (kein Abschneiden)
+    bigScale=Math.min(restScale*1.45, (halfW*2*0.96)/maxDim);
+    startX = wide ? -halfW*0.45 : -halfW*0.22;        // von oben (Navbar-Seite), leicht links
+    startY = halfH + bigScale*maxDim*0.6;             // von ganz oben, über dem Rand
   }
   window.addEventListener('resize',fit); fit(); setTimeout(fit,150);
 
@@ -430,13 +441,13 @@ try{
     const root=gltf.scene;
     const box=new THREE.Box3().setFromObject(root);
     const size=box.getSize(new THREE.Vector3()), center=box.getCenter(new THREE.Vector3());
-    const maxDim=Math.max(size.x,size.y,size.z)||1;
+    maxDim=Math.max(size.x,size.y,size.z)||1;
     pivot=new THREE.Group();
     root.position.sub(center);
     pivot.add(root);
-    baseScale=1.7/maxDim;
-    if(!reduce){ pivot.scale.setScalar(baseScale*INTRO_START_SCALE); pivot.position.set(startX,startY,0); if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
-    else { pivot.scale.setScalar(baseScale); pivot.position.set(restX,restY,0); revealRest(); }
+    fit(); // restScale/bigScale/Positionen mit echtem maxDim berechnen
+    if(!reduce){ pivot.scale.setScalar(bigScale); pivot.position.set(startX,startY,0); if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
+    else { pivot.scale.setScalar(restScale); pivot.position.set(restX,restY,0); revealRest(); }
     scene.add(pivot);
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
       ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
@@ -469,14 +480,22 @@ try{
     if(!run){raf=0;return;}
     if(pivot){
       if(!reduce && introStart!==null && !introDone){
-        // Fall: schräg von oben links -> Ruheplatz; dreht sich dabei
-        const t=clamp((performance.now()-introStart)/INTRO_DUR,0,1);
-        const e=easeInOut(t);
-        pivot.position.set(startX+(restX-startX)*e, startY+(restY-startY)*e, 0);
-        pivot.scale.setScalar(baseScale*(INTRO_START_SCALE+(1-INTRO_START_SCALE)*e));
-        curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
-        if(stageEl)stageEl.style.opacity=String(clamp(t/0.18,0,1)); // sanft auftauchen
-        if(t>=1){ introDone=true; if(stageEl)stageEl.style.opacity='1'; revealRest(); }
+        const el=performance.now()-introStart;
+        if(el<FALL_DUR){
+          // Phase 1 – Fall: von ganz oben (Navbar-Seite) groß an seinen Platz
+          const t=clamp(el/FALL_DUR,0,1), e=easeInOut(t);
+          pivot.position.set(startX+(restX-startX)*e, startY+(restY-startY)*e, 0);
+          pivot.scale.setScalar(bigScale);
+          curRotY=e*INTRO_SPINS*Math.PI*2; pivot.rotation.y=curRotY;
+          if(stageEl)stageEl.style.opacity=String(clamp(t/0.15,0,1));
+        } else {
+          // Phase 2 – am Platz angekommen: jetzt auf Originalgröße schrumpfen
+          const t=clamp((el-FALL_DUR)/SHRINK_DUR,0,1), e=easeOut(t);
+          pivot.position.set(restX,restY,0);
+          pivot.scale.setScalar(bigScale+(restScale-bigScale)*e);
+          curRotY+=spinVel; pivot.rotation.y=curRotY;
+          if(t>=1){ introDone=true; revealRest(); } // erst jetzt erscheint der Rest
+        }
       } else {
         // Ruhezustand: an seinem Platz, dreht sich sanft weiter (oder per Drag)
         pivot.position.set(restX,restY,0);
