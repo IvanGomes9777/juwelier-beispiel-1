@@ -70,15 +70,13 @@
   }
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms !important;animation:none !important;scroll-behavior:auto !important}}
 
-  .reveal{position:fixed;inset:0;z-index:500;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}
-  .reveal .col{background:var(--panel);transform-origin:top;animation:revcol .85s var(--ease) forwards;animation-delay:calc(.55s + var(--i)*.07s)}
-  @keyframes revcol{from{transform:scaleY(1)}to{transform:scaleY(0)}}
-  .reveal .mark{position:absolute;inset:0;display:grid;place-items:center;font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(2rem,7vw,4.2rem);letter-spacing:.42em;color:var(--fg);padding-left:.42em;animation:revmark 1.15s var(--ease) forwards}
-  @keyframes revmark{0%{opacity:0;letter-spacing:.6em}28%{opacity:1;letter-spacing:.42em}72%{opacity:1}100%{opacity:0}}
-  .rise{opacity:0;animation:rise .9s var(--ease) forwards;animation-delay:1.15s}
-  .rise.d1{animation-delay:1.25s}.rise.d2{animation-delay:1.35s}.rise.d3{animation-delay:1.45s}
+  /* Intro: Seite startet blank, Inhalt blendet ein, WÄHREND der Ring an seinen Platz fliegt */
+  .rise{opacity:0;animation:rise 1s var(--ease) forwards;animation-delay:.6s}
+  .rise.d1{animation-delay:.9s}.rise.d2{animation-delay:1.2s}.rise.d3{animation-delay:1.5s}
   @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.reveal{display:none}.rise{opacity:1;animation:none}}
+  .fadein{opacity:0;animation:fadein 1.2s var(--ease) forwards;animation-delay:.5s}
+  @keyframes fadein{to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.rise{opacity:1;animation:none}.fadein{opacity:1;animation:none}}
 
   .hero{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,4vw,60px);
     padding:clamp(90px,12vh,120px) clamp(24px,5vw,70px) 60px;overflow:hidden}
@@ -114,6 +112,8 @@
   .hero>*{position:relative;z-index:1}
   @media (prefers-reduced-motion:reduce){.hero-wrap{height:auto}.hero{position:relative;height:auto;min-height:100vh}}
   @media (max-width:900px){.hero-wrap{height:auto}.hero{position:relative;height:auto;min-height:100vh}}
+  /* Überblend-Veil für den Scroll-Zoom: in den Ring zoomen -> verblenden -> nächste Section */
+  .zoomveil{position:fixed;inset:0;z-index:85;background:var(--bg);opacity:0;visibility:hidden;pointer-events:none}
   .hero.bg-verlauf{background:radial-gradient(58vmin 58vmin at 70% 38%,color-mix(in srgb,var(--accent) 12%,#ffffff),transparent 60%),linear-gradient(160deg,#F8F9FB,#E6E9ED)}
   .hero.bg-spot{background:radial-gradient(48vmin 48vmin at 68% 42%,#ffffff,#E4E7EB 55%,#D3D7DD 100%)}
   .hero.bg-spot::after{content:"";position:absolute;inset:0;z-index:0;box-shadow:inset 0 0 22vmin rgba(20,24,30,.2);pointer-events:none}
@@ -199,8 +199,8 @@
   .bk-done h3{font-family:"Fraunces",serif;font-weight:600;font-size:1.6rem;margin:0 0 8px;color:var(--fg)}
   .bk-done p{color:var(--muted);margin:0 0 22px}
   @media (prefers-reduced-motion:reduce){.bk,.bkscrim,.bk-panel,.bk-submit{transition:none} .bk-panel{transform:none}}
-</style></head><body><div class="reveal" aria-hidden="true"><span class="mark">VEYRA</span><div class="col" style="--i:0"></div><div class="col" style="--i:1"></div><div class="col" style="--i:2"></div><div class="col" style="--i:3"></div><div class="col" style="--i:4"></div><div class="col" style="--i:5"></div></div>
-<aside class="sidebar" id="sidebar">
+</style></head><body><div class="zoomveil" id="zoomveil" aria-hidden="true"></div>
+<aside class="sidebar fadein" id="sidebar">
   <a class="brand" href="#">VEYRA<small>MAISON · DÜSSELDORF</small></a>
   <nav aria-label="Hauptnavigation">
     <button class="navitem" data-panel="schmuck" aria-haspopup="true" aria-expanded="false">Schmuck <span class="car" aria-hidden="true">&#8594;</span></button>
@@ -257,7 +257,7 @@
   </div>
   <div class="rcol"><div class="preview"><img id="previewImg" src="" alt="Vorschau" /></div><div class="pcap"><em id="capKicker"></em><b id="capTitle"></b></div></div>
 </div>
-<header class="topbar"><a class="brand" href="#">VEYRA</a><button id="ovlOpen" aria-expanded="false" aria-controls="ovl"><span class="dot"></span> Menü</button></header>
+<header class="topbar fadein"><a class="brand" href="#">VEYRA</a><button id="ovlOpen" aria-expanded="false" aria-controls="ovl"><span class="dot"></span> Menü</button></header>
 <div class="ovl" id="ovl" aria-hidden="true">
   <div class="x"><span class="brand" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;letter-spacing:.2em;color:var(--fg)">VEYRA</span><button id="ovlClose" aria-label="Schließen">&times;</button></div>
   <div class="grp"><div class="glabel"><a href="#">Schmuck</a></div><div class="links"><a href="#">Ringe</a><a href="#">Halsketten</a><a href="#">Ohrringe</a><a href="#">Armbänder</a></div></div>
@@ -266,7 +266,7 @@
   <div class="grp"><div class="glabel"><a href="#">Atelier</a></div></div>
   <div class="grp"><div class="glabel"><a href="#">Maison</a></div></div>
 </div>
-<div class="main"><div class="hero-wrap"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage rise d2"><div class="ringstage"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
+<div class="main"><div class="hero-wrap"><section class="hero bg-spot" id="hero"><div class="kin"><p class="eb rise">Maison Veyra · Atelier</p><h1 class="rise d1">Schmuck,<br><span class="hl2">der <span class="scr" id="scr">bleibt</span>.</span></h1><p class="lead rise d2">Ihr Ring in echtem 3D — ziehen zum Drehen, Metall live wählen.</p><div class="picker rise d2"><span class="pt">Metall</span><div class="sw" id="sw" role="group" aria-label="Metall"><button data-tint="#F3D08A" data-word="#A87F1E" aria-pressed="false" aria-label="Gelbgold" style="background:radial-gradient(circle at 35% 30%,#f6dc97,#c99a4e)"><span class="nm">Gelbgold</span></button><button data-tint="#EDEFF2" data-word="#5E6B78" aria-pressed="true" aria-label="Weißgold" style="background:radial-gradient(circle at 35% 30%,#f4f6f9,#b9c0cc)"><span class="nm">Weißgold</span></button><button data-tint="#F0C3AE" data-word="#B26A58" aria-pressed="false" aria-label="Roségold" style="background:radial-gradient(circle at 35% 30%,#edc9b8,#c98e76)"><span class="nm">Roségold</span></button><button data-tint="#E8ECF0" data-word="#566373" aria-pressed="false" aria-label="Platin" style="background:radial-gradient(circle at 35% 30%,#eaecef,#9098a2)"><span class="nm">Platin</span></button></div></div><a class="cta rise d3" href="#">Jetzt konfigurieren</a></div><div class="stage"><div class="ringstage"><div class="floor"></div><canvas id="ringcanvas"></canvas><div class="fallback" id="fallback"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80&auto=format&fit=crop" alt="Diamantring" /></div><div class="loadnote" id="loadnote">Ring wird geladen …</div></div></div></section></div><section class="coll" id="kollektionen" aria-labelledby="coll-title"><div class="head"><p class="eb">№ 02 — Kollektionen</p><h2 id="coll-title">Vier Welten, <em>ein Haus</em>.</h2><p class="intro">Von der Verlobung bis zur Vitrine. Trauringe nach Maß, feine Uhren und Schmuck von Rang — aus dem Atelier am Rhein.</p></div><div class="grid"><a class="item" href="#"><img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1100&q=80&auto=format&fit=crop" alt="Trauringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Trauringe</h3><span class="chips"><span class="chip">nach Maß</span><span class="chip">Gelb-/Weißgold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=1100&q=80&auto=format&fit=crop" alt="Verlobungsringe" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Verlobungsringe</h3><span class="chips"><span class="chip">Solitaire</span><span class="chip">ab 2.400 €</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1100&q=80&auto=format&fit=crop" alt="Feine Uhren" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Feine Uhren</h3><span class="chips"><span class="chip">Automatik</span><span class="chip">Manufaktur</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1100&q=80&auto=format&fit=crop" alt="Halsschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Halsschmuck</h3><span class="chips"><span class="chip">Rivière</span><span class="chip">750 Gold</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=1100&q=80&auto=format&fit=crop" alt="Ohrschmuck" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Ohrschmuck</h3><span class="chips"><span class="chip">Lumière</span><span class="chip">Brillant</span></span></span></a><a class="item" href="#"><img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=1100&q=80&auto=format&fit=crop" alt="Diamanten" loading="lazy" /><span class="veil"></span><span class="go" aria-hidden="true">&#8594;</span><span class="meta"><h3>Diamanten</h3><span class="chips"><span class="chip">zertifiziert</span><span class="chip">lupenrein</span></span></span></a></div><div class="more"><a href="#">Alle Kollektionen ansehen &#8594;</a></div></section><footer class="site"><div class="fi"><span class="wm">VEYRA</span><span class="cp">Königsallee · Düsseldorf · © 2026 Maison Veyra</span></div></footer></div>
 <div class="bkscrim" id="bkScrim" hidden></div>
 <div class="bk" id="bkModal" role="dialog" aria-modal="true" aria-labelledby="bkTitle" aria-describedby="bkSub" hidden>
   <div class="bk-panel">
@@ -397,17 +397,20 @@ try{
   controls.autoRotate=!reduce; controls.autoRotateSpeed=1.4;
   controls.target.set(0,0,0);
 
-  // ===== Animations-Status: Intro-Flyin + Scroll-Zoom =====
+  // ===== Animations-Status: Intro-Anflug + Scroll-Zoom mit Überblendung =====
   let pivot=null, baseScale=1, introStart=null;
-  const INTRO_DUR=1500;      // Dauer Reinflug (ms)
-  const INTRO_BIG=3.2;       // Startgröße: erst ganz groß
-  const ZOOM_MAX=5.0;        // wie stark beim Scrollen in den Ring gezoomt wird
+  const INTRO_DUR=2800;      // Dauer des Anflugs (ms) — langsam an seinen Platz
+  const INTRO_SPINS=2.0;     // volle Umdrehungen während des Anflugs
+  const INTRO_START_SCALE=0.32; // klein starten und an seinen Platz wachsen
+  const INTRO_DROP=0.9;      // von leicht oberhalb nach unten an seinen Platz
+  const ZOOM_MAX=7.0;        // wie stark beim Scrollen in den Ring gezoomt wird
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   const easeOutCubic=t=>1-Math.pow(1-t,3);
   const heroWrap=document.querySelector('.hero-wrap');
   const kin=document.querySelector('.kin');
   const stageEl=document.querySelector('.stage');
-  const heroEl=document.getElementById('hero');
+  const veil=document.getElementById('zoomveil');
+  const coll=document.getElementById('kollektionen');
   function scrollP(){
     if(reduce||!heroWrap)return 0;
     const total=heroWrap.offsetHeight-window.innerHeight;
@@ -429,9 +432,10 @@ try{
     root.position.sub(center);
     pivot.add(root);
     baseScale=2.2/maxDim;
-    pivot.scale.setScalar(baseScale*(reduce?1:INTRO_BIG));
+    if(!reduce){ pivot.scale.setScalar(baseScale*INTRO_START_SCALE); pivot.position.y=INTRO_DROP; controls.autoRotate=false; }
+    else { pivot.scale.setScalar(baseScale); }
     scene.add(pivot);
-    introStart=performance.now(); // Reinflug startet, sobald der Ring geladen ist
+    introStart=performance.now(); // Anflug startet, sobald der Ring geladen ist
     root.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
       ms.forEach(m=>{ m.envMapIntensity=1.5; if('metalness' in m && m.metalness<0.5) m.metalness=0.9; metals.push(m); }); }});
     // Standard-Metall (Weißgold) direkt anwenden
@@ -456,22 +460,30 @@ try{
     raf=requestAnimationFrame(loop);
     if(!run){raf=0;return;}
     if(pivot){
-      // Intro-Reinflug: erst ganz groß (INTRO_BIG) -> auf Normalgröße
-      let introFactor=1;
+      // Anflug: klein & oberhalb -> wächst rotierend an seinen Platz
+      let introFactor=1, intro=1;
       if(!reduce && introStart!==null){
         const t=clamp((performance.now()-introStart)/INTRO_DUR,0,1);
-        introFactor=INTRO_BIG+(1-INTRO_BIG)*easeOutCubic(t);
+        intro=easeOutCubic(t);
+        introFactor=INTRO_START_SCALE+(1-INTRO_START_SCALE)*intro;
+        pivot.position.y=INTRO_DROP*(1-intro);
+        pivot.rotation.y=intro*INTRO_SPINS*Math.PI*2; // dreht sich, verzögert auslaufend
+        if(t>=1 && !controls.autoRotate){ pivot.rotation.y=0; controls.autoRotate=true; }
       }
       // Scroll-Zoom: beim Runterscrollen in den Ring hineinzoomen
       const p=scrollP();
-      const zoomFactor=1+p*ZOOM_MAX;
+      const zoomFactor=1+clamp(p/0.7,0,1)*ZOOM_MAX;
       pivot.scale.setScalar(baseScale*introFactor*zoomFactor);
-      // Texte ausblenden, dann Ring, dann Hero -> neue Section beginnt
-      if(kin)kin.style.opacity=String(1-clamp(p/0.4,0,1));
-      if(stageEl)stageEl.style.opacity=String(1-clamp((p-0.7)/0.3,0,1));
-      if(heroEl)heroEl.style.opacity=String(1-clamp((p-0.85)/0.15,0,1));
+      // Texte zuerst ausblenden, Ring etwas später
+      if(kin)kin.style.opacity=String(1-clamp(p/0.35,0,1));
+      if(stageEl)stageEl.style.opacity=String(1-clamp((p-0.55)/0.35,0,1));
+      // Überblendung: in den Ring zoomen -> Veil deckt ab -> beim Weiterscrollen erscheint die neue Section
+      let veilO=0;
+      if(p<1){ veilO=clamp((p-0.5)/0.5,0,1); }
+      else if(coll){ veilO=clamp(coll.getBoundingClientRect().top/window.innerHeight,0,1); }
+      if(veil){ veil.style.opacity=String(veilO); veil.style.visibility=veilO>0.002?'visible':'hidden'; }
       // während des Scroll-Zooms nicht automatisch drehen
-      controls.autoRotate=!reduce && p<0.04;
+      if(intro>=1) controls.autoRotate=!reduce && p<0.04;
     }
     controls.update();
     renderer.render(scene,camera);
