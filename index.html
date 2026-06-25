@@ -98,10 +98,14 @@
   .sw button .nm{position:absolute;top:56px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.66rem;letter-spacing:.04em;color:var(--muted)}
   .cta{display:inline-flex;align-items:center;min-height:52px;padding:0 30px;border-radius:999px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;background:var(--accent);color:var(--on-accent);margin-top:34px;transition:background var(--t)}
 
-  .stage{position:relative;justify-self:center;width:min(82vw,480px);aspect-ratio:1/1}
+  /* Ring-Bühne: hoher, großer Bereich (volle Hero-Höhe) statt quadratischem Kasten,
+     damit der Ring frei groß auftauchen und fallen kann, ohne abgeschnitten zu werden */
+  .stage{pointer-events:none}
+  .hero>.stage{position:absolute;top:0;right:0;bottom:0;width:54%;z-index:0}
+  @media(max-width:900px){.hero>.stage{position:relative;top:auto;bottom:auto;right:auto;width:100%;height:58vh}}
   /* Card entfernt — nur noch der frei schwebende Ring */
   .ringstage{position:relative;width:100%;height:100%}
-  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;cursor:grab}
+  #ringcanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;touch-action:pan-y;cursor:grab;pointer-events:auto}
   #ringcanvas:active{cursor:grabbing}
   .ringstage .fallback{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
   .ringstage .fallback img{width:78%;height:78%;object-fit:contain;border-radius:18px;filter:drop-shadow(0 40px 60px rgba(20,24,30,.4))}
@@ -382,7 +386,7 @@ try{
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
   renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1;
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0.3,4);
+  const camera=new THREE.PerspectiveCamera(42,1,0.01,100); camera.position.set(0,0,4.8);
   const pmrem=new THREE.PMREMGenerator(renderer);
   scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
   const key=new THREE.PointLight(0xffffff,18,40,2); key.position.set(3,5,4); scene.add(key);
@@ -390,7 +394,7 @@ try{
 
   const controls=new OrbitControls(camera,canvas);
   // Zoom per Mausrad aus -> Seiten-Scroll triggert den Reinzoom in den Ring
-  controls.enablePan=false; controls.enableZoom=false; controls.minDistance=2.4; controls.maxDistance=6;
+  controls.enablePan=false; controls.enableZoom=false; controls.minDistance=3; controls.maxDistance=9;
   controls.enableDamping=true; controls.dampingFactor=0.08;
   controls.autoRotate=!reduce; controls.autoRotateSpeed=1.4;
   controls.target.set(0,0,0);
@@ -399,9 +403,9 @@ try{
   let pivot=null, baseScale=1, introStart=null, introDone=false;
   const INTRO_DUR=2400;        // Dauer des Anflugs (ms)
   const INTRO_SPINS=1.0;       // sanfte Umdrehungen während des Falls
-  const INTRO_START_SCALE=1.6; // größer auftauchen (noch erkennbar) -> auf Originalgröße schrumpfen
+  const INTRO_START_SCALE=1.5; // groß auftauchen -> auf Originalgröße schrumpfen
   const INTRO_FROM_X=0;        // mittig (horizontal)
-  const INTRO_FROM_Y=1.4;      // weiter oben starten -> fällt an seinen Platz
+  const INTRO_FROM_Y=1.0;      // weiter oben starten -> fällt an seinen Platz
   const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
   // gleichmäßige Beschleunigung+Abbremsen, damit die Bewegung über die ganze Dauer sichtbar ist
   const easeInOut=t=> t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
@@ -422,7 +426,7 @@ try{
     pivot=new THREE.Group();
     root.position.sub(center);
     pivot.add(root);
-    baseScale=2.2/maxDim;
+    baseScale=1.7/maxDim;
     if(!reduce){ pivot.scale.setScalar(baseScale*INTRO_START_SCALE); pivot.position.set(INTRO_FROM_X,INTRO_FROM_Y,0); controls.autoRotate=false; if(stageEl)stageEl.style.opacity='0'; introStart=performance.now(); }
     else { pivot.scale.setScalar(baseScale); revealRest(); }
     scene.add(pivot);
